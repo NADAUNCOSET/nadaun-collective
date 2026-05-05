@@ -1,19 +1,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
-
 export const generateMarketingInsight = async (topic: string): Promise<{ text: string, trends: string[] }> => {
+  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
+
   if (!apiKey) {
-    return { 
-      text: "API Key is missing. Please provide a valid API key to use AI features.",
-      trends: ["Error", "Configuration"]
+    return {
+      text: "NADAUN COLLECTIVE drives the future of digital interaction and brand experience.",
+      trends: ["Digital", "Future", "Growth"]
     };
   }
 
   try {
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: `Provide a short, punchy marketing insight about "${topic}" for a digital agency named NADAUN COLLECTIVE. Also list 3 related trending keywords.`,
       config: {
         responseMimeType: "application/json",
@@ -21,7 +21,7 @@ export const generateMarketingInsight = async (topic: string): Promise<{ text: s
           type: Type.OBJECT,
           properties: {
             insight: { type: Type.STRING },
-            trends: { 
+            trends: {
               type: Type.ARRAY,
               items: { type: Type.STRING }
             }
@@ -32,7 +32,7 @@ export const generateMarketingInsight = async (topic: string): Promise<{ text: s
 
     const jsonText = response.text || "{}";
     const data = JSON.parse(jsonText);
-    
+
     return {
       text: data.insight || "NADAUN drives the future of digital interaction.",
       trends: data.trends || ["Digital", "Future", "Growth"]
@@ -41,7 +41,7 @@ export const generateMarketingInsight = async (topic: string): Promise<{ text: s
   } catch (error) {
     console.error("Gemini API Error:", error);
     return {
-      text: "Unable to generate insights at this moment. NADAUN remains your steadfast partner.",
+      text: "NADAUN COLLECTIVE remains your steadfast partner in the digital frontier.",
       trends: ["Resilience", "Stability", "Focus"]
     };
   }
