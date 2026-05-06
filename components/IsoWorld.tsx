@@ -1,6 +1,6 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, useCursor, Environment, ContactShadows, Float, OrbitControls } from '@react-three/drei';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Html, useCursor, Environment, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { useSpring, animated } from '@react-spring/three';
 
@@ -156,15 +156,42 @@ const Building: React.FC<{ data: typeof UNIVERSE_DATA[0], onAiLabClick?: () => v
   );
 };
 
+// Mouse parallax camera — replaces OrbitControls entirely
+// Scroll events are no longer captured by the canvas
+const CameraController: React.FC = () => {
+  const { camera } = useThree();
+  const mouse = useRef({ x: 0, y: 0 });
+  const current = useRef({ x: 0, y: 5 });
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      mouse.current.x = e.clientX / window.innerWidth - 0.5;  // -0.5 ~ 0.5
+      mouse.current.y = e.clientY / window.innerHeight - 0.5; // -0.5 ~ 0.5
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, []);
+
+  useFrame(() => {
+    // Lerp camera toward mouse-driven target (stiffness: 0.04 = soft spring feel)
+    current.current.x += (mouse.current.x * 5 - current.current.x) * 0.04;
+    current.current.y += (5 - mouse.current.y * 2 - current.current.y) * 0.04;
+    camera.position.set(current.current.x, current.current.y, 16);
+    camera.lookAt(0, 0, 0);
+  });
+
+  return null;
+};
+
 const Scene: React.FC<{ onAiLabClick?: () => void }> = ({ onAiLabClick }) => {
   return (
     <>
+      <CameraController />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />
       <spotLight position={[-10, 20, -10]} angle={0.3} penumbra={1} intensity={2} color="#4444ff" />
       <Environment preset="city" />
 
-      {/* Moved the group UP (from -3.5 to -2.0) to reduce gap with title */}
       <group position={[0, -2.0, 0]}>
         {UNIVERSE_DATA.map((item) => (
           <Building key={item.id} data={item} onAiLabClick={onAiLabClick} />
@@ -200,23 +227,11 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
       </div>
 
       <div className="w-full h-full absolute inset-0 z-0 mt-0">
-        <Canvas 
+        <Canvas
           camera={{ position: [0, 5, 16], fov: 35 }}
-          dpr={[1, 1.5]} // Performance: Limited DPR to 1.5
+          dpr={[1, 1.5]}
           performance={{ min: 0.5 }}
         >
-          <OrbitControls 
-            enableZoom={true} 
-            minDistance={10} 
-            maxDistance={40} 
-            enablePan={false} 
-            minPolarAngle={Math.PI / 4} 
-            maxPolarAngle={Math.PI / 2.2}
-            autoRotate={true}
-            autoRotateSpeed={0.5}
-            enableDamping={true}
-            dampingFactor={0.05}
-          />
           <Scene onAiLabClick={onAiLabClick} />
         </Canvas>
       </div>
