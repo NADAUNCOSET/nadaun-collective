@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useLayoutEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 
@@ -259,8 +259,10 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
   const { scrollYProgress } = useScroll({ container: scrollRef });
   const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
-  useEffect(() => {
-    if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0;
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const el = scrollRef.current;
+    if (el) { el.scrollTop = 0; }
   }, [isOpen]);
 
   useEffect(() => {

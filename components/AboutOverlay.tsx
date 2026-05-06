@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useLayoutEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -299,7 +299,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [isOpen]);
+  }, [isOpen, scrollRef]);
 
   useEffect(() => {
     if (!isOpen) return;

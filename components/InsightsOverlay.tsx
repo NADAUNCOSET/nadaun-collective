@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { X, Sparkles, Loader2, Brain, TrendingUp, Target, Zap } from 'lucide-react';
 import { generateMarketingInsight } from '../services/geminiService';
@@ -205,8 +205,10 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
   const { scrollYProgress } = useScroll({ container: scrollRef });
   const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
-  useEffect(() => {
-    if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0;
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const el = scrollRef.current;
+    if (el) { el.scrollTop = 0; }
   }, [isOpen]);
 
   useEffect(() => {
