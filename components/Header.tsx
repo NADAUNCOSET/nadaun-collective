@@ -45,9 +45,9 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
           style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
         >
           {/* Logo Section */}
-          <motion.a 
-            href="#" 
-            className="flex items-center gap-2 z-50 relative group cursor-pointer select-none"
+          <motion.a
+            href="#"
+            className="flex items-center gap-2 z-50 relative cursor-pointer select-none"
             initial={{ y: 100 }}
             animate={introFinished ? { y: 0 } : { y: 100 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
@@ -56,14 +56,9 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
               <span className="text-2xl md:text-3xl font-extrabold text-white leading-none tracking-tight">
                 NADAUN
               </span>
-              <div className="relative flex items-center">
-                <span className="text-2xl md:text-3xl font-light text-white leading-none tracking-tight">
-                  COLLECTIVE
-                </span>
-                <span className="absolute inset-0 text-2xl md:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-[#FFB800] to-[#FF5E00] leading-none tracking-tight opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  COLLECTIVE
-                </span>
-              </div>
+              <span className="text-2xl md:text-3xl font-light leading-none tracking-tight" style={{ color: '#FFB800' }}>
+                COLLECTIVE
+              </span>
             </div>
           </motion.a>
 

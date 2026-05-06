@@ -56,6 +56,9 @@ const Hero: React.FC = () => {
   const ttl1Y  = useTransform(scrollYProgress, [0.44, 0.49], ['24px', '0px']);
   const ttl2Op = useTransform(scrollYProgress, [0.50, 0.55], [0, 1]);
   const ttl2Y  = useTransform(scrollYProgress, [0.50, 0.55], ['24px', '0px']);
+  // letter-spacing: wide while appearing → tight when all three are in
+  const ttlSpacingNum = useTransform(scrollYProgress, [0.50, 0.67], [0.35, -0.03]);
+  const ttlSpacing = useMotionTemplate`${ttlSpacingNum}em`;
 
   // ── All-words dissolve exit ────────────────────────────────────
   const dissolveOp   = useTransform(scrollYProgress, [0.72, 0.92], [1, 0]);
@@ -160,8 +163,8 @@ const Hero: React.FC = () => {
             Experience
           </motion.span>
 
-          {/* W4: TTL — letter by letter with wide tracking */}
-          <div style={{ display: 'flex', marginTop: '-0.04em' }}>
+          {/* W4: TTL — letter by letter, wide spacing → tight */}
+          <div style={{ display: 'flex', marginTop: '0.32em' }}>
             {(['T', 'T', 'L'] as const).map((char, i) => {
               const ops = [ttl0Op, ttl1Op, ttl2Op];
               const ys  = [ttl0Y,  ttl1Y,  ttl2Y];
@@ -171,7 +174,7 @@ const Hero: React.FC = () => {
                   style={{
                     ...wordBase,
                     fontSize: 'clamp(3.2rem, 10vw, 9rem)',
-                    letterSpacing: '0.35em',
+                    letterSpacing: ttlSpacing,
                     opacity: ops[i],
                     y: ys[i],
                   }}
