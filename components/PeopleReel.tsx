@@ -1,28 +1,18 @@
 import React, { useRef, useState } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 
-// Mixed shots from nadaun.framer.website — models, Hyundai, Coway, B-Ready etc.
 const PHOTOS = [
-  'https://framerusercontent.com/images/8iDqSjerVvrJdO3XmbmCqnQ3eHI.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/baj0VsRrAiBlnAcClysX8JOmXk.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/FxxtlPcNMxXKMiSQ5KYvnDITQ.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/WalxNKWEtizgPdzgDgJqwzg5u4Y.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/1z68aA8IVtTXqPCcZzZnjoqyrbY.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/QllGUMDkWAUR6xJgI8Qg44fwoZ4.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/deQ27myQIMb4tVVDQPCxwUw7Iw.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/spwqlYBLDlE9xpoHQcO45j3kQhA.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/fZngR5hO32M7PGE7XcFWZaNV1g.jpg?scale-down-to=1024',
-  'https://framerusercontent.com/images/6a4CWX9gdepzFplQj2ZpwcMVck.jpg?scale-down-to=1024',
+  'https://framerusercontent.com/images/8iDqSjerVvrJdO3XmbmCqnQ3eHI.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/baj0VsRrAiBlnAcClysX8JOmXk.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/FxxtlPcNMxXKMiSQ5KYvnDITQ.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/WalxNKWEtizgPdzgDgJqwzg5u4Y.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/1z68aA8IVtTXqPCcZzZnjoqyrbY.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/QllGUMDkWAUR6xJgI8Qg44fwoZ4.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/deQ27myQIMb4tVVDQPCxwUw7Iw.jpg?scale-down-to=2048',
+  'https://framerusercontent.com/images/spwqlYBLDlE9xpoHQcO45j3kQhA.jpg?scale-down-to=2048',
 ];
 
-// Stack depth config: depth 0 = front (current), 1 = mid, 2 = back
-const STACK = [
-  { scale: 1.00, y: 0,   opacity: 1.00, brightness: 1.00, z: 30 },
-  { scale: 0.93, y: -18, opacity: 0.70, brightness: 0.75, z: 20 },
-  { scale: 0.86, y: -34, opacity: 0.38, brightness: 0.55, z: 10 },
-];
-
-const SCROLL_PER_PHOTO = 55; // vh per photo
+const SCROLL_PER_PHOTO = 70;
 
 const PeopleReel: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,66 +30,63 @@ const PeopleReel: React.FC = () => {
     if (next !== current) setCurrent(next);
   });
 
-  // Render current + up to 2 behind as a visible stack
-  const visiblePhotos = PHOTOS.slice(Math.max(0, current - 2), current + 1)
-    .reverse() // back of stack first (lowest z-index)
-    .map((src, idx, arr) => ({
-      src,
-      depth: arr.length - 1 - idx, // 0 = front
-      photoIndex: current - idx,
-    }));
-
   return (
     <div ref={containerRef} style={{ height: `${PHOTOS.length * SCROLL_PER_PHOTO}vh` }}>
-      <div className="sticky top-0 w-full bg-black overflow-hidden" style={{ height: '100vh' }}>
-        {/* Top / bottom fade — seamless blend with surrounding sections */}
-        <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-black to-transparent z-50 pointer-events-none" />
-        <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black to-transparent z-50 pointer-events-none" />
+      <div className="sticky top-0 w-full bg-black" style={{ height: '100vh' }}>
 
-        {/* Stack of photos */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {visiblePhotos.map(({ src, depth, photoIndex }) => {
-            const cfg = STACK[depth] ?? STACK[STACK.length - 1];
-            return (
-              <motion.div
-                key={photoIndex}
-                className="absolute"
-                style={{ zIndex: cfg.z, width: '72vw', maxWidth: 880, aspectRatio: '3/4' }}
-                initial={depth === 0 ? { y: '62%', opacity: 0, scale: 1.06 } : false}
-                animate={{
-                  y: cfg.y,
-                  scale: cfg.scale,
-                  opacity: cfg.opacity,
+        {/* All photos stacked — each full-screen, slides up into place */}
+        {PHOTOS.map((src, i) => {
+          const depth = current - i; // 0 = front, 1 = one behind, negative = not yet shown
+          const isVisible = depth >= 0 && depth <= 2;
+
+          if (!isVisible && i > current) return null; // not yet reached
+
+          return (
+            <motion.div
+              key={i}
+              className="absolute inset-0 w-full h-full"
+              style={{ zIndex: i }}
+              initial={i === 0 ? false : { y: '100%' }}
+              animate={
+                i <= current
+                  ? {
+                      y: 0,
+                      scale: depth === 0 ? 1 : depth === 1 ? 0.96 : 0.92,
+                    }
+                  : { y: '100%' }
+              }
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <img
+                src={src}
+                alt=""
+                draggable={false}
+                className="w-full h-full object-cover select-none"
+                style={{
+                  filter: `brightness(${depth === 0 ? 0.78 : 0.5}) saturate(0.88)`,
                 }}
-                transition={{
-                  duration: 0.85,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                <div className="w-full h-full overflow-hidden rounded-sm shadow-2xl">
-                  <img
-                    src={src}
-                    alt=""
-                    draggable={false}
-                    className="w-full h-full object-cover select-none"
-                    style={{
-                      filter: `brightness(${cfg.brightness}) saturate(0.9)`,
-                    }}
-                  />
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+              />
+              {/* Top gradient — new photo blends smoothly over the one beneath */}
+              <div
+                className="absolute inset-x-0 top-0 h-48 pointer-events-none"
+                style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%)' }}
+              />
+            </motion.div>
+          );
+        })}
+
+        {/* Top / bottom black gradient — blends with Hero above, VideoReel below */}
+        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black to-transparent z-[999] pointer-events-none" />
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black to-transparent z-[999] pointer-events-none" />
 
         {/* Progress dots */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-50">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-[999]">
           {PHOTOS.map((_, i) => (
             <motion.div
               key={i}
               animate={{
                 width: i === current ? 24 : 5,
-                backgroundColor: i === current ? '#FFB800' : 'rgba(255,255,255,0.2)',
+                backgroundColor: i === current ? '#FFB800' : 'rgba(255,255,255,0.25)',
               }}
               transition={{ duration: 0.35 }}
               className="h-[3px] rounded-full"
