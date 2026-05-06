@@ -12,7 +12,7 @@ const PHOTOS = [
   'https://framerusercontent.com/images/spwqlYBLDlE9xpoHQcO45j3kQhA.jpg?scale-down-to=2048',
 ];
 
-const SCROLL_PER_PHOTO = 70;
+const SCROLL_PER_PHOTO = 90; // taller scroll per photo → more time to see each shot
 
 const PeopleReel: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,7 +32,7 @@ const PeopleReel: React.FC = () => {
 
   return (
     <div ref={containerRef} style={{ height: `${PHOTOS.length * SCROLL_PER_PHOTO}vh` }}>
-      <div className="sticky top-0 w-full bg-black" style={{ height: '100vh' }}>
+      <div className="sticky top-0 w-full bg-black" style={{ height: '130vh' }}>
 
         {/* All photos stacked — each full-screen, slides up into place */}
         {PHOTOS.map((src, i) => {
@@ -63,6 +63,7 @@ const PeopleReel: React.FC = () => {
                 draggable={false}
                 className="w-full h-full object-cover select-none"
                 style={{
+                  objectPosition: 'center 18%',
                   filter: `brightness(${depth === 0 ? 0.78 : 0.5}) saturate(0.88)`,
                 }}
               />

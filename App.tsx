@@ -116,7 +116,7 @@ const App: React.FC = () => {
           <PeopleReel />
           <VideoReel />
           <Manifesto />
-          <ScrollSection><Clients /></ScrollSection>
+          <Clients />
           <ScrollSection id="isoworld">
             <Suspense fallback={<div className="h-screen w-full bg-black" />}>
               <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />

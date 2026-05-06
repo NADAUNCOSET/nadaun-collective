@@ -1,1 +1,60 @@
-File not found: /v1/AUTH_mw/wikipedia-commons-local-public.96/9/96/Coway_logo.svg
+
+
+<!doctype html>
+<html lang="ko">
+<head>
+	<title>Coway</title>
+	<meta name="title" content="coway">
+	<meta name="keywords" content="coway">
+	<meta name="description" content="coway">
+
+	<meta property="og:title" content="coway">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="coway">
+	<meta property="og:site_name" content="coway">
+	<meta property="og:description" content="coway">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="format-detection" content="telephone=no, address=no, email=no">
+	<link rel="stylesheet" type="text/css" href="https://mall.cowaystatic.com/static/front/resources/mobile/css/reset.css?v=05061009">
+	<link rel="stylesheet" type="text/css" href="https://mall.cowaystatic.com/static/front/resources/mobile/css/common.css?v=05061009">
+</head>
+<body>
+<div id="wrap" class="error_page">
+	<!-- container -->
+	<div id="container">
+		<!-- contents -->
+		<div class="contents">
+			<div class="error_wrap">
+				<h1><img src="https://mall.cowaystatic.com/static/front/resources/mobile/images/common/ci_skyblue.png" alt="coway"></h1>
+				<p class="error_tit">The page you requested<br>could not be found.</p>
+				<p class="error_txt">
+					The URL may be incorrect,<br>
+					or the page might have been moved or deleted.<br>
+					Please check the address and try again.
+				</p>
+				<p class="error_msg guide">If the problem persists,<br>please contact our customer service at <em class="txt_blue">1588-5200</em>Thank you.</p>
+				<div class="btn_wrap">
+					<a href="javascript:void(0);" class="btnBasic sizeL btnWhite half" onclick="fn_history_move();"><span>Previous</span></a>
+					<a href="/" class="btnBasic sizeL btnBlack half"><span>Home</span></a>
+				</div>
+			</div>
+		</div>
+		<!-- //contents -->
+	</div>
+	<!-- //container -->
+</div>
+<script type="text/javascript">
+	function fn_history_move(){
+		let historyCnt = window.history.length;
+		if(historyCnt > 1){
+			history.back();
+		}else{
+			location.href = "/";
+		}
+
+	}
+</script>
+</body>
+</html>
