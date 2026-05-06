@@ -1,99 +1,144 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 
 interface ClientNode {
   name: string;
-  x: number; // 0–100 (%)
-  y: number; // 0–100 (%)
+  x: number;   // final position 0–100 (%)
+  y: number;
   size?: 'lg' | 'md' | 'sm';
+  logo?: string;   // local SVG
+  domain?: string; // clearbit fallback
 }
 
-// Constellation layout — manually positioned for visual balance
+const CX = 50; // constellation center X
+const CY = 52; // constellation center Y
+
 const NODES: ClientNode[] = [
-  { name: 'SAMSUNG',        x: 12,  y: 18,  size: 'lg' },
-  { name: 'HYUNDAI',        x: 28,  y: 8,   size: 'lg' },
-  { name: 'PEPSI',          x: 50,  y: 12,  size: 'lg' },
-  { name: 'EMIRATES',       x: 72,  y: 7,   size: 'lg' },
-  { name: 'KIA',            x: 88,  y: 22,  size: 'md' },
-  { name: 'DIOR',           x: 82,  y: 40,  size: 'md' },
-  { name: 'CALVIN KLEIN',   x: 92,  y: 58,  size: 'md' },
-  { name: 'ELLE',           x: 80,  y: 72,  size: 'md' },
-  { name: 'AMOREPACIFIC',   x: 62,  y: 82,  size: 'md' },
-  { name: 'OLIVE YOUNG',    x: 44,  y: 88,  size: 'md' },
-  { name: 'COWAY',          x: 26,  y: 80,  size: 'md' },
-  { name: 'JUNG SAEM MOOL', x: 10,  y: 70,  size: 'sm' },
-  { name: 'ACMÉ DE LA VIE', x: 6,   y: 52,  size: 'sm' },
-  { name: 'HD HYUNDAI',     x: 8,   y: 36,  size: 'sm' },
-  { name: 'HYUNDAI STEEL',  x: 22,  y: 28,  size: 'sm' },
-  { name: 'GAONCHIPS',      x: 38,  y: 32,  size: 'sm' },
-  { name: 'NUMBUZIN',       x: 55,  y: 28,  size: 'sm' },
-  { name: 'TONYMOLY',       x: 68,  y: 35,  size: 'sm' },
-  { name: 'SKINFOOD',       x: 74,  y: 52,  size: 'sm' },
-  { name: 'THE SAEM',       x: 68,  y: 65,  size: 'sm' },
-  { name: 'SKIN1004',       x: 52,  y: 62,  size: 'sm' },
-  { name: 'ABIB',           x: 36,  y: 60,  size: 'sm' },
-  { name: 'DASIQUE',        x: 22,  y: 52,  size: 'sm' },
-  { name: 'HECTO',          x: 32,  y: 44,  size: 'sm' },
-  { name: 'K2 SAFETY',      x: 46,  y: 46,  size: 'sm' },
-  { name: 'KOVA',           x: 60,  y: 48,  size: 'sm' },
-  { name: 'BEREX',          x: 18,  y: 62,  size: 'sm' },
-  { name: 'PAT',            x: 42,  y: 72,  size: 'sm' },
-  { name: 'PREED',          x: 56,  y: 75,  size: 'sm' },
-  { name: 'KWDA',           x: 70,  y: 78,  size: 'sm' },
-  { name: 'M2美度',          x: 84,  y: 86,  size: 'sm' },
-  { name: 'THE NEW GREY',   x: 32,  y: 18,  size: 'sm' },
-  { name: 'NUDAKE',         x: 18,  y: 42,  size: 'sm' },
+  { name: 'SAMSUNG',        x: 12,  y: 18,  size: 'lg', logo: '/logos/samsung.svg'   },
+  { name: 'HYUNDAI',        x: 28,  y: 8,   size: 'lg', logo: '/logos/hyundai.svg'   },
+  { name: 'PEPSI',          x: 50,  y: 12,  size: 'lg', logo: '/logos/pepsi.svg'     },
+  { name: 'EMIRATES',       x: 72,  y: 7,   size: 'lg', logo: '/logos/emirates.svg'  },
+  { name: 'KIA',            x: 88,  y: 22,  size: 'md', logo: '/logos/kia.svg'       },
+  { name: 'DIOR',           x: 82,  y: 40,  size: 'md', logo: '/logos/dior.svg'      },
+  { name: 'CALVIN KLEIN',   x: 92,  y: 58,  size: 'md', domain: 'calvinklein.com'   },
+  { name: 'ELLE',           x: 80,  y: 72,  size: 'md', domain: 'elle.com'          },
+  { name: 'OLIVE YOUNG',    x: 62,  y: 83,  size: 'md', logo: '/logos/oliveyoung.svg'},
+  { name: 'AMOREPACIFIC',   x: 44,  y: 89,  size: 'md', domain: 'amorepacific.com'  },
+  { name: 'COWAY',          x: 26,  y: 80,  size: 'md', logo: '/logos/coway.svg'     },
+  { name: 'JUNG SAEM MOOL', x: 10,  y: 70,  size: 'sm'                               },
+  { name: 'ACMÉ DE LA VIE', x: 6,   y: 52,  size: 'sm'                               },
+  { name: 'HD HYUNDAI',     x: 8,   y: 36,  size: 'sm', domain: 'hdhyundai.com'     },
+  { name: 'HYUNDAI STEEL',  x: 22,  y: 28,  size: 'sm', domain: 'hyundai-steel.com' },
+  { name: 'GAONCHIPS',      x: 38,  y: 32,  size: 'sm'                               },
+  { name: 'NUMBUZIN',       x: 55,  y: 28,  size: 'sm'                               },
+  { name: 'TONYMOLY',       x: 68,  y: 35,  size: 'sm', domain: 'tonymoly.com'      },
+  { name: 'SKINFOOD',       x: 74,  y: 52,  size: 'sm'                               },
+  { name: 'THE SAEM',       x: 68,  y: 65,  size: 'sm'                               },
+  { name: 'SKIN1004',       x: 52,  y: 62,  size: 'sm'                               },
+  { name: 'ABIB',           x: 36,  y: 60,  size: 'sm'                               },
+  { name: 'DASIQUE',        x: 22,  y: 52,  size: 'sm'                               },
+  { name: 'HECTO',          x: 32,  y: 44,  size: 'sm'                               },
+  { name: 'K2 SAFETY',      x: 46,  y: 46,  size: 'sm'                               },
+  { name: 'KOVA',           x: 60,  y: 48,  size: 'sm'                               },
+  { name: 'BEREX',          x: 18,  y: 62,  size: 'sm'                               },
+  { name: 'PAT',            x: 42,  y: 72,  size: 'sm'                               },
+  { name: 'PREED',          x: 56,  y: 75,  size: 'sm'                               },
+  { name: 'KWDA',           x: 70,  y: 78,  size: 'sm'                               },
+  { name: 'M2美度',          x: 84,  y: 86,  size: 'sm'                               },
+  { name: 'THE NEW GREY',   x: 32,  y: 18,  size: 'sm'                               },
+  { name: 'NUDAKE',         x: 18,  y: 42,  size: 'sm'                               },
 ];
 
-// Edges to draw — pairs of node indices forming the constellation lines
 const EDGES: [number, number][] = [
-  [0, 1], [1, 2], [2, 3], [3, 4],        // top arc
-  [4, 5], [5, 6], [6, 7],                // right side
-  [7, 8], [8, 9], [9, 10], [10, 11],     // bottom arc
-  [11, 12], [12, 13], [13, 0],           // left side
-  [1, 14], [14, 15], [15, 16], [16, 17], // inner upper
-  [17, 18], [18, 19], [19, 20],          // inner right
-  [20, 21], [21, 22], [22, 23],          // inner middle
-  [23, 24], [24, 25],                    // center
-  [10, 22], [9, 21], [2, 16],            // cross-links
-  [13, 32], [12, 26], [8, 29],           // extra branches
+  [0, 1], [1, 2], [2, 3], [3, 4],
+  [4, 5], [5, 6], [6, 7],
+  [7, 8], [8, 9], [9, 10], [10, 11],
+  [11, 12], [12, 13], [13, 0],
+  [1, 14], [14, 15], [15, 16], [16, 17],
+  [17, 18], [18, 19], [19, 20],
+  [20, 21], [21, 22], [22, 23],
+  [23, 24], [24, 25],
+  [10, 22], [9, 21], [2, 16],
+  [13, 32], [12, 26], [8, 28],
 ];
 
-interface EdgeProps {
-  a: ClientNode;
-  b: ClientNode;
-  pathLength: ReturnType<typeof useTransform>;
-}
+// Per-node clearbit logo component (handles load error)
+const NodeLogo: React.FC<{ node: ClientNode }> = ({ node }) => {
+  const [ok, setOk] = useState(true);
+  const src = node.logo ?? (node.domain ? `https://logo.clearbit.com/${node.domain}?size=64` : null);
 
-const ConstellationEdge: React.FC<EdgeProps> = ({ a, b, pathLength }) => (
-  <motion.line
-    x1={`${a.x}%`} y1={`${a.y}%`}
-    x2={`${b.x}%`} y2={`${b.y}%`}
-    stroke="rgba(255,184,0,0.25)"
-    strokeWidth="0.5"
-    style={{ pathLength }}
-  />
-);
+  if (!src || !ok) {
+    return (
+      <span
+        style={{
+          fontFamily: 'Manrope, sans-serif',
+          fontSize: node.size === 'lg' ? 'clamp(9px, 1.1vw, 13px)' : 'clamp(7px, 0.85vw, 10px)',
+          fontWeight: 700,
+          letterSpacing: '0.07em',
+          color: node.size === 'lg' ? 'rgba(255,255,255,0.9)'
+            : node.size === 'md' ? 'rgba(255,255,255,0.6)'
+            : 'rgba(255,255,255,0.35)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {node.name}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={node.name}
+      onError={() => setOk(false)}
+      style={{
+        maxHeight: node.size === 'lg' ? 22 : 16,
+        maxWidth: node.size === 'lg' ? 80 : 60,
+        objectFit: 'contain',
+        filter: 'brightness(0) invert(1)',
+        opacity: node.size === 'lg' ? 0.85 : node.size === 'md' ? 0.65 : 0.4,
+      }}
+    />
+  );
+};
 
 const Clients: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  // spreadFactor: 2.8 (spread) → 1.0 (final constellation)
+  const [spread, setSpread] = useState(2.8);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start 80%', 'center center'],
+    offset: ['start 85%', 'center 45%'],
   });
 
-  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    // Ease-in-out: clamp 0→1, then map to 2.8→1.0
+    const clamped = Math.max(0, Math.min(1, v));
+    const eased = clamped < 0.5
+      ? 2 * clamped * clamped
+      : 1 - Math.pow(-2 * clamped + 2, 2) / 2;
+    setSpread(2.8 - eased * 1.8);
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.4], [0.2, 1]);
+  const lineOpacity = useTransform(scrollYProgress, [0.1, 0.6], [0, 0.35]);
+
+  // Compute current node positions based on spread factor
+  const computed = NODES.map(n => ({
+    ...n,
+    cx: CX + (n.x - CX) * spread,
+    cy: CY + (n.y - CY) * spread,
+  }));
 
   return (
     <section ref={sectionRef} id="clients" className="relative w-full bg-black overflow-hidden" style={{ minHeight: '100vh' }}>
 
-      {/* Dot grid background */}
+      {/* Dot grid */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px)',
           backgroundSize: '44px 44px',
         }}
       />
@@ -101,94 +146,84 @@ const Clients: React.FC = () => {
       <motion.div className="relative z-10 px-8 md:px-16 lg:px-24 pt-20 pb-16" style={{ opacity }}>
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-12"
-        >
-          <p className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-3">
-            OUR PARTNERS
-          </p>
-          <div className="flex items-baseline justify-between">
+        <div className="mb-10 flex items-baseline justify-between">
+          <div>
+            <p className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-3">
+              OUR PARTNERS
+            </p>
             <h2
               className="font-black leading-none text-white"
               style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', letterSpacing: '-0.03em' }}
             >
               {NODES.length}+ BRANDS
             </h2>
-            <p className="text-white/20 text-xs tracking-widest hidden md:block">
-              TRUSTED BY THE BEST
-            </p>
           </div>
-        </motion.div>
+          <p className="text-white/15 text-xs tracking-widest hidden md:block">TRUSTED BY THE BEST</p>
+        </div>
 
-        {/* Constellation map */}
-        <div className="relative w-full" style={{ height: 'clamp(420px, 55vw, 640px)' }}>
+        {/* Constellation */}
+        <div className="relative w-full" style={{ height: 'clamp(420px, 56vw, 660px)' }}>
 
           {/* SVG lines */}
-          <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+          <motion.svg
+            className="absolute inset-0 w-full h-full"
+            style={{ overflow: 'visible', opacity: lineOpacity }}
+          >
             {EDGES.map(([ai, bi], ei) => {
-              const a = NODES[ai];
-              const b = NODES[bi];
+              const a = computed[ai];
+              const b = computed[bi];
               if (!a || !b) return null;
               return (
-                <ConstellationEdge key={ei} a={a} b={b} pathLength={pathLength} />
+                <line
+                  key={ei}
+                  x1={`${a.cx}%`} y1={`${a.cy}%`}
+                  x2={`${b.cx}%`} y2={`${b.cy}%`}
+                  stroke="rgba(255,184,0,0.5)"
+                  strokeWidth="0.6"
+                />
               );
             })}
-          </svg>
+          </motion.svg>
 
           {/* Nodes */}
-          {NODES.map((node, i) => {
-            const delay = i * 0.025;
-            const fontSize = node.size === 'lg' ? 'clamp(12px, 1.4vw, 16px)'
-              : node.size === 'md' ? 'clamp(10px, 1.1vw, 13px)'
-              : 'clamp(8px, 0.9vw, 10px)';
+          {computed.map((node, i) => {
+            const dotSize = node.size === 'lg' ? 7 : node.size === 'md' ? 5 : 3;
+            const dotColor = node.size === 'lg' ? '#FFB800'
+              : node.size === 'md' ? 'rgba(255,184,0,0.55)'
+              : 'rgba(255,255,255,0.3)';
 
             return (
               <motion.div
                 key={node.name}
-                className="absolute flex flex-col items-center group"
-                style={{ left: `${node.x}%`, top: `${node.y}%`, transform: 'translate(-50%, -50%)' }}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                className="absolute flex flex-col items-center group cursor-default"
+                style={{
+                  left: `${node.cx}%`,
+                  top: `${node.cy}%`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: node.size === 'lg' ? 3 : node.size === 'md' ? 2 : 1,
+                }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.3, delay: i * 0.02 }}
               >
                 {/* Dot */}
                 <div
-                  className="rounded-full mb-1.5 group-hover:scale-150 transition-transform duration-300"
+                  className="rounded-full mb-1.5 group-hover:scale-[2] transition-transform duration-300"
                   style={{
-                    width: node.size === 'lg' ? 6 : node.size === 'md' ? 4 : 3,
-                    height: node.size === 'lg' ? 6 : node.size === 'md' ? 4 : 3,
-                    backgroundColor: node.size === 'lg' ? '#FFB800'
-                      : node.size === 'md' ? 'rgba(255,184,0,0.6)'
-                      : 'rgba(255,255,255,0.35)',
-                    boxShadow: node.size === 'lg' ? '0 0 8px rgba(255,184,0,0.6)' : 'none',
+                    width: dotSize, height: dotSize,
+                    backgroundColor: dotColor,
+                    boxShadow: node.size === 'lg' ? `0 0 10px ${dotColor}` : 'none',
                   }}
                 />
-                {/* Label */}
-                <span
-                  className="font-bold tracking-widest whitespace-nowrap text-center group-hover:text-[#FFB800] transition-colors duration-300"
-                  style={{
-                    fontFamily: 'Manrope, sans-serif',
-                    fontSize,
-                    color: node.size === 'lg' ? 'rgba(255,255,255,0.85)'
-                      : node.size === 'md' ? 'rgba(255,255,255,0.55)'
-                      : 'rgba(255,255,255,0.3)',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  {node.name}
-                </span>
+                {/* Logo or text */}
+                <NodeLogo node={node} />
               </motion.div>
             );
           })}
         </div>
 
-        {/* Footer label */}
-        <p className="text-white/15 text-[10px] tracking-[0.4em] uppercase mt-10 text-center">
+        <p className="text-white/12 text-[10px] tracking-[0.4em] uppercase mt-8 text-center">
           SAMSUNG · HYUNDAI · PEPSI · EMIRATES · AMOREPACIFIC · OLIVE YOUNG +{NODES.length - 6} MORE
         </p>
       </motion.div>

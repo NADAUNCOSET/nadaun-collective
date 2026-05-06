@@ -98,35 +98,16 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
 
       <div className="container mx-auto px-6 h-full flex flex-col">
         {/* Section Header */}
-        <motion.div 
-          className="flex flex-col md:flex-row justify-between items-end mb-16 md:mb-24"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+        <motion.div
+          className="mb-16 md:mb-20"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div>
-             <motion.span 
-                variants={itemVariants}
-                className="block text-[#FFB800] font-bold tracking-[0.2em] text-xs uppercase mb-4"
-              >
-                Business Domain
-              </motion.span>
-            <motion.h2 
-              variants={itemVariants}
-              className="text-6xl md:text-8xl font-bold tracking-tighter leading-none text-white"
-            >
-              WE BUILD <br/> <span className="text-gray-600">THE NEXT LEVEL.</span>
-            </motion.h2>
-          </div>
-          <motion.div 
-            variants={itemVariants}
-            className="hidden md:block max-w-sm text-right pb-2"
-          >
-            <p className="text-gray-400 text-sm leading-relaxed font-medium">
-              We provide integrated digital solutions driven by data and creativity, <br/> pushing your business to the global stage.
-            </p>
-          </motion.div>
+          <span className="block text-[#FFB800] font-bold tracking-[0.2em] text-xs uppercase mb-4">
+            Business Domain
+          </span>
         </motion.div>
 
         {/* Interactive Accordion */}
