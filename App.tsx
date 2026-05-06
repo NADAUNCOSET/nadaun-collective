@@ -12,6 +12,7 @@ import BusinessOverlay from './components/BusinessOverlay';
 import InsightsOverlay from './components/InsightsOverlay';
 import Intro from './components/Intro';
 import Manifesto from './components/Manifesto';
+import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import { motion, useScroll, useSpring, useTransform, AnimatePresence, useMotionValue } from 'framer-motion';
 
@@ -136,6 +137,7 @@ const App: React.FC = () => {
 
         <main>
           <Hero startAnimation={introFinished} />
+          <VideoReel />
           <Manifesto />
           <ScrollSection>
             <Clients />
