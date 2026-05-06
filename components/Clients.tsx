@@ -134,14 +134,14 @@ const Clients: React.FC = () => {
         {/* Header */}
         <div className="mb-10 flex items-baseline justify-between">
           <div>
-            <p className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-3">
+            <p className="text-[10px] tracking-[0.5em] uppercase text-white/40 font-light mb-3">
               OUR PARTNERS
             </p>
             <h2
               className="font-black leading-none text-white"
               style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', letterSpacing: '-0.03em' }}
             >
-              {NODES.length}+ BRANDS
+              최고의 파트너
             </h2>
           </div>
           <p className="text-white/15 text-xs tracking-widest hidden md:block">TRUSTED BY THE BEST</p>
