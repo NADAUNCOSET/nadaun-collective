@@ -55,11 +55,8 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   const w3Op = useTransform(scrollYProgress, [0.24, 0.34], [0, 1]);
   const w3Y  = useTransform(scrollYProgress, [0.24, 0.34], ['28px', '0px']);
 
-  const w4Op = useTransform(scrollYProgress, [0.38, 0.47], [0, 1]);
-  const w4Y  = useTransform(scrollYProgress, [0.38, 0.47], ['20px', '0px']);
-
-  const w5Op = useTransform(scrollYProgress, [0.50, 0.62], [0, 1]);
-  const w5Y  = useTransform(scrollYProgress, [0.50, 0.62], ['28px', '0px']);
+  const w4Op = useTransform(scrollYProgress, [0.38, 0.52], [0, 1]);
+  const w4Y  = useTransform(scrollYProgress, [0.38, 0.52], ['28px', '0px']);
 
   // ── All-words dissolve exit ────────────────────────────────────
   const dissolveOp   = useTransform(scrollYProgress, [0.72, 0.92], [1, 0]);
@@ -171,26 +168,13 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
             Experience
           </motion.span>
 
-          {/* W4: through */}
-          <motion.span style={{
-            ...wordBase,
-            fontWeight: 200,
-            fontSize: 'clamp(1.4rem, 3.5vw, 3rem)',
-            color: 'rgba(255,255,255,0.5)',
-            marginTop: '0.2em',
-            opacity: w4Op,
-            y: w4Y,
-          }}>
-            through
-          </motion.span>
-
-          {/* W5: TTL */}
+          {/* W4: TTL */}
           <motion.span style={{
             ...wordBase,
             fontSize: 'clamp(3.2rem, 10vw, 9rem)',
             marginTop: '-0.04em',
-            opacity: w5Op,
-            y: w5Y,
+            opacity: w4Op,
+            y: w4Y,
           }}>
             TTL
           </motion.span>
