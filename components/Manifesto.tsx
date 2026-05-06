@@ -40,14 +40,15 @@ const Manifesto: React.FC = () => {
       ref={sectionRef}
       className="relative w-full min-h-screen bg-[#080808] flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* Video background */}
+      {/* Video background — desktop only (mobile saves bandwidth) */}
       <video
-        className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none hidden md:block"
         src="/manifesto-bg.mp4"
         autoPlay
         muted
         loop
         playsInline
+        preload="none"
       />
 
       {/* Dark overlay on video */}

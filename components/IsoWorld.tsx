@@ -1,117 +1,62 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, Environment, ContactShadows, Float } from '@react-three/drei';
+import { Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
 const UNIVERSE_DATA = [
-  {
-    id: 'space',
-    title: 'NADAUN SPACE',
-    subtitle: 'INFRA SOLUTION',
-    desc: '모든 창작의 시작,\n압도적 기술력의 인프라',
-    url: 'https://www.rainbowbene.com/',
-    color: '#00C2FF',
-    position: [-7, 0, 1.5] as [number, number, number],
-    height: 3.5
-  },
-  {
-    id: 'studio',
-    title: 'NADAUN STUDIO',
-    subtitle: 'VISUAL MASTERPIECE',
-    desc: '찰나를 영원으로 기록하는\n비주얼 디렉팅',
-    url: 'https://nadaun.framer.website/',
-    color: '#FFB800',
-    position: [-3.5, 0, -0.5] as [number, number, number],
-    height: 4.5
-  },
-  {
-    id: 'ailab',
-    title: 'AI INNOVATION LAB',
-    subtitle: 'FUTURE INTELLIGENCE',
-    desc: '데이터로 예측하는\n마케팅의 새로운 차원',
-    url: '',
-    color: '#00FF94',
-    position: [0, 0, -2.5] as [number, number, number],
-    height: 5.2
-  },
-  {
-    id: 'project',
-    title: 'NADAUN PROJECT',
-    subtitle: 'CREATIVE PERFORMANCE',
-    desc: '시장을 뒤흔드는\n압도적 퍼포먼스',
-    url: '',
-    color: '#FF4D4D',
-    position: [3.5, 0, -0.5] as [number, number, number],
-    height: 4.0
-  },
-  {
-    id: 'agency',
-    title: 'NAN AGENCY',
-    subtitle: 'FUTURE ENTERTAINMENT',
-    desc: '뉴미디어 시대의\n아이콘을 육성',
-    url: 'https://nanofficial.imweb.me/',
-    color: '#9D4DFF',
-    position: [7, 0, 1.5] as [number, number, number],
-    height: 3.8
-  },
-  {
-    id: 'moment',
-    title: 'NADAUN MOMENT',
-    subtitle: 'CORPORATE VISUAL ARCHIVE',
-    desc: '기업의 순간을 정제된\n감각으로 영원히 기록',
-    url: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',
-    color: '#FF8C00',
-    position: [10.5, 0, 4.5] as [number, number, number],
-    height: 3.2
-  }
+  { id: 'space',   title: 'NADAUN SPACE',        subtitle: 'INFRA SOLUTION',         desc: '모든 창작의 시작,\n압도적 기술력의 인프라',   url: 'https://www.rainbowbene.com/',                                         color: '#00C2FF', position: [-7,   0,  1.5] as [number,number,number], height: 3.5 },
+  { id: 'studio',  title: 'NADAUN STUDIO',       subtitle: 'VISUAL MASTERPIECE',     desc: '찰나를 영원으로 기록하는\n비주얼 디렉팅',       url: 'https://nadaun.framer.website/',                                        color: '#FFB800', position: [-3.5, 0, -0.5] as [number,number,number], height: 4.5 },
+  { id: 'ailab',   title: 'AI INNOVATION LAB',   subtitle: 'FUTURE INTELLIGENCE',    desc: '데이터로 예측하는\n마케팅의 새로운 차원',       url: '',                                                                      color: '#00FF94', position: [0,    0, -2.5] as [number,number,number], height: 5.2 },
+  { id: 'project', title: 'NADAUN PROJECT',      subtitle: 'CREATIVE PERFORMANCE',   desc: '시장을 뒤흔드는\n압도적 퍼포먼스',             url: '',                                                                      color: '#FF4D4D', position: [3.5,  0, -0.5] as [number,number,number], height: 4.0 },
+  { id: 'agency',  title: 'NAN AGENCY',          subtitle: 'FUTURE ENTERTAINMENT',   desc: '뉴미디어 시대의\n아이콘을 육성',               url: 'https://nanofficial.imweb.me/',                                         color: '#9D4DFF', position: [7,    0,  1.5] as [number,number,number], height: 3.8 },
+  { id: 'moment',  title: 'NADAUN MOMENT',       subtitle: 'CORPORATE VISUAL ARCHIVE',desc: '기업의 순간을 정제된\n감각으로 영원히 기록',  url: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',            color: '#FF8C00', position: [10.5, 0,  4.5] as [number,number,number], height: 3.2 },
 ];
 
-// Static building — no mesh interaction (canvas is non-interactive for scroll passthrough)
-const Building: React.FC<{ data: typeof UNIVERSE_DATA[0]; onAiLabClick?: () => void }> = ({ data, onAiLabClick }) => {
+// Shared geometry cache
+const BOX_GEOMETRIES: Record<number, THREE.BoxGeometry> = {};
+const getBoxGeometry = (height: number) => {
+  if (!BOX_GEOMETRIES[height]) BOX_GEOMETRIES[height] = new THREE.BoxGeometry(2, height, 2);
+  return BOX_GEOMETRIES[height];
+};
+
+const Building: React.FC<{ data: typeof UNIVERSE_DATA[0]; onAiLabClick?: () => void; showLabel?: boolean }> = ({ data, onAiLabClick, showLabel = true }) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
+  // Individual slow spin — group also rotates, so keep this subtle
   useFrame((_, delta) => {
-    if (meshRef.current) meshRef.current.rotation.y += delta * 0.25;
+    if (meshRef.current) meshRef.current.rotation.y += delta * 0.15;
   });
 
   const handleCardClick = () => {
-    if (data.id === 'ailab' && onAiLabClick) {
-      onAiLabClick();
-    } else if (data.url) {
-      window.open(data.url, '_blank');
-    }
+    if (data.id === 'ailab' && onAiLabClick) onAiLabClick();
+    else if (data.url) window.open(data.url, '_blank');
   };
 
   return (
     <group position={data.position}>
-      <Float speed={1.5} rotationIntensity={0.05} floatIntensity={0.18}>
-        <mesh ref={meshRef}>
-          <boxGeometry args={[2, data.height, 2]} />
-          <meshPhysicalMaterial
-            color={data.color}
-            metalness={0.8}
-            roughness={0.2}
-            clearcoat={1}
-            transparent
-            opacity={0.85}
-            emissive={data.color}
-            emissiveIntensity={0.18}
-          />
-        </mesh>
-      </Float>
+      <mesh ref={meshRef} geometry={getBoxGeometry(data.height)}>
+        <meshStandardMaterial
+          color={data.color}
+          metalness={0.6}
+          roughness={0.3}
+          emissive={data.color}
+          emissiveIntensity={0.12}
+          transparent
+          opacity={0.88}
+        />
+      </mesh>
 
-      {/* Html renders in a DOM portal — pointer-events: auto overrides parent's none */}
-      <Html
+      {showLabel && <Html
         position={[0, data.height / 2 + 1.8, 0]}
         center
         distanceFactor={15}
         style={{ pointerEvents: 'auto' }}
       >
         <div
-          className="flex flex-col items-center text-center w-[180px] select-none group cursor-pointer"
+          className="flex flex-col items-center text-center w-[170px] select-none group cursor-pointer"
           onClick={handleCardClick}
         >
-          <div className="bg-black/90 backdrop-blur-md border border-white/10 p-3 rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:border-white/20 shadow-2xl">
+          <div className="bg-black/90 backdrop-blur-md border border-white/10 p-3 rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:border-white/20 shadow-xl">
             <h3 className="text-sm font-bold tracking-tight mb-0.5" style={{ color: data.color }}>
               {data.title}
             </h3>
@@ -128,32 +73,35 @@ const Building: React.FC<{ data: typeof UNIVERSE_DATA[0]; onAiLabClick?: () => v
           </div>
           <div className="w-[1px] h-5 bg-gradient-to-b from-white/20 to-transparent" />
         </div>
-      </Html>
-
-      <ContactShadows opacity={0.4} scale={8} blur={2} far={4} color={data.color} resolution={128} />
+      </Html>}
     </group>
   );
 };
 
-// Entire universe slowly rotates — no user interaction needed
-const Scene: React.FC<{ onAiLabClick?: () => void }> = ({ onAiLabClick }) => {
+// On mobile: show only 3 core buildings to reduce draw calls
+const MOBILE_IDS = new Set(['studio', 'ailab', 'project']);
+
+const Scene: React.FC<{ onAiLabClick?: () => void; isMobile?: boolean }> = ({ onAiLabClick, isMobile }) => {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((_, delta) => {
-    if (groupRef.current) groupRef.current.rotation.y += delta * 0.07;
+    if (groupRef.current) groupRef.current.rotation.y += delta * 0.06;
   });
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <spotLight position={[-10, 20, -10]} angle={0.3} penumbra={1} intensity={2} color="#4444ff" />
-      <Environment preset="city" />
+      <ambientLight intensity={0.6} />
+      <pointLight position={[10, 10, 10]} intensity={1.2} />
+      <pointLight position={[-10, 8, -8]} intensity={0.4} color="#4444ff" />
+      {/* Single Environment (lighter than HDR city) */}
+      <Environment preset="night" />
 
       <group ref={groupRef} position={[0, -2.0, 0]}>
-        {UNIVERSE_DATA.map((item) => (
-          <Building key={item.id} data={item} onAiLabClick={onAiLabClick} />
-        ))}
+        {UNIVERSE_DATA
+          .filter(item => !isMobile || MOBILE_IDS.has(item.id))
+          .map((item) => (
+            <Building key={item.id} data={item} onAiLabClick={onAiLabClick} showLabel={!isMobile} />
+          ))}
       </group>
     </>
   );
@@ -164,11 +112,24 @@ interface IsoWorldProps {
 }
 
 const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [frameloop, setFrameloop] = useState<'never' | 'always'>('never');
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setFrameloop(entry.isIntersecting ? 'always' : 'never'),
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="isoworld" className="h-[100vh] w-full bg-black relative overflow-hidden">
+    <section ref={sectionRef} id="isoworld" className="h-[100vh] w-full bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-black z-0" />
       <div
-        className="absolute inset-0 z-0 opacity-20"
+        className="absolute inset-0 z-0 opacity-[0.15]"
         style={{
           backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)',
           backgroundSize: '40px 40px',
@@ -183,14 +144,16 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
         </div>
       </div>
 
-      {/* pointer-events: none → scroll passes through canvas to page */}
+      {/* pointer-events: none → scroll passes through to page */}
       <div className="w-full h-full absolute inset-0 z-0" style={{ pointerEvents: 'none' }}>
         <Canvas
-          camera={{ position: [0, 5, 16], fov: 35 }}
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5 }}
+          camera={{ position: [0, 5, isMobile ? 22 : 16], fov: isMobile ? 45 : 35 }}
+          dpr={isMobile ? 0.75 : 1}        // Lower DPR on mobile — biggest GPU win
+          frameloop={frameloop}            // Pause GPU when section off-screen
+          performance={{ min: 0.3 }}
+          gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
-          <Scene onAiLabClick={onAiLabClick} />
+          <Scene onAiLabClick={onAiLabClick} isMobile={isMobile} />
         </Canvas>
       </div>
 

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import IsoWorld from './components/IsoWorld';
+const IsoWorld = lazy(() => import('./components/IsoWorld'));
 import Business from './components/Business';
 import Clients from './components/Clients';
 import Work from './components/Work';
@@ -144,7 +144,9 @@ const App: React.FC = () => {
             <Clients />
           </ScrollSection>
           <ScrollSection id="isoworld">
-            <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
+            <Suspense fallback={<div className="h-screen w-full bg-black" />}>
+              <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
+            </Suspense>
           </ScrollSection>
           <ScrollSection>
             <Business

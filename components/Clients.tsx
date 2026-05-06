@@ -149,14 +149,16 @@ const ClientNode: React.FC<ClientNodeProps> = ({ node, mouseX, mouseY, entered }
 const Clients: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasEntered, setHasEntered] = useState(false);
+  // Mouse physics disabled on touch devices — no benefit and wastes RAF cycles
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const smoothMouseX = useSpring(mouseX, { stiffness: 100, damping: 20, mass: 0.5 });
-  const smoothMouseY = useSpring(mouseY, { stiffness: 100, damping: 20, mass: 0.5 });
+  const smoothMouseX = useSpring(mouseX, { stiffness: 80, damping: 25, mass: 0.5 });
+  const smoothMouseY = useSpring(mouseY, { stiffness: 80, damping: 25, mass: 0.5 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
+    if (isMobile || !containerRef.current) return;
     const r = containerRef.current.getBoundingClientRect();
     mouseX.set(e.clientX - r.left - r.width / 2);
     mouseY.set(e.clientY - r.top - r.height / 2);
