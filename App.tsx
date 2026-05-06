@@ -15,6 +15,19 @@ import Intro from './components/Intro';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import { motion, useScroll, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 
+// Wraps each major section with a scroll-triggered slide-up entrance
+const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => (
+  <motion.div
+    id={id}
+    initial={{ opacity: 0, y: 60 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.12 }}
+    transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+  >
+    {children}
+  </motion.div>
+);
+
 const App: React.FC = () => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -124,14 +137,19 @@ const App: React.FC = () => {
         />
 
         <main>
-          {/* Main Page Flow */}
           <Hero startAnimation={introFinished} />
-          <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
-          <Business 
-            onAiLabClick={() => setActiveOverlay('ai-lab')} 
-            onIntegratedClick={() => setActiveOverlay('integrated-solution')}
-          />
-          <Clients />
+          <ScrollSection>
+            <Clients />
+          </ScrollSection>
+          <ScrollSection id="isoworld">
+            <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
+          </ScrollSection>
+          <ScrollSection>
+            <Business
+              onAiLabClick={() => setActiveOverlay('ai-lab')}
+              onIntegratedClick={() => setActiveOverlay('integrated-solution')}
+            />
+          </ScrollSection>
         </main>
         
         <Footer />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 
+type Phase = 'c-only' | 'reveal';
+
 // High-quality creative studio and advertising agency images
 const HERO_IMAGES = [
   // 1. Creative Team / Strategy Meeting
@@ -21,9 +23,13 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   const [activeImage, setActiveImage] = useState(0);
+  const [phase, setPhase] = useState<Phase>('c-only');
+  const [xOffset, setXOffset] = useState(0);
+  const ollectiveRef = useRef<HTMLSpanElement>(null);
+
   const mouseX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 500);
   const mouseY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
-  
+
   const lastMousePos = useRef({ x: 0, y: 0 });
 
   const maskImage = useMotionTemplate`radial-gradient(circle 500px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
@@ -35,6 +41,20 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
       img.src = src;
     });
   }, []);
+
+  // Measure OLLECTIVE span width — used to offset C to screen center
+  useEffect(() => {
+    if (ollectiveRef.current) {
+      setXOffset(ollectiveRef.current.offsetWidth / 2);
+    }
+  }, []);
+
+  // C → COLLECTIVE reveal sequence, triggered once intro finishes
+  useEffect(() => {
+    if (!startAnimation) return;
+    const t = setTimeout(() => setPhase('reveal'), 750);
+    return () => clearTimeout(t);
+  }, [startAnimation]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const { clientX, clientY } = e;
@@ -58,10 +78,8 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   };
 
   const scrollToNext = () => {
-    const nextSection = document.getElementById('isoworld');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    const nextSection = document.getElementById('clients');
+    if (nextSection) nextSection.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -101,18 +119,39 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
       {/* Main Content Layer */}
       <div className="container mx-auto px-6 z-20 relative text-center pointer-events-none mix-blend-difference">
         <div className="flex flex-col items-center justify-center h-full">
-          {/* Main Title - STATIC POSITION. DO NOT ANIMATE OPACITY OR Y HERE. */}
-          {/* This ensures when the Intro mask opens, this text is exactly underneath */}
-          <div className="relative overflow-visible">
-             <h1 className="text-[13vw] font-extrabold tracking-tighter leading-none text-white select-none">
-                COLLECTIVE
-              </h1>
+
+          {/* C → COLLECTIVE slide animation */}
+          <div className="overflow-hidden">
+            <motion.h1
+              className="text-[13vw] font-extrabold tracking-tighter leading-none text-white select-none inline-flex items-baseline"
+              // c-only: instantly offset so "C" sits at viewport center
+              // reveal: slide back to natural centered position
+              animate={{ x: phase === 'c-only' ? xOffset : 0 }}
+              transition={
+                phase === 'c-only'
+                  ? { duration: 0 }
+                  : { duration: 0.85, ease: [0.16, 1, 0.3, 1] }
+              }
+            >
+              C
+              <motion.span
+                ref={ollectiveRef}
+                animate={{
+                  opacity: phase === 'reveal' ? 1 : 0,
+                  x: phase === 'reveal' ? 0 : 28,
+                }}
+                transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+                style={{ display: 'inline-block' }}
+              >
+                OLLECTIVE
+              </motion.span>
+            </motion.h1>
           </div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={startAnimation ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+            animate={startAnimation && phase === 'reveal' ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
             className="mt-12 max-w-2xl mx-auto"
           >
             <p className="text-sm md:text-lg text-gray-300 font-medium tracking-widest uppercase flex items-center gap-4 justify-center">
@@ -125,10 +164,10 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
       </div>
 
       {/* Scroll Indicator */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
-        animate={startAnimation ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: 0.8, duration: 0.4 }}
+        animate={startAnimation && phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ delay: 0.9, duration: 0.4 }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer pointer-events-auto group"
         onClick={scrollToNext}
       >

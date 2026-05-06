@@ -234,7 +234,8 @@ const Clients: React.FC = () => {
   }, []);
 
   return (
-    <section 
+    <section
+      id="clients"
       ref={containerRef}
       className="relative w-full min-h-[85vh] md:h-[100vh] bg-black overflow-hidden flex flex-col justify-center"
       onMouseMove={handleMouseMove}
