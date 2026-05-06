@@ -74,7 +74,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
               src="/symbol-white.webp"
               alt=""
               aria-hidden="true"
-              className="w-[85vw] max-w-[85vw] min-w-[280px] select-none"
+              className="w-[42vw] max-w-[42vw] min-w-[200px] select-none"
               draggable={false}
             />
           </motion.div>
@@ -91,7 +91,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
             src="/symbol-black.webp"
             alt=""
             aria-hidden="true"
-            className="w-[85vw] max-w-[85vw] min-w-[280px] select-none"
+            className="w-[42vw] max-w-[42vw] min-w-[200px] select-none"
             draggable={false}
           />
         </motion.div>
