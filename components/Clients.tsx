@@ -46,7 +46,7 @@ const CLIENT_LIST = [
   { name: "DIOR BEAUTY", category: "BEAUTY" },
 ];
 
-const SPACING = 90;
+const SPACING = 105;
 
 interface NodeData {
   name: string;
@@ -97,7 +97,7 @@ const ClientNode: React.FC<ClientNodeProps> = ({ node, mouseX, mouseY, entered }
   const scale = useTransform(distance, (d) =>
     d < 300 ? 1 + Math.pow(1 - d / 300, 2) * 1.6 : 1
   );
-  const proximity = useTransform(distance, (d) => (d < 300 ? 1 : 0.5));
+  const proximity = useTransform(distance, (d) => (d < 300 ? 1 : 0.72));
 
   return (
     <motion.div
@@ -114,8 +114,8 @@ const ClientNode: React.FC<ClientNodeProps> = ({ node, mouseX, mouseY, entered }
       <motion.div style={{ scale, opacity: proximity }} className="flex flex-col items-center justify-center">
         {/* Node dot */}
         <motion.div
-          className="rounded-full mb-2"
-          style={{ width: 6, height: 6 }}
+          className="rounded-full mb-2.5"
+          style={{ width: 8, height: 8 }}
           animate={{
             backgroundColor: isHovered ? '#FFB800' : 'rgba(255,255,255,0.75)',
             boxShadow: isHovered
@@ -126,15 +126,15 @@ const ClientNode: React.FC<ClientNodeProps> = ({ node, mouseX, mouseY, entered }
         />
         {/* Name */}
         <motion.h3
-          className="text-[10px] md:text-[11px] font-bold leading-none tracking-tight whitespace-nowrap"
-          animate={{ color: isHovered ? '#ffffff' : '#888888' }}
+          className="text-[12px] md:text-[13px] font-bold leading-none tracking-tight whitespace-nowrap"
+          animate={{ color: isHovered ? '#ffffff' : 'rgba(255,255,255,0.68)' }}
           transition={{ duration: 0.15 }}
         >
           {node.name}
         </motion.h3>
         {/* Category — only shown when scaled up enough */}
         <motion.span
-          className="text-[6px] uppercase tracking-widest text-[#FFB800] mt-1 absolute top-full whitespace-nowrap"
+          className="text-[8px] uppercase tracking-widest text-[#FFB800] mt-1.5 absolute top-full whitespace-nowrap"
           style={{ opacity: useTransform(scale, (s) => (s > 1.9 ? 1 : 0)) }}
         >
           {node.category}
@@ -242,7 +242,7 @@ const Clients: React.FC = () => {
       >
         {/* Container anchored at center (0,0) */}
         <div
-          className="relative scale-[0.42] sm:scale-[0.65] md:scale-[0.82] lg:scale-100 origin-center"
+          className="relative scale-[0.52] sm:scale-[0.72] md:scale-[0.88] lg:scale-100 origin-center"
           style={{ width: 0, height: 0 }}
         >
           {/* ── SVG constellation lines — draw-on effect via strokeDashoffset ── */}
