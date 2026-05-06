@@ -110,7 +110,7 @@ const App: React.FC = () => {
         />
 
         <main>
-          <Hero startAnimation={introFinished} />
+          <Hero />
           <VideoReel />
           <Manifesto />
           <Clients />

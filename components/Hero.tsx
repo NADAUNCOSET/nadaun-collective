@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, useMotionValue, useMotionTemplate, useSpring, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
-
-type Phase = 'idle' | 'reveal';
 
 const ALL_IMAGES = [
   { src: '/hero/pepsi-festa.webp',    pos: 'center 35%' },
@@ -15,15 +13,10 @@ const ALL_IMAGES = [
 
 const SECTION_H = 320;
 
-interface HeroProps {
-  startAnimation?: boolean;
-}
-
-const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
+const Hero: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const stickyRef  = useRef<HTMLDivElement>(null);
-  const [activeImage, setActiveImage] = useState(0);
-  const [phase, setPhase] = useState<Phase>('idle');
+  const [activeImage, setActiveImage] = React.useState(0);
   const lastMousePos = useRef({ x: 0, y: 0 });
   const scrollLocked = useRef(false);
 
@@ -47,16 +40,22 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   });
 
   // ── Word entries (stacking top → bottom) ─────────────────────
-  // W1 "Seamless" — phase reveal, no scroll needed
-  // W2–W5 — scroll-triggered entries
+  const w1Op = useTransform(scrollYProgress, [0.00, 0.08], [0, 1]);
+  const w1Y  = useTransform(scrollYProgress, [0.00, 0.08], ['28px', '0px']);
+
   const w2Op = useTransform(scrollYProgress, [0.10, 0.20], [0, 1]);
   const w2Y  = useTransform(scrollYProgress, [0.10, 0.20], ['28px', '0px']);
 
   const w3Op = useTransform(scrollYProgress, [0.24, 0.34], [0, 1]);
   const w3Y  = useTransform(scrollYProgress, [0.24, 0.34], ['28px', '0px']);
 
-  const w4Op = useTransform(scrollYProgress, [0.38, 0.52], [0, 1]);
-  const w4Y  = useTransform(scrollYProgress, [0.38, 0.52], ['28px', '0px']);
+  // TTL — letter by letter
+  const ttl0Op = useTransform(scrollYProgress, [0.38, 0.43], [0, 1]);
+  const ttl0Y  = useTransform(scrollYProgress, [0.38, 0.43], ['24px', '0px']);
+  const ttl1Op = useTransform(scrollYProgress, [0.44, 0.49], [0, 1]);
+  const ttl1Y  = useTransform(scrollYProgress, [0.44, 0.49], ['24px', '0px']);
+  const ttl2Op = useTransform(scrollYProgress, [0.50, 0.55], [0, 1]);
+  const ttl2Y  = useTransform(scrollYProgress, [0.50, 0.55], ['24px', '0px']);
 
   // ── All-words dissolve exit ────────────────────────────────────
   const dissolveOp   = useTransform(scrollYProgress, [0.72, 0.92], [1, 0]);
@@ -64,6 +63,10 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   const dissolveFilter = useMotionTemplate`blur(${dissolveBlur}px)`;
 
   const taglineOp = useTransform(scrollYProgress, [0.68, 0.82], [1, 0]);
+
+  // ── White sweep line — passes through the screen during transition
+  const lineX = useTransform(scrollYProgress, [0.68, 0.90], ['-100%', '220%']);
+  const lineOp = useTransform(scrollYProgress, [0.68, 0.72, 0.86, 0.90], [0, 0.7, 0.7, 0]);
 
   useEffect(() => {
     ALL_IMAGES.forEach(({ src }) => { const img = new Image(); img.src = src; });
@@ -79,12 +82,6 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     window.addEventListener('resize', setpad);
     return () => window.removeEventListener('resize', setpad);
   }, []);
-
-  useEffect(() => {
-    if (!startAnimation) return;
-    const t = setTimeout(() => setPhase('reveal'), 800);
-    return () => clearTimeout(t);
-  }, [startAnimation]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const { clientX, clientY } = e;
@@ -148,13 +145,8 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
           className="z-10 pointer-events-none absolute left-8 md:left-16 lg:left-24 top-1/2 -translate-y-1/2 flex flex-col"
           style={{ opacity: dissolveOp, filter: dissolveFilter }}
         >
-          {/* W1: Seamless */}
-          <motion.span
-            style={wordBase}
-            initial={{ opacity: 0, y: '28px' }}
-            animate={phase === 'reveal' ? { opacity: 1, y: '0px' } : {}}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          >
+          {/* W1: Seamless — scroll-triggered */}
+          <motion.span style={{ ...wordBase, opacity: w1Op, y: w1Y }}>
             Seamless
           </motion.span>
 
@@ -168,28 +160,42 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
             Experience
           </motion.span>
 
-          {/* W4: TTL */}
-          <motion.span style={{
-            ...wordBase,
-            fontSize: 'clamp(3.2rem, 10vw, 9rem)',
-            marginTop: '-0.04em',
-            opacity: w4Op,
-            y: w4Y,
-          }}>
-            TTL
-          </motion.span>
+          {/* W4: TTL — letter by letter with wide tracking */}
+          <div style={{ display: 'flex', marginTop: '-0.04em' }}>
+            {(['T', 'T', 'L'] as const).map((char, i) => {
+              const ops = [ttl0Op, ttl1Op, ttl2Op];
+              const ys  = [ttl0Y,  ttl1Y,  ttl2Y];
+              return (
+                <motion.span
+                  key={i}
+                  style={{
+                    ...wordBase,
+                    fontSize: 'clamp(3.2rem, 10vw, 9rem)',
+                    letterSpacing: '0.35em',
+                    opacity: ops[i],
+                    y: ys[i],
+                  }}
+                >
+                  {char}
+                </motion.span>
+              );
+            })}
+          </div>
         </motion.div>
 
         {/* ── Tagline ─────────────────────────────────── */}
         <motion.p
           className="z-10 pointer-events-none absolute bottom-6 left-8 md:left-16 lg:left-24 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
-          initial={{ opacity: 0 }}
-          animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.8, delay: 1.1 }}
           style={{ opacity: taglineOp }}
         >
           EST. 2020 — SEOUL, KOREA
         </motion.p>
+
+        {/* ── Sweep line — passes through as section exits ── */}
+        <motion.div
+          className="absolute inset-x-0 h-[1.5px] bg-white pointer-events-none z-20"
+          style={{ top: '50%', x: lineX, opacity: lineOp }}
+        />
 
         {/* ── Bottom blend ────────────────────────────── */}
         <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
