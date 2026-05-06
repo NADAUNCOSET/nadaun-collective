@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, useMotionTemplate, useSpring, useScroll, useMotionValueEvent, useTransform, MotionValue } from 'framer-motion';
+import { motion, useMotionValue, useMotionTemplate, useSpring, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
 
 type Phase = 'c-only' | 'reveal';
 
@@ -65,40 +65,6 @@ const LetterSpan: React.FC<{
   );
 };
 
-// NADAUN letter: slides in from right, spacing compresses, then fades out
-const NadaunLetter: React.FC<{
-  char: string;
-  index: number;
-  enter: MotionValue<number>;
-  compress: MotionValue<number>;
-  dissolve: MotionValue<number>;
-  phase: Phase;
-}> = ({ char, index, enter, compress, dissolve, phase }) => {
-  const inX     = useTransform(enter,    [index, index + 0.8], [160, 0]);
-  const inOp    = useTransform(enter,    [index, index + 0.7], [0, 1]);
-  const spacing = useTransform(compress, [0, 1], ['0.22em', '0.04em']);
-  const outOp   = useTransform(dissolve, [index + 4, index + 4.6], [1, 0]);
-  return (
-    <motion.span
-      initial={{ opacity: 0 }}
-      animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0 }}
-      style={{
-        display: 'inline-block',
-        fontFamily: 'Manrope, sans-serif',
-        fontWeight: 200,
-        fontSize: 'clamp(3rem, 7vw, 7rem)',
-        letterSpacing: spacing,
-        lineHeight: 1,
-        color: 'rgba(255,255,255,0.75)',
-        x: inX,
-        opacity: inOp,
-      }}
-    >
-      {char}
-    </motion.span>
-  );
-};
 
 interface HeroProps {
   startAnimation?: boolean;
@@ -134,11 +100,6 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
   // COLLECTIVE dissolve on exit (scroll 0.60→0.92, C exits first)
   const dissolveProgress = useTransform(scrollYProgress, [0.60, 0.92], [10, 0]);
-
-  // NADAUN enter: letters slide in from right on scroll 0→0.28
-  const nadaunEnter    = useTransform(scrollYProgress, [0.02, 0.28], [0, 6]);
-  // NADAUN compress: letter-spacing narrows as scroll continues 0.28→0.55
-  const nadaunCompress = useTransform(scrollYProgress, [0.28, 0.56], [0, 1]);
 
   // tagline fades out earlier
   const taglineOpacity = useTransform(scrollYProgress, [0.55, 0.72], [1, 0]);
@@ -235,22 +196,7 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
         {/* ── Text ──────────────────────────────────────── */}
         <div className="z-10 pointer-events-none w-full px-8 md:px-16 lg:px-24 flex flex-col absolute inset-0 justify-end pb-16 md:pb-20">
-          {/* NADAUN — letters fly in from right on scroll */}
-          <div className="flex items-baseline overflow-hidden mb-1" style={{ gap: 0 }}>
-            {'NADAUN'.split('').map((char, i) => (
-              <NadaunLetter
-                key={i}
-                char={char}
-                index={i}
-                enter={nadaunEnter}
-                compress={nadaunCompress}
-                dissolve={dissolveProgress}
-                phase={phase}
-              />
-            ))}
-          </div>
-
-          <div className="overflow-visible leading-none mt-2">
+          <div className="overflow-visible leading-none">
             <motion.div
               className="inline-flex items-baseline"
               variants={containerVariants}
