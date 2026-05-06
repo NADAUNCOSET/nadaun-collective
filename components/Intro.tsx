@@ -91,8 +91,8 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
             animate={stage >= 2 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-             <h1 className="text-[13vw] font-extrabold tracking-tighter leading-none text-white select-none">
-              COLLECTIVE
+            <h1 className="text-[13vw] font-extrabold tracking-tighter leading-none text-white select-none">
+              C
             </h1>
           </motion.div>
         </div>
@@ -110,7 +110,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
           {/* C. The Text (Black) - Inverted */}
           <div className="relative overflow-hidden">
             <h1 className="text-[13vw] font-extrabold tracking-tighter leading-none text-black select-none">
-              COLLECTIVE
+              C
             </h1>
           </div>
         </motion.div>
