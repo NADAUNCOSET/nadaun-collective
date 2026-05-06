@@ -2,7 +2,6 @@ import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 const IsoWorld = lazy(() => import('./components/IsoWorld'));
-import Business from './components/Business';
 import Clients from './components/Clients';
 import Footer from './components/Footer';
 import AboutOverlay from './components/AboutOverlay';
@@ -13,7 +12,6 @@ import InsightsOverlay from './components/InsightsOverlay';
 import Intro from './components/Intro';
 import Manifesto from './components/Manifesto';
 import VideoReel from './components/VideoReel';
-import PeopleReel from './components/PeopleReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import { motion, useScroll, useSpring, useTransform, AnimatePresence, useMotionValue } from 'framer-motion';
 
@@ -113,7 +111,6 @@ const App: React.FC = () => {
 
         <main>
           <Hero startAnimation={introFinished} />
-          <PeopleReel />
           <VideoReel />
           <Manifesto />
           <Clients />
@@ -122,15 +119,9 @@ const App: React.FC = () => {
               <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
             </Suspense>
           </ScrollSection>
-          <ScrollSection>
-            <Business
-              onAiLabClick={() => setActiveOverlay('ai-lab')}
-              onIntegratedClick={() => setActiveOverlay('integrated-solution')}
-            />
-          </ScrollSection>
         </main>
 
-        <Footer />
+        <Footer onContactClick={() => setActiveOverlay('contact')} />
       </div>
     </div>
   );

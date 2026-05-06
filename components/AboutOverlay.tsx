@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 220;
+const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 380;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 // Normalized start/end for each chapter
@@ -17,7 +17,7 @@ const C5S = C4E,             C5E = 1;
 
 const TIMELINE = [
   { year: '2020', title: '사진 장비 판매샵' },
-  { year: '2021', title: '사진·영상 판매샵' },
+  { year: '2021', title: '사진·영상 기자재 판매 및 유통' },
   { year: '2022', title: '렌탈샵 확장 및 제작업' },
   { year: '2023', title: '브랜드 필름·VCR 제작' },
   { year: '2024', title: '난컴퍼니 설립 · MCN' },
@@ -256,36 +256,113 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 };
 
 // ── Chapter 5 ─────────────────────────────────────────────────────────────────
+const TTL_STEPS = [
+  { en: 'On-site Direction',    ko: '현장 연출' },
+  { en: 'Brand Experience',     ko: 'BX 설계' },
+  { en: 'Live Production',      ko: '라이브 제작' },
+  { en: 'Digital Campaign',     ko: '디지털 캠페인' },
+  { en: 'Global Livestreaming', ko: '글로벌 송출' },
+];
+
 const Chapter5: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C5S, C5E], [0, 1]);
-  const titleOp = useTransform(p, [0.00, 0.18], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.18], ['5%', '0%']);
-  const gridOp  = useTransform(p, [0.14, 0.38], [0, 1]);
-  const gridY   = useTransform(p, [0.14, 0.38], ['4%', '0%']);
+
+  const tagOp    = useTransform(p, [0.00, 0.12], [0, 1]);
+  const h1Op     = useTransform(p, [0.06, 0.20], [0, 1]);
+  const h1Y      = useTransform(p, [0.06, 0.20], ['5%', '0%']);
+  const h2Op     = useTransform(p, [0.14, 0.28], [0, 1]);
+  const h2Y      = useTransform(p, [0.14, 0.28], ['5%', '0%']);
+  const subOp    = useTransform(p, [0.28, 0.40], [0, 1]);
+  const subY     = useTransform(p, [0.28, 0.40], ['3%', '0%']);
+  const lineScaleX = useTransform(p, [0.38, 0.68], [0, 1]);
+  const stepsOp  = useTransform(p, [0.44, 0.60], [0, 1]);
+  const pillsOp  = useTransform(p, [0.60, 0.76], [0, 1]);
+  const footerOp = useTransform(p, [0.82, 0.96], [0, 1]);
+
+  // O2O line color transition: white → gold on scroll
+  const imc1Color = useTransform(p, [0.60, 0.76], ['rgba(255,255,255,0.15)', 'rgba(255,184,0,0.9)']);
+  const imc2Color = useTransform(p, [0.65, 0.80], ['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.85)']);
+  const imc3Color = useTransform(p, [0.70, 0.84], ['rgba(255,255,255,0.15)', 'rgba(255,184,0,0.9)']);
 
   return (
     <div style={{ height: `${H5}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: titleOp, y: titleY }}
-          className="flex items-baseline justify-between mb-12"
-        >
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold">OUR PARTNERS</p>
-          <p className="text-white/40 text-xs font-mono">{PARTNERS.length}+ BRANDS</p>
-        </motion.div>
-        <motion.div style={{ opacity: gridOp, y: gridY }}
-          className="grid grid-cols-3 md:grid-cols-6 gap-x-6 gap-y-5"
-        >
-          {PARTNERS.map(name => (
-            <span key={name}
-              className="text-xs font-bold text-white/50 hover:text-white transition-colors tracking-wider uppercase truncate cursor-default"
-            >{name}</span>
-          ))}
-        </motion.div>
-        <motion.div style={{ opacity: gridOp }}
-          className="mt-16 pt-6 border-t border-white/10 flex items-center justify-between"
-        >
-          <p className="text-white/30 text-[11px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
-          <p className="text-[#FFB800] text-[11px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
+        <motion.div>
+          <motion.p style={{ opacity: tagOp }}
+            className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold"
+          >THROUGH THE LINE</motion.p>
+
+          <motion.h2
+            style={{ opacity: h1Op, y: h1Y, fontSize: 'clamp(4.5rem, 15vw, 12rem)' }}
+            className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
+          >ALL IN</motion.h2>
+          <motion.h2
+            style={{ opacity: h2Op, y: h2Y, fontSize: 'clamp(4.5rem, 15vw, 12rem)', color: '#FFB800' }}
+            className="font-black tracking-[-0.03em] leading-[0.85] block mb-10"
+          >ONE.</motion.h2>
+
+          <motion.div style={{ opacity: subOp, y: subY }} className="max-w-2xl mb-10">
+            <p className="text-white/80 text-lg md:text-xl leading-relaxed font-light mb-3">
+              Seamless Hybrid Experience —<br className="hidden md:block" />
+              <span className="text-white/55">온·오프라인의 경계가 없는 통합 캠페인</span>
+            </p>
+            <p className="text-white/45 text-sm leading-relaxed">
+              From On-site Direction to Global Livestreaming.<br />
+              ATL과 BTL의 경계를 허물고, TTL로 브랜드를 완성합니다.
+            </p>
+          </motion.div>
+
+          {/* Flow line: steps */}
+          <div className="relative mb-8 overflow-hidden">
+            <div className="h-[1px] w-full bg-white/8 mb-6" />
+            <motion.div className="absolute top-0 left-0 h-[1px] bg-[#FFB800] origin-left w-full"
+              style={{ scaleX: lineScaleX }} />
+            <motion.div style={{ opacity: stepsOp }}
+              className="flex flex-wrap gap-3 items-center"
+            >
+              {TTL_STEPS.map((step, i) => (
+                <React.Fragment key={step.en}>
+                  <div className="flex flex-col">
+                    <span className="text-white text-[11px] font-bold uppercase tracking-wider">{step.en}</span>
+                    <span className="text-white/35 text-[10px]">{step.ko}</span>
+                  </div>
+                  {i < TTL_STEPS.length - 1 && (
+                    <span className="text-[#FFB800]/50 text-xs mx-1">→</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* BX · O2O · IMC pills */}
+          <motion.div style={{ opacity: pillsOp }} className="flex flex-wrap gap-3 mb-12">
+            {[
+              { label: 'BX',  sub: 'Brand Experience' },
+              { label: 'O2O', sub: 'Online to Offline' },
+              { label: 'IMC', sub: 'Integrated Marketing' },
+            ].map((item, i) => {
+              const colArr = [imc1Color, imc2Color, imc3Color];
+              return (
+                <motion.div
+                  key={item.label}
+                  style={{ borderColor: colArr[i] }}
+                  className="flex flex-col px-6 py-3 border rounded-full"
+                >
+                  <motion.span style={{ color: colArr[i] }}
+                    className="text-sm font-black tracking-wider uppercase"
+                  >{item.label}</motion.span>
+                  <span className="text-white/35 text-[10px] tracking-wide">{item.sub}</span>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+          <motion.div style={{ opacity: footerOp }}
+            className="pt-6 border-t border-white/10 flex items-center justify-between"
+          >
+            <p className="text-white/25 text-[11px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
+            <p className="text-[#FFB800] text-[11px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
+          </motion.div>
         </motion.div>
       </StickyPanel>
     </div>

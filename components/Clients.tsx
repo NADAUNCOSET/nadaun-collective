@@ -3,50 +3,52 @@ import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-mot
 
 interface ClientNode {
   name: string;
-  x: number;   // final position 0–100 (%)
+  x: number;
   y: number;
   size?: 'lg' | 'md' | 'sm';
-  logo?: string;   // local SVG
-  domain?: string; // clearbit fallback
 }
 
-const CX = 50; // constellation center X
-const CY = 52; // constellation center Y
+const CX = 50;
+const CY = 52;
 
 const NODES: ClientNode[] = [
-  { name: 'SAMSUNG',        x: 12,  y: 18,  size: 'lg', logo: '/logos/samsung.svg'   },
-  { name: 'HYUNDAI',        x: 28,  y: 8,   size: 'lg', logo: '/logos/hyundai.svg'   },
-  { name: 'PEPSI',          x: 50,  y: 12,  size: 'lg', logo: '/logos/pepsi.svg'     },
-  { name: 'EMIRATES',       x: 72,  y: 7,   size: 'lg', logo: '/logos/emirates.svg'  },
-  { name: 'KIA',            x: 88,  y: 22,  size: 'md', logo: '/logos/kia.svg'       },
-  { name: 'DIOR',           x: 82,  y: 40,  size: 'md', logo: '/logos/dior.svg'      },
-  { name: 'CALVIN KLEIN',   x: 92,  y: 58,  size: 'md', domain: 'calvinklein.com'   },
-  { name: 'ELLE',           x: 80,  y: 72,  size: 'md', domain: 'elle.com'          },
-  { name: 'OLIVE YOUNG',    x: 62,  y: 83,  size: 'md', logo: '/logos/oliveyoung.svg'},
-  { name: 'AMOREPACIFIC',   x: 44,  y: 89,  size: 'md', domain: 'amorepacific.com'  },
-  { name: 'COWAY',          x: 26,  y: 80,  size: 'md', logo: '/logos/coway.svg'     },
-  { name: 'JUNG SAEM MOOL', x: 10,  y: 70,  size: 'sm'                               },
-  { name: 'ACMÉ DE LA VIE', x: 6,   y: 52,  size: 'sm'                               },
-  { name: 'HD HYUNDAI',     x: 8,   y: 36,  size: 'sm', domain: 'hdhyundai.com'     },
-  { name: 'HYUNDAI STEEL',  x: 22,  y: 28,  size: 'sm', domain: 'hyundai-steel.com' },
-  { name: 'GAONCHIPS',      x: 38,  y: 32,  size: 'sm'                               },
-  { name: 'NUMBUZIN',       x: 55,  y: 28,  size: 'sm'                               },
-  { name: 'TONYMOLY',       x: 68,  y: 35,  size: 'sm', domain: 'tonymoly.com'      },
-  { name: 'SKINFOOD',       x: 74,  y: 52,  size: 'sm'                               },
-  { name: 'THE SAEM',       x: 68,  y: 65,  size: 'sm'                               },
-  { name: 'SKIN1004',       x: 52,  y: 62,  size: 'sm'                               },
-  { name: 'ABIB',           x: 36,  y: 60,  size: 'sm'                               },
-  { name: 'DASIQUE',        x: 22,  y: 52,  size: 'sm'                               },
-  { name: 'HECTO',          x: 32,  y: 44,  size: 'sm'                               },
-  { name: 'K2 SAFETY',      x: 46,  y: 46,  size: 'sm'                               },
-  { name: 'KOVA',           x: 60,  y: 48,  size: 'sm'                               },
-  { name: 'BEREX',          x: 18,  y: 62,  size: 'sm'                               },
-  { name: 'PAT',            x: 42,  y: 72,  size: 'sm'                               },
-  { name: 'PREED',          x: 56,  y: 75,  size: 'sm'                               },
-  { name: 'KWDA',           x: 70,  y: 78,  size: 'sm'                               },
-  { name: 'M2美度',          x: 84,  y: 86,  size: 'sm'                               },
-  { name: 'THE NEW GREY',   x: 32,  y: 18,  size: 'sm'                               },
-  { name: 'NUDAKE',         x: 18,  y: 42,  size: 'sm'                               },
+  { name: 'SAMSUNG',        x: 12,  y: 18,  size: 'lg' },
+  { name: 'HYUNDAI',        x: 28,  y: 8,   size: 'lg' },
+  { name: 'PEPSI',          x: 50,  y: 12,  size: 'lg' },
+  { name: 'EMIRATES',       x: 72,  y: 7,   size: 'lg' },
+  { name: 'KIA',            x: 88,  y: 22,  size: 'md' },
+  { name: 'DIOR',           x: 82,  y: 40,  size: 'md' },
+  { name: 'CALVIN KLEIN',   x: 92,  y: 58,  size: 'md' },
+  { name: 'ELLE',           x: 80,  y: 72,  size: 'md' },
+  { name: 'OLIVE YOUNG',    x: 62,  y: 83,  size: 'md' },
+  { name: 'AMOREPACIFIC',   x: 44,  y: 89,  size: 'md' },
+  { name: 'COWAY',          x: 26,  y: 80,  size: 'md' },
+  { name: 'JUNG SAEM MOOL', x: 10,  y: 70,  size: 'sm' },
+  { name: 'ACMÉ DE LA VIE', x: 6,   y: 52,  size: 'sm' },
+  { name: 'HD HYUNDAI',     x: 8,   y: 36,  size: 'sm' },
+  { name: 'HYUNDAI STEEL',  x: 22,  y: 28,  size: 'sm' },
+  { name: 'GAONCHIPS',      x: 38,  y: 32,  size: 'sm' },
+  { name: 'NUMBUZIN',       x: 55,  y: 28,  size: 'sm' },
+  { name: 'TONYMOLY',       x: 68,  y: 35,  size: 'sm' },
+  { name: 'SKINFOOD',       x: 74,  y: 52,  size: 'sm' },
+  { name: 'THE SAEM',       x: 68,  y: 65,  size: 'sm' },
+  { name: 'SKIN1004',       x: 52,  y: 62,  size: 'sm' },
+  { name: 'ABIB',           x: 36,  y: 60,  size: 'sm' },
+  { name: 'DASIQUE',        x: 22,  y: 52,  size: 'sm' },
+  { name: 'HECTO',          x: 32,  y: 44,  size: 'sm' },
+  { name: 'K2 SAFETY',      x: 46,  y: 46,  size: 'sm' },
+  { name: 'KOVA',           x: 60,  y: 48,  size: 'sm' },
+  { name: 'BEREX',          x: 18,  y: 62,  size: 'sm' },
+  { name: 'PAT',            x: 42,  y: 72,  size: 'sm' },
+  { name: 'PREED',          x: 56,  y: 75,  size: 'sm' },
+  { name: 'KWDA',           x: 70,  y: 78,  size: 'sm' },
+  { name: 'M2美度',          x: 84,  y: 86,  size: 'sm' },
+  { name: 'THE NEW GREY',   x: 32,  y: 18,  size: 'sm' },
+  { name: 'NUDAKE',         x: 18,  y: 42,  size: 'sm' },
+  { name: 'POSCO',          x: 14,  y: 94,  size: 'md' },
+  { name: 'INNOCEAN',       x: 38,  y: 4,   size: 'md' },
+  { name: 'CHEIL',          x: 62,  y: 96,  size: 'md' },
+  { name: 'SBS',            x: 80,  y: 56,  size: 'md' },
 ];
 
 const EDGES: [number, number][] = [
@@ -62,45 +64,29 @@ const EDGES: [number, number][] = [
   [13, 32], [12, 26], [8, 28],
 ];
 
-// Per-node clearbit logo component (handles load error)
-const NodeLogo: React.FC<{ node: ClientNode }> = ({ node }) => {
-  const [ok, setOk] = useState(true);
-  const src = node.logo ?? (node.domain ? `https://logo.clearbit.com/${node.domain}?size=64` : null);
-
-  if (!src || !ok) {
-    return (
-      <span
-        style={{
-          fontFamily: 'Manrope, sans-serif',
-          fontSize: node.size === 'lg' ? 'clamp(9px, 1.1vw, 13px)' : 'clamp(7px, 0.85vw, 10px)',
-          fontWeight: 700,
-          letterSpacing: '0.07em',
-          color: node.size === 'lg' ? 'rgba(255,255,255,0.9)'
-            : node.size === 'md' ? 'rgba(255,255,255,0.6)'
-            : 'rgba(255,255,255,0.35)',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {node.name}
-      </span>
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={node.name}
-      onError={() => setOk(false)}
-      style={{
-        maxHeight: node.size === 'lg' ? 22 : 16,
-        maxWidth: node.size === 'lg' ? 80 : 60,
-        objectFit: 'contain',
-        filter: 'brightness(0) invert(1)',
-        opacity: node.size === 'lg' ? 0.85 : node.size === 'md' ? 0.65 : 0.4,
-      }}
-    />
-  );
-};
+const NodeLabel: React.FC<{ node: ClientNode }> = ({ node }) => (
+  <span
+    style={{
+      fontFamily: 'Manrope, sans-serif',
+      fontSize: node.size === 'lg'
+        ? 'clamp(11px, 1.3vw, 15px)'
+        : node.size === 'md'
+        ? 'clamp(9px, 1.1vw, 13px)'
+        : 'clamp(8px, 0.9vw, 11px)',
+      fontWeight: node.size === 'lg' ? 800 : node.size === 'md' ? 700 : 600,
+      letterSpacing: '0.06em',
+      color: node.size === 'lg'
+        ? 'rgba(255,255,255,1)'
+        : node.size === 'md'
+        ? 'rgba(255,255,255,0.85)'
+        : 'rgba(255,255,255,0.6)',
+      whiteSpace: 'nowrap',
+      textShadow: node.size === 'lg' ? '0 0 20px rgba(255,184,0,0.4)' : 'none',
+    }}
+  >
+    {node.name}
+  </span>
+);
 
 const Clients: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -216,8 +202,7 @@ const Clients: React.FC = () => {
                     boxShadow: node.size === 'lg' ? `0 0 10px ${dotColor}` : 'none',
                   }}
                 />
-                {/* Logo or text */}
-                <NodeLogo node={node} />
+                <NodeLabel node={node} />
               </motion.div>
             );
           })}

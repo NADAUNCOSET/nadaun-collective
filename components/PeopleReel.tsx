@@ -1,133 +1,90 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// All from nadaun.framer.website — mixed portrait & commercial shots
-const SLIDES = [
-  { src: 'https://framerusercontent.com/images/8iDqSjerVvrJdO3XmbmCqnQ3eHI.jpg?scale-down-to=2048',  pos: 'center 12%' },
-  { src: 'https://framerusercontent.com/images/baj0VsRrAiBlnAcClysX8JOmXk.jpg?scale-down-to=2048',  pos: 'center 8%'  },
-  { src: 'https://framerusercontent.com/images/FxxtlPcNMxXKMiSQ5KYvnDITQ.jpg?scale-down-to=2048',  pos: 'center 10%' },
-  { src: 'https://framerusercontent.com/images/WalxNKWEtizgPdzgDgJqwzg5u4Y.jpg?scale-down-to=2048', pos: 'center 18%' },
-  { src: 'https://framerusercontent.com/images/1z68aA8IVtTXqPCcZzZnjoqyrbY.jpg?scale-down-to=2048', pos: 'center 5%'  },
-  { src: 'https://framerusercontent.com/images/QllGUMDkWAUR6xJgI8Qg44fwoZ4.jpg?scale-down-to=2048', pos: 'center 15%' },
-  { src: 'https://framerusercontent.com/images/deQ27myQIMb4tVVDQPCxwUw7Iw.jpg?scale-down-to=2048',  pos: 'center 8%'  },
-  { src: 'https://framerusercontent.com/images/spwqlYBLDlE9xpoHQcO45j3kQhA.jpg?scale-down-to=2048', pos: 'center 20%' },
+const PHOTOS = [
+  { src: 'https://framerusercontent.com/images/8iDqSjerVvrJdO3XmbmCqnQ3eHI.jpg?scale-down-to=2048',  pos: 'center 18%' },
+  { src: 'https://framerusercontent.com/images/baj0VsRrAiBlnAcClysX8JOmXk.jpg?scale-down-to=2048',  pos: 'center 15%' },
+  { src: 'https://framerusercontent.com/images/FxxtlPcNMxXKMiSQ5KYvnDITQ.jpg?scale-down-to=2048',  pos: 'center 12%' },
+  { src: 'https://framerusercontent.com/images/WalxNKWEtizgPdzgDgJqwzg5u4Y.jpg?scale-down-to=2048', pos: 'center 20%' },
+  { src: 'https://framerusercontent.com/images/1z68aA8IVtTXqPCcZzZnjoqyrbY.jpg?scale-down-to=2048', pos: 'center 10%' },
+  { src: 'https://framerusercontent.com/images/QllGUMDkWAUR6xJgI8Qg44fwoZ4.jpg?scale-down-to=2048', pos: 'center 18%' },
+  { src: 'https://framerusercontent.com/images/deQ27myQIMb4tVVDQPCxwUw7Iw.jpg?scale-down-to=2048',  pos: 'center 14%' },
+  { src: 'https://framerusercontent.com/images/spwqlYBLDlE9xpoHQcO45j3kQhA.jpg?scale-down-to=2048', pos: 'center 22%' },
 ];
 
-// Each section: tall outer (200vh) + sticky inner (100vh)
-// → as next section enters, its sticky frame slides up from bottom and covers the previous one
-const SECTION_HEIGHT = 200; // vh
+const INTERVAL = 4200;
 
-const PhotoSection: React.FC<{
-  src: string;
-  objectPos: string;
-  idx: number;
-  total: number;
-}> = ({ src, objectPos, idx, total }) => {
-  const ref = useRef<HTMLDivElement>(null);
+const PeopleReel: React.FC = () => {
+  const [current, setCurrent] = useState(0);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end end'],
-  });
-
-  // Image is 118% tall → parallax pan: moves up by 18% over the scroll
-  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '-18%']);
-
-  const isFirst = idx === 0;
-  const isLast  = idx === total - 1;
+  useEffect(() => {
+    const id = setInterval(() => setCurrent(p => (p + 1) % PHOTOS.length), INTERVAL);
+    return () => clearInterval(id);
+  }, []);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        height: `${SECTION_HEIGHT}vh`,
-        position: 'relative',
-      }}
-    >
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflow: 'hidden',
-          zIndex: idx + 1, // higher index = covers previous
-          backgroundColor: '#000',
-        }}
-      >
-        {/* Parallax image — taller than viewport so it pans */}
-        <motion.img
-          src={src}
-          alt=""
-          draggable={false}
-          className="select-none pointer-events-none"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '118%',
-            objectFit: 'cover',
-            objectPosition: objectPos,
-            y: imageY,
-          }}
-        />
+    <div className="relative w-full bg-black overflow-hidden" style={{ height: '100vh' }}>
 
-        {/* Cinematic gradient overlay — vignette + top/bottom fades */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: [
-              'linear-gradient(to bottom, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.0) 28%)',
-              'linear-gradient(to top,   rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.0) 32%)',
-              'radial-gradient(ellipse 130% 110% at 50% 50%, transparent 38%, rgba(0,0,0,0.42) 100%)',
-            ].join(', '),
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Top blend with Hero (first slide only) */}
-        {isFirst && (
-          <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
-        )}
-
-        {/* Bottom blend with VideoReel (last slide only) */}
-        {isLast && (
-          <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none" />
-        )}
-
-        {/* Slide counter — bottom right */}
-        <div
-          className="absolute bottom-8 right-8 font-mono text-white/25 pointer-events-none"
-          style={{ fontSize: 11, letterSpacing: '0.15em' }}
+      {/* Photo stack — crossfade */}
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={current}
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.4, ease: 'easeInOut' }}
         >
-          {String(idx + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-        </div>
-
-        {/* Progress bar — bottom */}
-        <div className="absolute bottom-0 inset-x-0 h-[2px] bg-white/8 pointer-events-none">
-          <motion.div
-            className="h-full bg-[#FFB800]"
-            style={{ width: useTransform(scrollYProgress, [0, 1], ['0%', '100%']) }}
+          <img
+            src={PHOTOS[current].src}
+            alt=""
+            draggable={false}
+            className="w-full h-full object-cover select-none pointer-events-none"
+            style={{ objectPosition: PHOTOS[current].pos }}
           />
-        </div>
+          {/* Cinematic overlays */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: [
+                'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 25%)',
+                'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 30%)',
+                'radial-gradient(ellipse 130% 110% at 50% 50%, transparent 40%, rgba(0,0,0,0.38) 100%)',
+              ].join(', '),
+            }}
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Top blend with Hero */}
+      <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
+      {/* Bottom blend with next section */}
+      <div className="absolute bottom-0 inset-x-0 h-36 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
+
+      {/* Counter */}
+      <div
+        className="absolute bottom-8 right-8 font-mono text-white/25 z-20 pointer-events-none"
+        style={{ fontSize: 11, letterSpacing: '0.15em' }}
+      >
+        {String(current + 1).padStart(2, '0')} / {String(PHOTOS.length).padStart(2, '0')}
+      </div>
+
+      {/* Progress dots */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20 pointer-events-none">
+        {PHOTOS.map((_, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-700"
+            style={{
+              width: i === current ? 20 : 4,
+              height: 4,
+              backgroundColor: i === current ? '#FFB800' : 'rgba(255,255,255,0.2)',
+            }}
+          />
+        ))}
       </div>
     </div>
   );
 };
-
-const PeopleReel: React.FC = () => (
-  <div className="bg-black">
-    {SLIDES.map((slide, i) => (
-      <PhotoSection
-        key={i}
-        src={slide.src}
-        objectPos={slide.pos}
-        idx={i}
-        total={SLIDES.length}
-      />
-    ))}
-  </div>
-);
 
 export default PeopleReel;

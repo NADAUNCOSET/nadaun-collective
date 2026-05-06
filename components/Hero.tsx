@@ -1,17 +1,24 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useMotionValue, useMotionTemplate, useSpring } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useMotionTemplate, useSpring, useScroll, useMotionValueEvent, useTransform, MotionValue } from 'framer-motion';
 
 type Phase = 'c-only' | 'reveal';
 
-const HERO_IMAGES = [
-  '/hero/pepsi-festa.webp',
-  '/hero/hd-hyundai.webp',
-  '/hero/royal-salute.webp',
-  '/hero/banyan-tree.webp',
-  '/hero/varilux-seoul.webp',
+// Portfolio & campaign shots + people folder portraits
+const ALL_IMAGES = [
+  { src: '/hero/pepsi-festa.webp',          pos: 'center 35%' },
+  { src: '/hero/hd-hyundai.webp',           pos: 'center 40%' },
+  { src: '/people/estevan-00.webp',         pos: 'center 20%' },
+  { src: '/hero/royal-salute.webp',         pos: 'center 30%' },
+  { src: '/people/thenewgrey-00.webp',      pos: 'center 25%' },
+  { src: '/hero/banyan-tree.webp',          pos: 'center 30%' },
+  { src: '/people/dong-wook-00.webp',       pos: 'center 20%' },
+  { src: '/hero/varilux-seoul.webp',        pos: 'center 40%' },
+  { src: '/people/laon-band-00.webp',       pos: 'center 25%' },
+  { src: 'https://framerusercontent.com/images/QllGUMDkWAUR6xJgI8Qg44fwoZ4.jpg?scale-down-to=2048', pos: 'center 18%' },
 ];
 
-// Letter-by-letter dissolve for COLLECTIVE
+const SECTION_H = 320; // vh — outer scroll height
+
 const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.065, delayChildren: 0.05 } },
@@ -19,11 +26,78 @@ const containerVariants = {
 const letterVariants = {
   hidden: { opacity: 0, filter: 'blur(10px)', y: 6 },
   visible: {
-    opacity: 1,
-    filter: 'blur(0px)',
-    y: 0,
+    opacity: 1, filter: 'blur(0px)', y: 0,
     transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
   },
+};
+
+// COLLECTIVE letter: scroll-exit (dissolves out letter by letter)
+const LetterSpan: React.FC<{
+  char: string;
+  index: number;
+  dissolve: MotionValue<number>;
+  phase: Phase;
+}> = ({ char, index, dissolve, phase }) => {
+  const exitOpacity = useTransform(dissolve, [index, index + 0.8], [1, 0]);
+  const exitY       = useTransform(dissolve, [index, index + 0.8], [0, -18]);
+  const exitBlur    = useTransform(dissolve, [index, index + 0.8], [0, 8]);
+  const filter      = useMotionTemplate`blur(${exitBlur}px)`;
+  return (
+    <motion.span
+      variants={letterVariants}
+      initial="hidden"
+      animate={phase === 'reveal' ? 'visible' : 'hidden'}
+      style={{
+        display: 'inline-block',
+        fontFamily: 'Manrope, sans-serif',
+        fontWeight: 600,
+        fontSize: 'clamp(4rem, 13.5vw, 12rem)',
+        letterSpacing: '-0.01em',
+        lineHeight: 0.92,
+        color: '#ffffff',
+        opacity: exitOpacity,
+        y: exitY,
+        filter,
+      }}
+    >
+      {char}
+    </motion.span>
+  );
+};
+
+// NADAUN letter: slides in from right, spacing compresses, then fades out
+const NadaunLetter: React.FC<{
+  char: string;
+  index: number;
+  enter: MotionValue<number>;
+  compress: MotionValue<number>;
+  dissolve: MotionValue<number>;
+  phase: Phase;
+}> = ({ char, index, enter, compress, dissolve, phase }) => {
+  const inX     = useTransform(enter,    [index, index + 0.8], [160, 0]);
+  const inOp    = useTransform(enter,    [index, index + 0.7], [0, 1]);
+  const spacing = useTransform(compress, [0, 1], ['0.22em', '0.04em']);
+  const outOp   = useTransform(dissolve, [index + 4, index + 4.6], [1, 0]);
+  return (
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 0 }}
+      style={{
+        display: 'inline-block',
+        fontFamily: 'Manrope, sans-serif',
+        fontWeight: 200,
+        fontSize: 'clamp(3rem, 7vw, 7rem)',
+        letterSpacing: spacing,
+        lineHeight: 1,
+        color: 'rgba(255,255,255,0.75)',
+        x: inX,
+        opacity: inOp,
+      }}
+    >
+      {char}
+    </motion.span>
+  );
 };
 
 interface HeroProps {
@@ -31,27 +105,51 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
+  const sectionRef  = useRef<HTMLDivElement>(null);
+  const stickyRef   = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [phase, setPhase] = useState<Phase>('c-only');
   const lastMousePos = useRef({ x: 0, y: 0 });
+  const scrollLocked = useRef(false); // true once user has scrolled past hero
 
   const rawX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 500);
   const rawY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
   const mouseX = useSpring(rawX, { stiffness: 100, damping: 20, restDelta: 0.5 });
   const mouseY = useSpring(rawY, { stiffness: 100, damping: 20, restDelta: 0.5 });
 
-  const lensMask = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
-  const lensWebkit = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+  const lensMask    = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+  const lensWebkit  = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+
+  // Scroll drives background cycling
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  });
+
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    scrollLocked.current = v > 0.01;
+    const idx = Math.min(Math.floor(v * ALL_IMAGES.length), ALL_IMAGES.length - 1);
+    setActiveImage(idx);
+  });
+
+  // COLLECTIVE dissolve on exit (scroll 0.60→0.92, C exits first)
+  const dissolveProgress = useTransform(scrollYProgress, [0.60, 0.92], [10, 0]);
+
+  // NADAUN enter: letters slide in from right on scroll 0→0.28
+  const nadaunEnter    = useTransform(scrollYProgress, [0.02, 0.28], [0, 6]);
+  // NADAUN compress: letter-spacing narrows as scroll continues 0.28→0.55
+  const nadaunCompress = useTransform(scrollYProgress, [0.28, 0.56], [0, 1]);
+
+  // tagline fades out earlier
+  const taglineOpacity = useTransform(scrollYProgress, [0.55, 0.72], [1, 0]);
 
   useEffect(() => {
-    HERO_IMAGES.forEach((src) => { const img = new Image(); img.src = src; });
+    ALL_IMAGES.forEach(({ src }) => { const img = new Image(); img.src = src; });
   }, []);
 
-  // Sync --header-pad with hero left padding so header aligns to COLLECTIVE left edge
   useEffect(() => {
     const setpad = () => {
       const vw = window.innerWidth;
-      // matches px-8 md:px-16 lg:px-24
       const px = vw >= 1024 ? 96 : vw >= 768 ? 64 : 32;
       document.documentElement.style.setProperty('--header-pad', `${px}px`);
     };
@@ -70,151 +168,122 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     const { clientX, clientY } = e;
     rawX.set(clientX);
     rawY.set(clientY);
-    const d = Math.sqrt(
-      (clientX - lastMousePos.current.x) ** 2 + (clientY - lastMousePos.current.y) ** 2
-    );
-    if (d > 160) {
-      setActiveImage(p => (p + 1) % HERO_IMAGES.length);
-      lastMousePos.current = { x: clientX, y: clientY };
+    // Mouse still changes image when not scrolled
+    if (!scrollLocked.current) {
+      const d = Math.sqrt(
+        (clientX - lastMousePos.current.x) ** 2 + (clientY - lastMousePos.current.y) ** 2
+      );
+      if (d > 160) {
+        setActiveImage(p => (p + 1) % ALL_IMAGES.length);
+        lastMousePos.current = { x: clientX, y: clientY };
+      }
     }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const { clientX, clientY } = e.touches[0];
-    rawX.set(clientX);
-    rawY.set(clientY);
-  };
-
-  const scrollToNext = () => {
-    window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
   };
 
   const collectiveLetters = 'COLLECTIVE'.split('');
 
   return (
-    <section
-      className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black cursor-none"
-      onMouseMove={handleMouseMove}
-      onTouchMove={handleTouchMove}
-    >
-      {/* ── Base background (always visible, dimmed) ─────────────────── */}
-      <div className="absolute inset-0 z-0">
-        {HERO_IMAGES.map((src, i) => (
-          <div
-            key={i}
-            className={`absolute inset-0 transition-opacity duration-1000 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <img
-              src={src}
-              alt=""
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.32) saturate(0.85)' }}
-            />
-          </div>
-        ))}
-      </div>
+    // Outer tall div — provides scroll distance
+    <div ref={sectionRef} style={{ height: `${SECTION_H}vh` }} className="relative">
 
-      {/* ── Lens (brighter circle around cursor) ─────────────────────── */}
-      <motion.div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}
+      {/* Sticky viewport — stays fixed while scrolling through outer */}
+      <div
+        ref={stickyRef}
+        className="sticky top-0 w-full overflow-hidden bg-black cursor-none"
+        style={{ height: '100vh' }}
+        onMouseMove={handleMouseMove}
       >
-        {HERO_IMAGES.map((src, i) => (
-          <div
-            key={i}
-            className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <img
-              src={src}
-              alt=""
-              className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.82) contrast(1.06) saturate(1.1)' }}
-            />
-          </div>
-        ))}
-      </motion.div>
+        {/* ── Background images ─────────────────────────── */}
+        <div className="absolute inset-0 z-0">
+          {ALL_IMAGES.map(({ src, pos }, i) => (
+            <div
+              key={i}
+              className={`absolute inset-0 transition-opacity duration-1000 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <img
+                src={src}
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ objectPosition: pos, filter: 'brightness(0.32) saturate(0.85)' }}
+              />
+            </div>
+          ))}
+        </div>
 
-      {/* ── Vignette ─────────────────────────────────────────────────── */}
-      <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-
-      {/* ── Text composition ─────────────────────────────────────────── */}
-      <div className="z-10 relative pointer-events-none w-full px-8 md:px-16 lg:px-24 flex flex-col">
-
-        {/* NADAUN — thin, wide tracking */}
-        <motion.p
-          style={{
-            fontFamily: 'Manrope, sans-serif',
-            fontWeight: 200,
-            fontSize: 'clamp(0.85rem, 2vw, 1.8rem)',
-            letterSpacing: '0.55em',
-            color: 'rgba(255,255,255,0.55)',
-            lineHeight: 1,
-            textTransform: 'uppercase',
-          }}
-          initial={{ opacity: 0, x: -8 }}
-          animate={phase === 'reveal' ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.0 }}
+        {/* ── Lens ──────────────────────────────────────── */}
+        <motion.div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}
         >
-          NADAUN
-        </motion.p>
+          {ALL_IMAGES.map(({ src, pos }, i) => (
+            <div
+              key={i}
+              className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <img
+                src={src}
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ objectPosition: pos, filter: 'brightness(0.82) contrast(1.06) saturate(1.1)' }}
+              />
+            </div>
+          ))}
+        </motion.div>
 
-        {/* COLLECTIVE — semibold, letter dissolve */}
-        <div className="overflow-visible leading-none mt-2">
-          <motion.div
-            className="inline-flex items-baseline"
-            variants={containerVariants}
-            initial="hidden"
-            animate={phase === 'reveal' ? 'visible' : 'hidden'}
-          >
-            {collectiveLetters.map((char, i) => (
-              <motion.span
+        {/* ── Vignette ──────────────────────────────────── */}
+        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+
+        {/* ── Text ──────────────────────────────────────── */}
+        <div className="z-10 pointer-events-none w-full px-8 md:px-16 lg:px-24 flex flex-col absolute inset-0 justify-end pb-16 md:pb-20">
+          {/* NADAUN — letters fly in from right on scroll */}
+          <div className="flex items-baseline overflow-hidden mb-1" style={{ gap: 0 }}>
+            {'NADAUN'.split('').map((char, i) => (
+              <NadaunLetter
                 key={i}
-                variants={letterVariants}
-                style={{
-                  display: 'inline-block',
-                  fontFamily: 'Manrope, sans-serif',
-                  fontWeight: 600,
-                  fontSize: 'clamp(4rem, 13.5vw, 12rem)',
-                  letterSpacing: '-0.01em',
-                  lineHeight: 0.92,
-                  color: '#ffffff',
-                }}
-              >
-                {char}
-              </motion.span>
+                char={char}
+                index={i}
+                enter={nadaunEnter}
+                compress={nadaunCompress}
+                dissolve={dissolveProgress}
+                phase={phase}
+              />
             ))}
-          </motion.div>
+          </div>
+
+          <div className="overflow-visible leading-none mt-2">
+            <motion.div
+              className="inline-flex items-baseline"
+              variants={containerVariants}
+              initial="hidden"
+              animate={phase === 'reveal' ? 'visible' : 'hidden'}
+            >
+              {collectiveLetters.map((char, i) => (
+                <LetterSpan
+                  key={i}
+                  char={char}
+                  index={i}
+                  dissolve={dissolveProgress}
+                  phase={phase}
+                />
+              ))}
+            </motion.div>
+          </div>
+
+          <motion.p
+            className="mt-8 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
+            initial={{ opacity: 0 }}
+            animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            style={{ opacity: taglineOpacity }}
+          >
+            EST. 2020 — SEOUL, KOREA
+          </motion.p>
         </div>
 
-        {/* Tagline */}
-        <motion.p
-          className="mt-8 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
-          initial={{ opacity: 0 }}
-          animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-        >
-          EST. 2020 — SEOUL, KOREA
-        </motion.p>
+        {/* ── Bottom blend to next section ──────────────── */}
+        <div className="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
       </div>
-
-      {/* ── Scroll indicator ─────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: 1.2, duration: 0.5 }}
-        className="absolute bottom-10 right-12 md:right-20 z-20 flex flex-col items-center cursor-pointer pointer-events-auto gap-3"
-        onClick={scrollToNext}
-      >
-        <span className="text-[9px] text-white/30 tracking-[0.35em] uppercase font-light rotate-90 origin-center mb-2">Scroll</span>
-        <div className="w-[1px] h-[48px] bg-white/15 relative overflow-hidden">
-          <motion.div
-            animate={{ y: [-48, 48] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
-            className="absolute top-0 left-0 w-full h-[35%] bg-[#FFB800]"
-          />
-        </div>
-      </motion.div>
-    </section>
+    </div>
   );
 };
 
