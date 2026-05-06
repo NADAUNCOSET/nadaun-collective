@@ -5,9 +5,8 @@ import { generateMarketingInsight } from '../services/geminiService';
 
 const HEADER_H = 57;
 
-// Chapter heights (vh)
-const H1 = 260, H2 = 280, H3 = 300;
-const TOTAL = H1 + H2 + H3; // 840
+const H1 = 300, H2 = 280, H3 = 300;
+const TOTAL = H1 + H2 + H3;
 
 const C1S = 0,   C1E = H1 / TOTAL;
 const C2S = C1E, C2E = (H1 + H2) / TOTAL;
@@ -31,32 +30,59 @@ const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
-// ── Ch1 ───────────────────────────────────────────────────────────────────────
+// Word that enters from right, stays, then exits left
+const SlideWord: React.FC<{
+  p: MotionValue<number>;
+  enter: [number, number];
+  exit: [number, number];
+  text: string;
+  color?: string;
+}> = ({ p, enter, exit, text, color = '#ffffff' }) => {
+  const op = useTransform(p, [enter[0], enter[1], exit[0], exit[1]], [0, 1, 1, 0]);
+  const x  = useTransform(p, [enter[0], enter[1], exit[0], exit[1]], ['80vw', '0vw', '0vw', '-80vw']);
+  return (
+    <motion.h1
+      style={{ opacity: op, x, color, position: 'absolute', willChange: 'transform' }}
+      className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+    >
+      <span style={{ fontSize: 'clamp(5.5rem, 20vw, 17rem)', display: 'block' }}>{text}</span>
+    </motion.h1>
+  );
+};
+
+// ── Ch1 — word-by-word horizontal slide ──────────────────────────────────────
 const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
-  const exitOp = useTransform(p, [0.5, 0.82], [1, 0]);
-  const exitY  = useTransform(p, [0.5, 0.82], ['0%', '-8%']);
-  const subOp  = useTransform(p, [0.06, 0.26, 0.5, 0.78], [0, 1, 1, 0]);
+
+  const tagOp = useTransform(p, [0.02, 0.16], [0, 1]);
+  const subOp = useTransform(p, [0.66, 0.80], [0, 1]);
+  const subX  = useTransform(p, [0.66, 0.80], ['-4%', '0%']);
 
   return (
     <div style={{ height: `${H1}vh` }}>
-      <StickyPanel>
-        <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">AI INNOVATION LAB</p>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white"
-            style={{ fontSize: 'clamp(5rem, 18vw, 14rem)' }}>INSIGHT</h1>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white/25"
-            style={{ fontSize: 'clamp(5rem, 18vw, 14rem)' }}>DRIVEN</h1>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85]"
-            style={{ fontSize: 'clamp(5rem, 18vw, 14rem)', color: '#FFB800' }}>GROWTH.</h1>
-          <motion.p style={{ opacity: subOp }}
-            className="mt-10 text-white/75 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
-          >
-            Gemini 기반 AI 엔진으로 시장의 흐름을 예측하고,<br />
-            초개인화 마케팅 전략을 실시간으로 제안합니다.
-          </motion.p>
-        </motion.div>
-      </StickyPanel>
+      <div
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        className="relative overflow-hidden flex items-center"
+      >
+        <motion.p
+          style={{ opacity: tagOp, position: 'absolute', top: '2rem' }}
+          className="left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold"
+        >
+          AI INNOVATION LAB
+        </motion.p>
+
+        <SlideWord p={p} enter={[0.00, 0.16]} exit={[0.28, 0.42]} text="INSIGHT" color="#ffffff" />
+        <SlideWord p={p} enter={[0.30, 0.44]} exit={[0.56, 0.68]} text="DRIVEN" color="rgba(255,255,255,0.22)" />
+        <SlideWord p={p} enter={[0.58, 0.72]} exit={[0.94, 1.00]} text="GROWTH." color="#FFB800" />
+
+        <motion.p
+          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%' }}
+          className="left-8 md:left-16 lg:left-24 text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
+        >
+          Gemini 기반 AI 엔진으로 시장의 흐름을 예측하고,<br />
+          초개인화 마케팅 전략을 실시간으로 제안합니다.
+        </motion.p>
+      </div>
     </div>
   );
 };
@@ -64,11 +90,13 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 // ── Ch2 ───────────────────────────────────────────────────────────────────────
 const Ch2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C2S, C2E], [0, 1]);
+
   const titleOp = useTransform(p, [0.00, 0.14], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.14], ['5%', '0%']);
+  const titleX  = useTransform(p, [0.00, 0.14], ['-5%', '0%']);
   const bodyOp  = useTransform(p, [0.10, 0.26], [0, 1]);
-  const bodyY   = useTransform(p, [0.10, 0.26], ['5%', '0%']);
+  const bodyX   = useTransform(p, [0.10, 0.26], ['5%', '0%']);
   const exitOp  = useTransform(p, [0.76, 0.94], [1, 0]);
+  const exitX   = useTransform(p, [0.76, 0.94], ['0%', '-5%']);
 
   const [industry, setIndustry] = useState('');
   const [insight, setInsight] = useState('');
@@ -86,15 +114,15 @@ const Ch2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   return (
     <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: exitOp }} className="max-w-3xl">
-          <motion.p style={{ opacity: titleOp, y: titleY }}
+        <motion.div style={{ opacity: exitOp, x: exitX }} className="max-w-3xl">
+          <motion.p style={{ opacity: titleOp, x: titleX }}
             className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold"
           >AI INSIGHT ENGINE</motion.p>
-          <motion.h2 style={{ opacity: titleOp, y: titleY, fontSize: 'clamp(3rem, 8vw, 7rem)' }}
+          <motion.h2 style={{ opacity: titleOp, x: titleX, fontSize: 'clamp(3rem, 8vw, 7rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.88] text-white mb-10"
           >MARKET<br />INTELLIGENCE.</motion.h2>
 
-          <motion.div style={{ opacity: bodyOp, y: bodyY }}>
+          <motion.div style={{ opacity: bodyOp, x: bodyX }}>
             <p className="text-white/65 text-base mb-6 font-light">업종을 선택하면 AI가 맞춤형 인사이트를 생성합니다.</p>
             <div className="flex flex-wrap gap-2.5 mb-8">
               {INDUSTRIES.map(ind => (
@@ -117,8 +145,8 @@ const Ch2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             )}
             {insight && !loading && (
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: '4%' }}
+                animate={{ opacity: 1, x: '0%' }}
                 transition={{ duration: 0.6 }}
                 className="border border-[#FFB800]/20 bg-[#FFB800]/5 rounded-2xl p-6 md:p-8"
               >
@@ -139,19 +167,21 @@ const Ch2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 // ── Ch3 ───────────────────────────────────────────────────────────────────────
 const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
+
   const titleOp = useTransform(p, [0.00, 0.14], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.14], ['5%', '0%']);
-  const c0Op = useTransform(p, [0.12, 0.24], [0, 1]); const c0Y = useTransform(p, [0.12, 0.24], ['4%', '0%']);
-  const c1Op = useTransform(p, [0.24, 0.36], [0, 1]); const c1Y = useTransform(p, [0.24, 0.36], ['4%', '0%']);
-  const c2Op = useTransform(p, [0.36, 0.48], [0, 1]); const c2Y = useTransform(p, [0.36, 0.48], ['4%', '0%']);
-  const c3Op = useTransform(p, [0.48, 0.60], [0, 1]); const c3Y = useTransform(p, [0.48, 0.60], ['4%', '0%']);
+  const titleX  = useTransform(p, [0.00, 0.14], ['-5%', '0%']);
+
+  const c0Op = useTransform(p, [0.12, 0.24], [0, 1]); const c0X = useTransform(p, [0.12, 0.24], ['6%', '0%']);
+  const c1Op = useTransform(p, [0.24, 0.36], [0, 1]); const c1X = useTransform(p, [0.24, 0.36], ['6%', '0%']);
+  const c2Op = useTransform(p, [0.36, 0.48], [0, 1]); const c2X = useTransform(p, [0.36, 0.48], ['6%', '0%']);
+  const c3Op = useTransform(p, [0.48, 0.60], [0, 1]); const c3X = useTransform(p, [0.48, 0.60], ['6%', '0%']);
   const cOps = [c0Op, c1Op, c2Op, c3Op];
-  const cYs  = [c0Y,  c1Y,  c2Y,  c3Y];
+  const cXs  = [c0X, c1X, c2X, c3X];
 
   return (
     <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
-        <motion.p style={{ opacity: titleOp, y: titleY }}
+        <motion.p style={{ opacity: titleOp, x: titleX }}
           className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold"
         >AI CAPABILITIES</motion.p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,7 +190,7 @@ const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             return (
               <motion.div
                 key={cap.title}
-                style={{ opacity: cOps[i], y: cYs[i] }}
+                style={{ opacity: cOps[i], x: cXs[i] }}
                 className="border border-white/10 bg-white/[0.02] rounded-2xl p-7 flex flex-col gap-4 hover:bg-white/[0.05] transition-colors"
               >
                 <div className="flex items-center gap-3">

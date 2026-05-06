@@ -4,21 +4,20 @@ import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 
 const HEADER_H = 57;
 
-// Chapter heights (vh)
-const H1 = 260, H2 = 380, H3 = 320, H4 = 340;
-const TOTAL = H1 + H2 + H3 + H4; // 1300
+const H1 = 300, H2 = 380, H3 = 320, H4 = 340;
+const TOTAL = H1 + H2 + H3 + H4;
 
-const C1S = 0,               C1E = H1 / TOTAL;
-const C2S = C1E,             C2E = (H1 + H2) / TOTAL;
-const C3S = C2E,             C3E = (H1 + H2 + H3) / TOTAL;
-const C4S = C3E,             C4E = 1;
+const C1S = 0,   C1E = H1 / TOTAL;
+const C2S = C1E, C2E = (H1 + H2) / TOTAL;
+const C3S = C2E, C3E = (H1 + H2 + H3) / TOTAL;
+const C4S = C3E, C4E = 1;
 
 const DOMAINS = [
-  { id: '01', title: 'INTEGRATED SOLUTION', desc: '온/오프라인의 경계를 허무는 통합 마케팅 전략.', tags: ['Media Planning', 'Brand Consulting', 'Performance Funnel'], icon: Lightbulb },
-  { id: '02', title: 'AD-TECH PLATFORM', desc: '독자적인 AI 알고리즘과 DMP를 통해 타겟 오디언스를 정밀 타격하고 광고 효율을 극대화합니다.', tags: ['AI Optimization', 'Programmatic Buying', 'DMP Analysis'], icon: Cpu },
-  { id: '03', title: 'IMMERSIVE CREATIVE', desc: '3D, WebGL, AR/VR 등 최첨단 기술로 단순한 광고를 넘어선 브랜드 경험을 창조합니다.', tags: ['Interactive Web', '3D Motion', 'Virtual Experience'], icon: Zap },
-  { id: '04', title: 'GLOBAL NETWORK', desc: '전 세계 파트너사 네트워크로 로컬라이제이션부터 글로벌 미디어 바잉까지 지원합니다.', tags: ['Global Media', 'Localization', 'Cross-border'], icon: Globe },
-  { id: '05', title: 'AI INNOVATION LAB', desc: 'Gemini 기반 AI 엔진으로 시장의 흐름을 예측하고 초개인화 마케팅 전략을 실시간으로 제안합니다.', tags: ['Gen AI', 'Predictive Analytics', 'Auto-Optimization'], icon: Sparkles },
+  { id: '01', title: 'INTEGRATED SOLUTION', tags: ['Media Planning', 'Brand Consulting', 'Performance Funnel'], icon: Lightbulb },
+  { id: '02', title: 'AD-TECH PLATFORM', tags: ['AI Optimization', 'Programmatic Buying', 'DMP Analysis'], icon: Cpu },
+  { id: '03', title: 'IMMERSIVE CREATIVE', tags: ['Interactive Web', '3D Motion', 'Virtual Experience'], icon: Zap },
+  { id: '04', title: 'GLOBAL NETWORK', tags: ['Global Media', 'Localization', 'Cross-border'], icon: Globe },
+  { id: '05', title: 'AI INNOVATION LAB', tags: ['Gen AI', 'Predictive Analytics', 'Auto-Optimization'], icon: Sparkles },
 ];
 
 const TEAMS = [
@@ -29,7 +28,7 @@ const TEAMS = [
 ];
 
 const PROCESS = [
-  { num: '01', title: '제작의뢰', desc: 'OT를 통해 영상 제작에 대한 고객의 니즈를 확실하게 파악합니다.' },
+  { num: '01', title: '제작의뢰', desc: 'OT를 통해 영상 제작에 대한 고객의 니즈를 파악합니다.' },
   { num: '02', title: '기획', desc: '고객의 니즈를 바탕으로 아이디어를 구상하고 컨셉을 도출합니다.' },
   { num: '03', title: 'PPM / 촬영', desc: '사전 미팅으로 세부 의견을 조율한 후 전문 촬영진이 진행합니다.' },
   { num: '04', title: '후반작업', desc: '전문 영상 편집자들이 고객의 요청에 맞추어 편집을 진행합니다.' },
@@ -46,32 +45,65 @@ const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
-// ── Ch1 ───────────────────────────────────────────────────────────────────────
+// Word that enters from right, stays, then exits left
+const SlideWord: React.FC<{
+  p: MotionValue<number>;
+  enter: [number, number];
+  exit: [number, number];
+  text: string;
+  color?: string;
+}> = ({ p, enter, exit, text, color = '#ffffff' }) => {
+  const op = useTransform(p, [enter[0], enter[1], exit[0], exit[1]], [0, 1, 1, 0]);
+  const x  = useTransform(p, [enter[0], enter[1], exit[0], exit[1]], ['80vw', '0vw', '0vw', '-80vw']);
+  return (
+    <motion.h1
+      style={{ opacity: op, x, color, position: 'absolute', willChange: 'transform' }}
+      className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+      // font-size set via inline style so it's not overridden
+    >
+      <span style={{ fontSize: 'clamp(5.5rem, 20vw, 17rem)', display: 'block' }}>{text}</span>
+    </motion.h1>
+  );
+};
+
+// ── Ch1 — word-by-word horizontal slide ──────────────────────────────────────
 const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
-  const exitOp = useTransform(p, [0.5, 0.82], [1, 0]);
-  const exitY  = useTransform(p, [0.5, 0.82], ['0%', '-8%']);
-  const subOp  = useTransform(p, [0.06, 0.25, 0.5, 0.78], [0, 1, 1, 0]);
+
+  // Three words occupy ~0.33 each; overlap slightly for smooth transition
+  const tagOp = useTransform(p, [0.02, 0.16], [0, 1]);
+  const subOp = useTransform(p, [0.66, 0.80], [0, 1]);
+  const subX  = useTransform(p, [0.66, 0.80], ['-4%', '0%']);
 
   return (
     <div style={{ height: `${H1}vh` }}>
-      <StickyPanel>
-        <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">Business Overview</p>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white"
-            style={{ fontSize: 'clamp(5rem, 18vw, 14rem)' }}>WE BUILD</h1>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white/25"
-            style={{ fontSize: 'clamp(5rem, 18vw, 14rem)' }}>THE NEXT</h1>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white"
-            style={{ fontSize: 'clamp(5rem, 18vw, 14rem)' }}>LEVEL.</h1>
-          <motion.p style={{ opacity: subOp }}
-            className="mt-10 text-white/75 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
-          >
-            커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
-            단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
-          </motion.p>
-        </motion.div>
-      </StickyPanel>
+      <div
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        className="relative overflow-hidden flex items-center"
+      >
+        <motion.p
+          style={{ opacity: tagOp, position: 'absolute', top: '2rem' }}
+          className="left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold"
+        >
+          Business Overview
+        </motion.p>
+
+        {/* Word 1 */}
+        <SlideWord p={p} enter={[0.00, 0.16]} exit={[0.28, 0.42]} text="WE BUILD" color="#ffffff" />
+        {/* Word 2 */}
+        <SlideWord p={p} enter={[0.30, 0.44]} exit={[0.56, 0.68]} text="THE NEXT" color="rgba(255,255,255,0.22)" />
+        {/* Word 3 */}
+        <SlideWord p={p} enter={[0.58, 0.72]} exit={[0.94, 1.00]} text="LEVEL." color="#FFB800" />
+
+        {/* Subtext appears with word 3 */}
+        <motion.p
+          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%' }}
+          className="left-8 md:left-16 lg:left-24 text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
+        >
+          커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
+          단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
+        </motion.p>
+      </div>
     </div>
   );
 };
@@ -79,23 +111,27 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 // ── Ch2 ───────────────────────────────────────────────────────────────────────
 const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onIntegratedClick?: () => void }> = ({ g, onAiLabClick, onIntegratedClick }) => {
   const p = useTransform(g, [C2S, C2E], [0, 1]);
+
   const titleOp = useTransform(p, [0.00, 0.10], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.10], ['5%', '0%']);
-  const d0Op = useTransform(p, [0.08, 0.18], [0, 1]); const d0Y = useTransform(p, [0.08, 0.18], ['3%', '0%']);
-  const d1Op = useTransform(p, [0.18, 0.28], [0, 1]); const d1Y = useTransform(p, [0.18, 0.28], ['3%', '0%']);
-  const d2Op = useTransform(p, [0.28, 0.38], [0, 1]); const d2Y = useTransform(p, [0.28, 0.38], ['3%', '0%']);
-  const d3Op = useTransform(p, [0.38, 0.48], [0, 1]); const d3Y = useTransform(p, [0.38, 0.48], ['3%', '0%']);
-  const d4Op = useTransform(p, [0.48, 0.58], [0, 1]); const d4Y = useTransform(p, [0.48, 0.58], ['3%', '0%']);
+  const titleX  = useTransform(p, [0.00, 0.10], ['-5%', '0%']);
+
+  const d0Op = useTransform(p, [0.08, 0.18], [0, 1]); const d0X = useTransform(p, [0.08, 0.18], ['5%', '0%']);
+  const d1Op = useTransform(p, [0.18, 0.28], [0, 1]); const d1X = useTransform(p, [0.18, 0.28], ['5%', '0%']);
+  const d2Op = useTransform(p, [0.28, 0.38], [0, 1]); const d2X = useTransform(p, [0.28, 0.38], ['5%', '0%']);
+  const d3Op = useTransform(p, [0.38, 0.48], [0, 1]); const d3X = useTransform(p, [0.38, 0.48], ['5%', '0%']);
+  const d4Op = useTransform(p, [0.48, 0.58], [0, 1]); const d4X = useTransform(p, [0.48, 0.58], ['5%', '0%']);
+
   const exitOp = useTransform(p, [0.76, 0.94], [1, 0]);
-  const exitY  = useTransform(p, [0.76, 0.94], ['0%', '-6%']);
+  const exitX  = useTransform(p, [0.76, 0.94], ['0%', '-6%']);
+
   const dOps = [d0Op, d1Op, d2Op, d3Op, d4Op];
-  const dYs  = [d0Y,  d1Y,  d2Y,  d3Y,  d4Y];
+  const dXs  = [d0X, d1X, d2X, d3X, d4X];
 
   return (
     <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <motion.p style={{ opacity: titleOp, y: titleY }}
+        <motion.div style={{ opacity: exitOp, x: exitX }}>
+          <motion.p style={{ opacity: titleOp, x: titleX }}
             className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold"
           >BUSINESS DOMAINS</motion.p>
           <div className="flex flex-col gap-0">
@@ -104,7 +140,7 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
               return (
                 <motion.div
                   key={d.id}
-                  style={{ opacity: dOps[i], y: dYs[i] }}
+                  style={{ opacity: dOps[i], x: dXs[i] }}
                   className="group border-t border-white/10 py-5 md:py-6 flex items-center gap-5 md:gap-8 cursor-default"
                   onClick={() => {
                     if (d.id === '05' && onAiLabClick) onAiLabClick();
@@ -114,7 +150,7 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
                   <span className="font-mono text-sm text-white/25 shrink-0 w-6">{d.id}</span>
                   <Icon className="w-5 h-5 text-white/30 group-hover:text-[#FFB800] transition-colors shrink-0" />
                   <h3 className="font-black tracking-[-0.02em] text-white/80 group-hover:text-white transition-colors"
-                    style={{ fontSize: 'clamp(1.4rem, 3.5vw, 3rem)' }}>
+                    style={{ fontSize: 'clamp(1.6rem, 4vw, 3.5rem)' }}>
                     {d.title}
                   </h3>
                   <div className="hidden md:flex flex-wrap gap-1.5 ml-auto">
@@ -138,28 +174,33 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
 // ── Ch3 ───────────────────────────────────────────────────────────────────────
 const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
+
   const titleOp = useTransform(p, [0.00, 0.14], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.14], ['5%', '0%']);
-  const t0Op = useTransform(p, [0.12, 0.24], [0, 1]); const t0Y = useTransform(p, [0.12, 0.24], ['4%', '0%']);
-  const t1Op = useTransform(p, [0.22, 0.34], [0, 1]); const t1Y = useTransform(p, [0.22, 0.34], ['4%', '0%']);
-  const t2Op = useTransform(p, [0.32, 0.44], [0, 1]); const t2Y = useTransform(p, [0.32, 0.44], ['4%', '0%']);
-  const t3Op = useTransform(p, [0.42, 0.54], [0, 1]); const t3Y = useTransform(p, [0.42, 0.54], ['4%', '0%']);
+  const titleX  = useTransform(p, [0.00, 0.14], ['-5%', '0%']);
+
+  const t0Op = useTransform(p, [0.12, 0.26], [0, 1]); const t0X = useTransform(p, [0.12, 0.26], ['6%', '0%']);
+  const t1Op = useTransform(p, [0.22, 0.36], [0, 1]); const t1X = useTransform(p, [0.22, 0.36], ['6%', '0%']);
+  const t2Op = useTransform(p, [0.32, 0.46], [0, 1]); const t2X = useTransform(p, [0.32, 0.46], ['6%', '0%']);
+  const t3Op = useTransform(p, [0.42, 0.56], [0, 1]); const t3X = useTransform(p, [0.42, 0.56], ['6%', '0%']);
+
   const exitOp = useTransform(p, [0.76, 0.94], [1, 0]);
+  const exitX  = useTransform(p, [0.76, 0.94], ['0%', '-5%']);
+
   const tOps = [t0Op, t1Op, t2Op, t3Op];
-  const tYs  = [t0Y,  t1Y,  t2Y,  t3Y];
+  const tXs  = [t0X, t1X, t2X, t3X];
 
   return (
     <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: exitOp }}>
-          <motion.p style={{ opacity: titleOp, y: titleY }}
+        <motion.div style={{ opacity: exitOp, x: exitX }}>
+          <motion.p style={{ opacity: titleOp, x: titleX }}
             className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold"
           >CONTENT PRODUCTION — TEAM</motion.p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {TEAMS.map((team, i) => (
               <motion.div
                 key={team.name}
-                style={{ opacity: tOps[i], y: tYs[i] }}
+                style={{ opacity: tOps[i], x: tXs[i] }}
                 className="group border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl p-7 flex flex-col gap-4 relative overflow-hidden transition-colors duration-400"
               >
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#FFB800]/50 via-[#FFB800]/15 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
@@ -190,22 +231,24 @@ const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 // ── Ch4 ───────────────────────────────────────────────────────────────────────
 const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C4S, C4E], [0, 1]);
+
   const titleOp    = useTransform(p, [0.00, 0.12], [0, 1]);
-  const titleY     = useTransform(p, [0.00, 0.12], ['5%', '0%']);
+  const titleX     = useTransform(p, [0.00, 0.12], ['-5%', '0%']);
   const lineScaleX = useTransform(p, [0.10, 0.72], [0, 1]);
-  const p0Op = useTransform(p, [0.10, 0.20], [0, 1]); const p0Y = useTransform(p, [0.10, 0.20], ['30px', '0px']);
-  const p1Op = useTransform(p, [0.20, 0.30], [0, 1]); const p1Y = useTransform(p, [0.20, 0.30], ['30px', '0px']);
-  const p2Op = useTransform(p, [0.30, 0.40], [0, 1]); const p2Y = useTransform(p, [0.30, 0.40], ['30px', '0px']);
-  const p3Op = useTransform(p, [0.40, 0.50], [0, 1]); const p3Y = useTransform(p, [0.40, 0.50], ['30px', '0px']);
-  const p4Op = useTransform(p, [0.50, 0.60], [0, 1]); const p4Y = useTransform(p, [0.50, 0.60], ['30px', '0px']);
-  const p5Op = useTransform(p, [0.60, 0.72], [0, 1]); const p5Y = useTransform(p, [0.60, 0.72], ['30px', '0px']);
+
+  const p0Op = useTransform(p, [0.10, 0.20], [0, 1]); const p0X = useTransform(p, [0.10, 0.20], ['-4%', '0%']);
+  const p1Op = useTransform(p, [0.20, 0.30], [0, 1]); const p1X = useTransform(p, [0.20, 0.30], ['-4%', '0%']);
+  const p2Op = useTransform(p, [0.30, 0.40], [0, 1]); const p2X = useTransform(p, [0.30, 0.40], ['-4%', '0%']);
+  const p3Op = useTransform(p, [0.40, 0.50], [0, 1]); const p3X = useTransform(p, [0.40, 0.50], ['-4%', '0%']);
+  const p4Op = useTransform(p, [0.50, 0.60], [0, 1]); const p4X = useTransform(p, [0.50, 0.60], ['-4%', '0%']);
+  const p5Op = useTransform(p, [0.60, 0.72], [0, 1]); const p5X = useTransform(p, [0.60, 0.72], ['-4%', '0%']);
   const pOps = [p0Op, p1Op, p2Op, p3Op, p4Op, p5Op];
-  const pYs  = [p0Y,  p1Y,  p2Y,  p3Y,  p4Y,  p5Y];
+  const pXs  = [p0X, p1X, p2X, p3X, p4X, p5X];
 
   return (
     <div style={{ height: `${H4}vh` }}>
       <StickyPanel>
-        <motion.p style={{ opacity: titleOp, y: titleY }}
+        <motion.p style={{ opacity: titleOp, x: titleX }}
           className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-4 font-bold"
         >PRODUCTION PROCESS</motion.p>
         <div className="relative my-8">
@@ -215,7 +258,7 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-5">
           {PROCESS.map((step, i) => (
-            <motion.div key={step.num} style={{ opacity: pOps[i], y: pYs[i] }} className="flex flex-col gap-3">
+            <motion.div key={step.num} style={{ opacity: pOps[i], x: pXs[i] }} className="flex flex-col gap-3">
               <span className="font-mono font-black text-white/10 leading-none"
                 style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}>
                 {step.num}
