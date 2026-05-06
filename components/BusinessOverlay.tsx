@@ -95,24 +95,24 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           Business Overview
         </p>
 
-        <motion.h1 style={{ opacity: w1Op, x: w1X, position: 'absolute', color: '#ffffff', willChange: 'transform' }}
+        <motion.h1 style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', color: '#ffffff', willChange: 'transform' }}
           className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
           <span style={FS}>WE BUILD</span>
         </motion.h1>
 
-        <motion.h1 style={{ opacity: w2Op, x: w2X, position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
+        <motion.h1 style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
           className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
           <span style={FS}>THE NEXT</span>
         </motion.h1>
 
-        <motion.h1 style={{ opacity: w3Op, x: w3X, position: 'absolute', color: '#FFB800', willChange: 'transform' }}
+        <motion.h1 style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', color: '#FFB800', willChange: 'transform' }}
           className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
           <span style={FS}>LEVEL.</span>
         </motion.h1>
 
         <motion.p
-          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%' }}
-          className="left-8 md:left-16 lg:left-24 text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
+          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%', left: '2rem' }}
+          className="text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
         >
           커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
           단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
