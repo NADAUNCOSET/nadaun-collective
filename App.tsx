@@ -4,13 +4,12 @@ import Hero from './components/Hero';
 const IsoWorld = lazy(() => import('./components/IsoWorld'));
 import Business from './components/Business';
 import Clients from './components/Clients';
-import Work from './components/Work';
-import Insights from './components/Insights';
 import Footer from './components/Footer';
 import AboutOverlay from './components/AboutOverlay';
 import AiInnovationLabOverlay from './components/AiInnovationLabOverlay';
 import ContactOverlay from './components/ContactOverlay';
-import Overlay from './components/Overlay';
+import BusinessOverlay from './components/BusinessOverlay';
+import InsightsOverlay from './components/InsightsOverlay';
 import Intro from './components/Intro';
 import Manifesto from './components/Manifesto';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
@@ -113,21 +112,19 @@ const App: React.FC = () => {
         <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} />
         
         <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} />
-        
-        <Overlay isOpen={activeOverlay === 'business'} onClose={closeOverlay} title="Business Domain">
-           <Business 
-             onAiLabClick={() => setActiveOverlay('ai-lab')} 
-             onIntegratedClick={() => setActiveOverlay('integrated-solution')}
-           />
-        </Overlay>
 
-        <Overlay isOpen={activeOverlay === 'work'} onClose={closeOverlay} title="Selected Works">
-           <Work isOverlay={true} />
-        </Overlay>
+        <BusinessOverlay
+          isOpen={activeOverlay === 'business'}
+          onClose={closeOverlay}
+          onAiLabClick={() => setActiveOverlay('ai-lab')}
+          onIntegratedClick={() => setActiveOverlay('integrated-solution')}
+        />
 
-        <Overlay isOpen={activeOverlay === 'insights'} onClose={closeOverlay} title="AI Insights">
-           <Insights onAiLabClick={() => setActiveOverlay('ai-lab')} />
-        </Overlay>
+        <InsightsOverlay
+          isOpen={activeOverlay === 'insights'}
+          onClose={closeOverlay}
+          onAiLabClick={() => setActiveOverlay('ai-lab')}
+        />
 
         <ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />
         
