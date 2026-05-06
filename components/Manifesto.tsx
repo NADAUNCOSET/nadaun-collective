@@ -40,14 +40,18 @@ const Manifesto: React.FC = () => {
       ref={sectionRef}
       className="relative w-full min-h-screen bg-[#080808] flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* Subtle grid texture */}
-      <div
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
+      {/* Video background */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none"
+        src="/manifesto-bg.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
       />
+
+      {/* Dark overlay on video */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 pointer-events-none" />
 
       {/* Ambient glow */}
       <motion.div
@@ -57,7 +61,7 @@ const Manifesto: React.FC = () => {
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] rounded-full"
           style={{
-            background: 'radial-gradient(ellipse, rgba(255,184,0,0.04) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(255,184,0,0.06) 0%, transparent 70%)',
           }}
         />
       </motion.div>

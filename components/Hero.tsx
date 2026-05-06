@@ -4,11 +4,11 @@ import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 type Phase = 'c-only' | 'reveal';
 
 const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?q=80&w=2056&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop"
+  "https://nadaun-portfolio.vercel.app/images/portfolio/hd-hyundai/00.webp",
+  "https://nadaun-portfolio.vercel.app/images/portfolio/pepsi-festa/00.webp",
+  "https://nadaun-portfolio.vercel.app/images/portfolio/royal-salute/00.webp",
+  "https://nadaun-portfolio.vercel.app/images/portfolio/banyan-tree/00.webp",
+  "https://nadaun-portfolio.vercel.app/images/portfolio/varilux-seoul/00.webp",
 ];
 
 interface HeroProps {
