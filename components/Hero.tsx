@@ -145,7 +145,7 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
         {/* ── Words — stacking top → bottom ───────────── */}
         <motion.div
-          className="z-10 pointer-events-none absolute left-8 md:left-16 lg:left-24 top-24 md:top-28 flex flex-col"
+          className="z-10 pointer-events-none absolute left-8 md:left-16 lg:left-24 top-1/2 -translate-y-1/2 flex flex-col"
           style={{ opacity: dissolveOp, filter: dissolveFilter }}
         >
           {/* W1: Seamless */}
