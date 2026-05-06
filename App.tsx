@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
-import Lenis from 'lenis';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 const IsoWorld = lazy(() => import('./components/IsoWorld'));
@@ -17,7 +16,6 @@ import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import { motion, useScroll, useSpring, useTransform, AnimatePresence, useMotionValue } from 'framer-motion';
 
-// Scroll-driven enter + exit per section — cinematic parallax feel
 const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
@@ -32,63 +30,30 @@ const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ c
 
 const App: React.FC = () => {
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   const rawCursorX = useMotionValue(-100);
   const rawCursorY = useMotionValue(-100);
-  // Spring so cursor ring trails smoothly behind the dot
   const cursorX = useSpring(rawCursorX, { stiffness: 300, damping: 26, mass: 0.5 });
   const cursorY = useSpring(rawCursorY, { stiffness: 300, damping: 26, mass: 0.5 });
 
   const [introFinished, setIntroFinished] = useState(false);
-  const [showHeader, setShowHeader] = useState(true);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
-
-  // Lenis smooth scroll
-  const lenisRef = useRef<Lenis | null>(null);
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      wheelMultiplier: 0.9,
-    });
-    lenisRef.current = lenis;
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    const rafId = requestAnimationFrame(raf);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-    };
-  }, []);
-
-  // Pause Lenis when overlays are open
-  useEffect(() => {
-    if (!lenisRef.current) return;
-    if (activeOverlay) {
-      lenisRef.current.stop();
-    } else {
-      lenisRef.current.start();
-    }
-  }, [activeOverlay]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       rawCursorX.set(e.clientX);
       rawCursorY.set(e.clientY);
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [cursorX, cursorY]);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [rawCursorX, rawCursorY]);
+
+  // Lock body scroll when overlay is open
+  useEffect(() => {
+    document.body.style.overflow = activeOverlay ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [activeOverlay]);
 
   const handleNavClick = (id: string) => setActiveOverlay(id);
   const closeOverlay = () => setActiveOverlay(null);
@@ -96,22 +61,13 @@ const App: React.FC = () => {
   return (
     <div className="bg-black min-h-screen text-white selection:bg-[#FFB800] selection:text-black cursor-none">
 
-      {/* Intro Animation Layer */}
       <AnimatePresence mode="sync">
-        {!introFinished && (
-          <Intro onComplete={() => setIntroFinished(true)} />
-        )}
+        {!introFinished && <Intro onComplete={() => setIntroFinished(true)} />}
       </AnimatePresence>
 
-      {/* Main Content */}
       <div className="relative z-0">
-        <Header
-          onNavClick={handleNavClick}
-          show={showHeader}
-          introFinished={introFinished}
-        />
+        <Header onNavClick={handleNavClick} show introFinished={introFinished} />
 
-        {/* Progress Bar */}
         {introFinished && (
           <motion.div
             className="fixed top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-[60]"
@@ -122,30 +78,18 @@ const App: React.FC = () => {
           />
         )}
 
-        {/* Custom Cursor */}
+        {/* Cursor ring — spring trail */}
         <motion.div
-          className="fixed top-0 left-0 w-7 h-7 border border-white/80 rounded-full pointer-events-none z-[9999] hidden md:block"
-          style={{
-            x: cursorX,
-            y: cursorY,
-            translateX: '-50%',
-            translateY: '-50%',
-            mixBlendMode: 'difference',
-          }}
+          className="fixed top-0 left-0 w-7 h-7 border border-white/70 rounded-full pointer-events-none z-[9999] hidden md:block"
+          style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%', mixBlendMode: 'difference' }}
         />
-
-        {/* Cursor dot */}
+        {/* Cursor dot — instant */}
         <motion.div
           className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] hidden md:block"
-          style={{
-            x: cursorX,
-            y: cursorY,
-            translateX: '-50%',
-            translateY: '-50%',
-          }}
+          style={{ x: rawCursorX, y: rawCursorY, translateX: '-50%', translateY: '-50%' }}
         />
 
-        {/* --- OVERLAYS --- */}
+        {/* OVERLAYS */}
         <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} />
         <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} />
         <BusinessOverlay
@@ -170,9 +114,7 @@ const App: React.FC = () => {
           <Hero startAnimation={introFinished} />
           <VideoReel />
           <Manifesto />
-          <ScrollSection>
-            <Clients />
-          </ScrollSection>
+          <ScrollSection><Clients /></ScrollSection>
           <ScrollSection id="isoworld">
             <Suspense fallback={<div className="h-screen w-full bg-black" />}>
               <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
