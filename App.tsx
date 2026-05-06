@@ -12,6 +12,7 @@ import AiInnovationLabOverlay from './components/AiInnovationLabOverlay';
 import ContactOverlay from './components/ContactOverlay';
 import Overlay from './components/Overlay';
 import Intro from './components/Intro';
+import Manifesto from './components/Manifesto';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import { motion, useScroll, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 
@@ -138,6 +139,7 @@ const App: React.FC = () => {
 
         <main>
           <Hero startAnimation={introFinished} />
+          <Manifesto />
           <ScrollSection>
             <Clients />
           </ScrollSection>
