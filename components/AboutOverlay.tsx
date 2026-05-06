@@ -1,12 +1,12 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, MotionValue } from 'framer-motion';
+import React, { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 360, H4 = 270, H5 = 220;
-const TOTAL = H1 + H2 + H3 + H4 + H5; // 1370
+const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 220;
+const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 // Normalized start/end for each chapter
 const C1S = 0,               C1E = H1 / TOTAL;
@@ -54,7 +54,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     <div style={{ height: `${H1}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">
+          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-8 font-bold">
             NADAUN COLLECTIVE — Since 2020, Seoul
           </p>
           <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white"
@@ -103,7 +103,7 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
+          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
           <motion.h2
             style={{ opacity: line1Op, y: line1Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
@@ -153,7 +153,7 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp }}>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">OUR STORY</p>
+          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-8 font-bold">OUR STORY</p>
           <motion.h2 style={{ opacity: titleOp, y: titleY, fontSize: 'clamp(3.5rem, 10vw, 9rem)' }}
             className="font-black tracking-[-0.03em] leading-none text-white mb-12"
           >2020 <span className="text-white/25">→</span> 2026</motion.h2>
@@ -189,21 +189,29 @@ const GLOBAL_NODES = [
 // ── Chapter 4 ─────────────────────────────────────────────────────────────────
 const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C4S, C4E], [0, 1]);
+  const [activeCity, setActiveCity] = useState(0);
 
-  const word1Op = useTransform(p, [0.00, 0.18], [0, 1]);
-  const word1Y  = useTransform(p, [0.00, 0.18], ['6%', '0%']);
-  const word2Op = useTransform(p, [0.12, 0.30], [0, 1]);
-  const word2Y  = useTransform(p, [0.12, 0.30], ['6%', '0%']);
-  const bodyOp  = useTransform(p, [0.32, 0.50], [0, 1]);
-  const nodesOp = useTransform(p, [0.44, 0.62], [0, 1]);
-  const nodesY  = useTransform(p, [0.44, 0.62], ['12px', '0px']);
-  const exitOp  = useTransform(p, [0.80, 0.96], [1, 0]);
+  const word1Op = useTransform(p, [0.00, 0.16], [0, 1]);
+  const word1Y  = useTransform(p, [0.00, 0.16], ['6%', '0%']);
+  const word2Op = useTransform(p, [0.10, 0.26], [0, 1]);
+  const word2Y  = useTransform(p, [0.10, 0.26], ['6%', '0%']);
+  const bodyOp  = useTransform(p, [0.28, 0.44], [0, 1]);
+  const nodesOp = useTransform(p, [0.38, 0.52], [0, 1]);
+  const nodesY  = useTransform(p, [0.38, 0.52], ['14px', '0px']);
+  const exitOp  = useTransform(p, [0.84, 0.97], [1, 0]);
+
+  // City highlight travels SEOUL → SINGAPORE from p=0.52 to p=0.82
+  const cityProgress = useTransform(p, [0.52, 0.82], [0, GLOBAL_NODES.length - 0.001]);
+  useMotionValueEvent(cityProgress, 'change', (v) => {
+    const idx = Math.max(0, Math.min(Math.floor(v), GLOBAL_NODES.length - 1));
+    setActiveCity(idx);
+  });
 
   return (
     <div style={{ height: `${H4}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp }}>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">IP CONNECT — GLOBAL</p>
+          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold">IP CONNECT — GLOBAL</p>
           <motion.h2 style={{ opacity: word1Op, y: word1Y, fontSize: 'clamp(5rem, 16vw, 13rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
           >IP</motion.h2>
@@ -216,16 +224,29 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             핵심 IP부터 글로벌 에이전시 네트워크까지 — 모든 것을 하나로 연결하는<br className="hidden md:block" />
             올인원 파트너. 세계 어디서도, 어떤 브랜드든 완성합니다.
           </motion.p>
-          {/* Global nodes */}
-          <motion.div style={{ opacity: nodesOp, y: nodesY }} className="flex flex-wrap gap-2 mt-8">
+
+          {/* City nodes — yellow highlight travels sequentially on scroll */}
+          <motion.div style={{ opacity: nodesOp, y: nodesY }} className="flex flex-wrap gap-2.5 mt-8">
             {GLOBAL_NODES.map((city, i) => (
-              <span
+              <motion.span
                 key={city}
-                className="text-[10px] font-bold uppercase tracking-[0.3em] px-4 py-2 border border-white/15 rounded-full"
-                style={{ color: i === 0 ? '#FFB800' : 'rgba(255,255,255,0.45)' }}
+                animate={{
+                  color: i === activeCity ? '#FFB800' : 'rgba(255,255,255,0.35)',
+                  borderColor: i === activeCity ? 'rgba(255,184,0,0.55)' : 'rgba(255,255,255,0.12)',
+                  backgroundColor: i === activeCity ? 'rgba(255,184,0,0.06)' : 'rgba(255,255,255,0)',
+                }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="text-[11px] font-bold uppercase tracking-[0.3em] px-4 py-2.5 border rounded-full"
               >
-                {i === 0 ? '● ' : '○ '}{city}
-              </span>
+                <motion.span
+                  animate={{ opacity: i === activeCity ? 1 : 0.5 }}
+                  transition={{ duration: 0.3 }}
+                  className="mr-1.5"
+                >
+                  {i === activeCity ? '●' : '○'}
+                </motion.span>
+                {city}
+              </motion.span>
             ))}
           </motion.div>
         </motion.div>
