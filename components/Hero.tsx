@@ -4,8 +4,8 @@ import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 type Phase = 'c-only' | 'reveal';
 
 const HERO_IMAGES = [
-  "https://nadaun-portfolio.vercel.app/images/portfolio/hd-hyundai/00.webp",
   "https://nadaun-portfolio.vercel.app/images/portfolio/pepsi-festa/00.webp",
+  "https://nadaun-portfolio.vercel.app/images/portfolio/hd-hyundai/00.webp",
   "https://nadaun-portfolio.vercel.app/images/portfolio/royal-salute/00.webp",
   "https://nadaun-portfolio.vercel.app/images/portfolio/banyan-tree/00.webp",
   "https://nadaun-portfolio.vercel.app/images/portfolio/varilux-seoul/00.webp",
@@ -27,26 +27,21 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   const mouseY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
   const lastMousePos = useRef({ x: 0, y: 0 });
 
-  const maskImage = useMotionTemplate`radial-gradient(circle 750px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
-  const webkitMaskImage = useMotionTemplate`radial-gradient(circle 750px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
+  // Lens mask — reveals full-brightness layer on top of dimmed base
+  const lensMask = useMotionTemplate`radial-gradient(circle 700px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+  const lensWebkit = useMotionTemplate`radial-gradient(circle 700px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
 
   useEffect(() => {
     HERO_IMAGES.forEach((src) => { new Image().src = src; });
   }, []);
 
-  // Measure C's actual viewport position vs viewport center
-  // Also sets --header-pad CSS var so Header aligns to COLLECTIVE edges
   const measure = useCallback(() => {
     if (!h1Ref.current || !ollectiveRef.current) return;
     const h1Rect = h1Ref.current.getBoundingClientRect();
     const ollWidth = ollectiveRef.current.getBoundingClientRect().width;
     const cWidth = h1Rect.width - ollWidth;
-
-    // Offset needed to place C at exact viewport center
     const cCenterX = h1Rect.left + cWidth / 2;
     setXOffset(window.innerWidth / 2 - cCenterX);
-
-    // Share COLLECTIVE left-edge position with Header via CSS variable
     const pad = Math.max(16, h1Rect.left);
     document.documentElement.style.setProperty('--header-pad', `${pad}px`);
   }, []);
@@ -57,7 +52,6 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     return () => window.removeEventListener('resize', measure);
   }, [measure]);
 
-  // C → COLLECTIVE reveal sequence
   useEffect(() => {
     if (!startAnimation) return;
     const t = setTimeout(() => setPhase('reveal'), 750);
@@ -93,34 +87,48 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
     >
-      {/* Background */}
+      {/* ── Base layer: always visible, dark ────────────────────────── */}
+      <div className="absolute inset-0 z-0">
+        {HERO_IMAGES.map((src, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <img
+              src={src}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ filter: 'brightness(0.38) saturate(0.85)' }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ── Lens layer: cursor area brighter ─────────────────────────── */}
       <motion.div
-        className="absolute inset-0 z-0 bg-black"
-        style={{ maskImage, WebkitMaskImage: webkitMaskImage }}
+        className="absolute inset-0 z-[1]"
+        style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}
       >
         {HERO_IMAGES.map((src, i) => (
           <div
             key={i}
-            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
-              activeImage === i ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
           >
             <img
               src={src}
-              alt="Hero Background"
+              alt=""
               className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.7) contrast(1.1) grayscale(0.2)' }}
+              style={{ filter: 'brightness(0.82) contrast(1.08) saturate(1.1)' }}
             />
           </div>
         ))}
       </motion.div>
 
-      {/* Content */}
-      <div className="z-20 relative text-center pointer-events-none mix-blend-difference w-full flex flex-col items-center">
+      {/* ── Bottom vignette ──────────────────────────────────────────── */}
+      <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
-        {/* C → COLLECTIVE animation
-            overflow-hidden removed intentionally — section clips overflow instead.
-            h1 shifts right so C sits at viewport center during c-only phase. */}
+      {/* ── Content ──────────────────────────────────────────────────── */}
+      <div className="z-20 relative text-center pointer-events-none w-full flex flex-col items-center">
         <motion.h1
           ref={h1Ref}
           className="text-[13vw] font-extrabold tracking-tighter leading-none text-white select-none inline-flex items-baseline"
@@ -151,15 +159,15 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
           transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
           className="mt-12 max-w-2xl mx-auto"
         >
-          <p className="text-sm md:text-lg text-gray-300 font-medium tracking-widest uppercase flex items-center gap-4 justify-center">
-            <span className="w-12 h-[1px] bg-gray-500"></span>
+          <p className="text-sm md:text-lg text-white/50 font-medium tracking-widest uppercase flex items-center gap-4 justify-center">
+            <span className="w-12 h-[1px] bg-white/30" />
             Explore the unseen
-            <span className="w-12 h-[1px] bg-gray-500"></span>
+            <span className="w-12 h-[1px] bg-white/30" />
           </p>
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* ── Scroll indicator ─────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={startAnimation && phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}

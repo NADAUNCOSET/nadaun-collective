@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
       html {
-        scroll-snap-type: y proximity;
+        scroll-behavior: auto;
       }
       body {
         font-family: 'Manrope', sans-serif;
@@ -19,8 +19,7 @@
         overflow-x: hidden;
       }
       .snap-section {
-        scroll-snap-align: start;
-        scroll-snap-stop: normal;
+        /* snap handled by Lenis — remove browser-level snap for smoother feel */
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {

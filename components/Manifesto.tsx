@@ -48,7 +48,7 @@ const Manifesto: React.FC = () => {
         muted
         loop
         playsInline
-        preload="none"
+        preload="auto"
       />
 
       {/* Dark overlay on video */}
