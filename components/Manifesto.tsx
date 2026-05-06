@@ -7,7 +7,7 @@ const KO_LINES = [
   '결합된',
 ];
 
-const EN_WORDS = ['HAIEND', 'CONTENT', 'SOLUTION', 'GROUP'];
+const EN_WORDS = ['HIGH-END', 'CONTENT', 'SOLUTION', 'GROUP'];
 
 // Each Korean line stagger-reveals on scroll
 const ManifestoLine: React.FC<{ text: string; delay: number }> = ({ text, delay }) => (

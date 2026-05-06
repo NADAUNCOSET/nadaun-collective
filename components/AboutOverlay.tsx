@@ -73,7 +73,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           </p>
           <motion.h1 style={{ opacity: h1Op, y: h1Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-          >HAIEND</motion.h1>
+          >HIGH-END</motion.h1>
           <motion.h1 style={{ opacity: h2Op, y: h2Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string, color: '#FFB800' }}
             className="font-black tracking-[-0.03em] leading-[0.85] block"
           >CONTENT</motion.h1>
