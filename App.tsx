@@ -38,8 +38,11 @@ const App: React.FC = () => {
     restDelta: 0.001
   });
 
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
+  const rawCursorX = useMotionValue(-100);
+  const rawCursorY = useMotionValue(-100);
+  // Spring so cursor ring trails smoothly behind the dot
+  const cursorX = useSpring(rawCursorX, { stiffness: 300, damping: 26, mass: 0.5 });
+  const cursorY = useSpring(rawCursorY, { stiffness: 300, damping: 26, mass: 0.5 });
 
   const [introFinished, setIntroFinished] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
@@ -80,8 +83,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
+      rawCursorX.set(e.clientX);
+      rawCursorY.set(e.clientY);
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);

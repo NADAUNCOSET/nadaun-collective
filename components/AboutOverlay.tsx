@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const HEADER_H = 57;
@@ -274,8 +274,22 @@ interface AboutOverlayProps {
 
 const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ container: scrollRef });
-  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  const progress = useMotionValue(0);
+  const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    progress.set(0);
+    el.scrollTop = 0;
+    const onScroll = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      if (max > 0) progress.set(el.scrollTop / max);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [isOpen, progress]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -292,7 +306,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
             className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
@@ -315,11 +329,11 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Chapter1 g={scrollYProgress} />
-            <Chapter2 g={scrollYProgress} />
-            <Chapter3 g={scrollYProgress} />
-            <Chapter4 g={scrollYProgress} />
-            <Chapter5 g={scrollYProgress} />
+            <Chapter1 g={progress} />
+            <Chapter2 g={progress} />
+            <Chapter3 g={progress} />
+            <Chapter4 g={progress} />
+            <Chapter5 g={progress} />
           </div>
         </motion.div>
       )}

@@ -1,15 +1,32 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { motion, useMotionValue, useMotionTemplate, useSpring } from 'framer-motion';
 
 type Phase = 'c-only' | 'reveal';
 
 const HERO_IMAGES = [
-  "https://nadaun-portfolio.vercel.app/images/portfolio/pepsi-festa/00.webp",
-  "https://nadaun-portfolio.vercel.app/images/portfolio/hd-hyundai/00.webp",
-  "https://nadaun-portfolio.vercel.app/images/portfolio/royal-salute/00.webp",
-  "https://nadaun-portfolio.vercel.app/images/portfolio/banyan-tree/00.webp",
-  "https://nadaun-portfolio.vercel.app/images/portfolio/varilux-seoul/00.webp",
+  '/hero/pepsi-festa.webp',
+  '/hero/hd-hyundai.webp',
+  '/hero/royal-salute.webp',
+  '/hero/banyan-tree.webp',
+  '/hero/varilux-seoul.webp',
 ];
+
+// Letter-by-letter dissolve variants
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+  },
+};
+const letterVariants = {
+  hidden: { opacity: 0, filter: 'blur(12px)', y: 4 },
+  visible: {
+    opacity: 1,
+    filter: 'blur(0px)',
+    y: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 
 interface HeroProps {
   startAnimation?: boolean;
@@ -22,17 +39,21 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
   const h1Ref = useRef<HTMLHeadingElement>(null);
   const ollectiveRef = useRef<HTMLSpanElement>(null);
-
-  const mouseX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 500);
-  const mouseY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
   const lastMousePos = useRef({ x: 0, y: 0 });
 
-  // Lens mask — reveals full-brightness layer on top of dimmed base
-  const lensMask = useMotionTemplate`radial-gradient(circle 700px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
-  const lensWebkit = useMotionTemplate`radial-gradient(circle 700px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+  // Raw mouse position
+  const rawX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 500);
+  const rawY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
+
+  // Smoothed mouse for lens (spring gives a satisfying lag)
+  const mouseX = useSpring(rawX, { stiffness: 120, damping: 22, restDelta: 0.5 });
+  const mouseY = useSpring(rawY, { stiffness: 120, damping: 22, restDelta: 0.5 });
+
+  const lensMask = useMotionTemplate`radial-gradient(circle 720px at ${mouseX}px ${mouseY}px, black 35%, transparent 100%)`;
+  const lensWebkit = useMotionTemplate`radial-gradient(circle 720px at ${mouseX}px ${mouseY}px, black 35%, transparent 100%)`;
 
   useEffect(() => {
-    HERO_IMAGES.forEach((src) => { new Image().src = src; });
+    HERO_IMAGES.forEach((src) => { const img = new Image(); img.src = src; });
   }, []);
 
   const measure = useCallback(() => {
@@ -60,12 +81,12 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const { clientX, clientY } = e;
-    mouseX.set(clientX);
-    mouseY.set(clientY);
+    rawX.set(clientX);
+    rawY.set(clientY);
     const d = Math.sqrt(
       (clientX - lastMousePos.current.x) ** 2 + (clientY - lastMousePos.current.y) ** 2
     );
-    if (d > 150) {
+    if (d > 160) {
       setActiveImage(p => (p + 1) % HERO_IMAGES.length);
       lastMousePos.current = { x: clientX, y: clientY };
     }
@@ -73,21 +94,23 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     const { clientX, clientY } = e.touches[0];
-    mouseX.set(clientX);
-    mouseY.set(clientY);
+    rawX.set(clientX);
+    rawY.set(clientY);
   };
 
   const scrollToNext = () => {
-    document.getElementById('clients')?.scrollIntoView({ behavior: 'smooth' });
+    window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
   };
+
+  const letters = 'OLLECTIVE'.split('');
 
   return (
     <section
-      className="snap-section relative h-screen w-full flex items-center justify-center overflow-hidden bg-black cursor-none"
+      className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black cursor-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
     >
-      {/* ── Base layer: always visible, dark ────────────────────────── */}
+      {/* ── Base: always visible dark background ─────────────────────── */}
       <div className="absolute inset-0 z-0">
         {HERO_IMAGES.map((src, i) => (
           <div
@@ -98,15 +121,15 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
               src={src}
               alt=""
               className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.38) saturate(0.85)' }}
+              style={{ filter: 'brightness(0.35) saturate(0.9)' }}
             />
           </div>
         ))}
       </div>
 
-      {/* ── Lens layer: cursor area brighter ─────────────────────────── */}
+      {/* ── Lens: brighter circle following cursor ───────────────────── */}
       <motion.div
-        className="absolute inset-0 z-[1]"
+        className="absolute inset-0 z-[1] pointer-events-none"
         style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}
       >
         {HERO_IMAGES.map((src, i) => (
@@ -118,17 +141,19 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
               src={src}
               alt=""
               className="w-full h-full object-cover"
-              style={{ filter: 'brightness(0.82) contrast(1.08) saturate(1.1)' }}
+              style={{ filter: 'brightness(0.85) contrast(1.06) saturate(1.08)' }}
             />
           </div>
         ))}
       </motion.div>
 
-      {/* ── Bottom vignette ──────────────────────────────────────────── */}
-      <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+      {/* ── Vignette ─────────────────────────────────────────────────── */}
+      <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/75 via-transparent to-black/25 pointer-events-none" />
 
       {/* ── Content ──────────────────────────────────────────────────── */}
-      <div className="z-20 relative text-center pointer-events-none w-full flex flex-col items-center">
+      <div className="z-10 relative text-center pointer-events-none w-full flex flex-col items-center">
+
+        {/* C + OLLECTIVE letter-dissolve */}
         <motion.h1
           ref={h1Ref}
           className="text-[13vw] font-extrabold tracking-tighter leading-none text-white select-none inline-flex items-baseline"
@@ -136,33 +161,43 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
           transition={
             phase === 'c-only'
               ? { duration: 0 }
-              : { duration: 0.85, ease: [0.16, 1, 0.3, 1] }
+              : { duration: 0.9, ease: [0.16, 1, 0.3, 1] }
           }
         >
+          {/* C — always visible */}
           C
+
+          {/* OLLECTIVE — letter-by-letter dissolve */}
           <motion.span
             ref={ollectiveRef}
-            animate={{
-              opacity: phase === 'reveal' ? 1 : 0,
-              x: phase === 'reveal' ? 0 : 28,
-            }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-            style={{ display: 'inline-block' }}
+            className="inline-flex"
+            variants={containerVariants}
+            initial="hidden"
+            animate={phase === 'reveal' ? 'visible' : 'hidden'}
           >
-            OLLECTIVE
+            {letters.map((char, i) => (
+              <motion.span
+                key={i}
+                variants={letterVariants}
+                style={{ display: 'inline-block' }}
+              >
+                {char}
+              </motion.span>
+            ))}
           </motion.span>
         </motion.h1>
 
+        {/* Tagline */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={startAnimation && phase === 'reveal' ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
-          className="mt-12 max-w-2xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={startAnimation && phase === 'reveal' ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: 0.85, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-10 max-w-2xl mx-auto"
         >
-          <p className="text-sm md:text-lg text-white/50 font-medium tracking-widest uppercase flex items-center gap-4 justify-center">
-            <span className="w-12 h-[1px] bg-white/30" />
+          <p className="text-xs md:text-sm text-white/40 font-medium tracking-[0.35em] uppercase flex items-center gap-4 justify-center">
+            <span className="w-10 h-[1px] bg-white/25" />
             Explore the unseen
-            <span className="w-12 h-[1px] bg-white/30" />
+            <span className="w-10 h-[1px] bg-white/25" />
           </p>
         </motion.div>
       </div>
@@ -171,15 +206,15 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={startAnimation && phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: 0.9, duration: 0.4 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer pointer-events-auto group"
+        transition={{ delay: 1.1, duration: 0.5 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer pointer-events-auto"
         onClick={scrollToNext}
       >
-        <div className="w-[1px] h-[60px] bg-white/20 relative overflow-hidden group-hover:h-[80px] transition-all duration-300">
+        <div className="w-[1px] h-[56px] bg-white/15 relative overflow-hidden">
           <motion.div
-            animate={{ y: [-60, 60] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="absolute top-0 left-0 w-full h-[30%] bg-[#FFB800]"
+            animate={{ y: [-56, 56] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
+            className="absolute top-0 left-0 w-full h-[35%] bg-[#FFB800]"
           />
         </div>
       </motion.div>
