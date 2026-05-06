@@ -47,6 +47,19 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     HERO_IMAGES.forEach((src) => { const img = new Image(); img.src = src; });
   }, []);
 
+  // Sync --header-pad with hero left padding so header aligns to COLLECTIVE left edge
+  useEffect(() => {
+    const setpad = () => {
+      const vw = window.innerWidth;
+      // matches px-8 md:px-16 lg:px-24
+      const px = vw >= 1024 ? 96 : vw >= 768 ? 64 : 32;
+      document.documentElement.style.setProperty('--header-pad', `${px}px`);
+    };
+    setpad();
+    window.addEventListener('resize', setpad);
+    return () => window.removeEventListener('resize', setpad);
+  }, []);
+
   useEffect(() => {
     if (!startAnimation) return;
     const t = setTimeout(() => setPhase('reveal'), 800);
@@ -127,24 +140,26 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
       {/* ── Text composition ─────────────────────────────────────────── */}
       <div className="z-10 relative pointer-events-none w-full px-8 md:px-16 lg:px-24 flex flex-col">
 
-        {/* NADAUN — thin, wide tracking (like "About" in ref) */}
+        {/* NADAUN — thin, wide tracking */}
         <motion.p
-          className="font-extralight text-white/70 uppercase leading-none"
           style={{
             fontFamily: 'Manrope, sans-serif',
             fontWeight: 200,
-            fontSize: 'clamp(1rem, 2.4vw, 2.2rem)',
-            letterSpacing: '0.52em',
+            fontSize: 'clamp(0.85rem, 2vw, 1.8rem)',
+            letterSpacing: '0.55em',
+            color: 'rgba(255,255,255,0.55)',
+            lineHeight: 1,
+            textTransform: 'uppercase',
           }}
-          initial={{ opacity: 0, x: -10 }}
-          animate={phase === 'reveal' ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+          initial={{ opacity: 0, x: -8 }}
+          animate={phase === 'reveal' ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.0 }}
         >
           NADAUN
         </motion.p>
 
-        {/* COLLECTIVE — ultra bold Barlow, letter dissolve */}
-        <div className="overflow-visible leading-none mt-1">
+        {/* COLLECTIVE — semibold, letter dissolve */}
+        <div className="overflow-visible leading-none mt-2">
           <motion.div
             className="inline-flex items-baseline"
             variants={containerVariants}
@@ -157,11 +172,11 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
                 variants={letterVariants}
                 style={{
                   display: 'inline-block',
-                  fontFamily: "'Barlow', sans-serif",
-                  fontWeight: 900,
-                  fontSize: 'clamp(4.5rem, 14.5vw, 13rem)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
+                  fontFamily: 'Manrope, sans-serif',
+                  fontWeight: 600,
+                  fontSize: 'clamp(4rem, 13.5vw, 12rem)',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 0.92,
                   color: '#ffffff',
                 }}
               >
