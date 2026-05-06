@@ -89,7 +89,7 @@ const App: React.FC = () => {
         />
 
         {/* OVERLAYS */}
-        <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} />
+        <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />
         <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} />
         <BusinessOverlay
           isOpen={activeOverlay === 'business'}

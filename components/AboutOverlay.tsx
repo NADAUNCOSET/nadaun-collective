@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 220;
+const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 340;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 // Normalized start/end for each chapter
@@ -256,27 +256,29 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 };
 
 // ── Chapter 5 ─────────────────────────────────────────────────────────────────
-const Chapter5: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
   const p = useTransform(g, [C5S, C5E], [0, 1]);
 
-  // Line sweeps right immediately as Singapore fades in Ch4
-  const lineScaleX = useTransform(p, [0.00, 0.50], [0, 1]);
-  const textOp     = useTransform(p, [0.30, 0.62], [0, 1]);
-  const textY      = useTransform(p, [0.30, 0.62], ['4%', '0%']);
+  const line1ScaleX = useTransform(p, [0.00, 0.40], [0, 1]);
+  const textOp      = useTransform(p, [0.28, 0.52], [0, 1]);
+  const textY       = useTransform(p, [0.28, 0.52], ['4%', '0%']);
+  const line2ScaleX = useTransform(p, [0.52, 0.76], [0, 1]);
+  const ctaOp       = useTransform(p, [0.68, 0.90], [0, 1]);
+  const ctaY        = useTransform(p, [0.68, 0.90], ['4%', '0%']);
 
   return (
     <div style={{ height: `${H5}vh` }}>
       <StickyPanel>
-        {/* Sweeping horizontal line */}
+        {/* Line 1 */}
         <div className="relative mb-10">
           <div className="h-[1px] w-full bg-white/8" />
           <motion.div
             className="absolute top-0 left-0 h-[1px] bg-white/60 origin-left w-full"
-            style={{ scaleX: lineScaleX }}
+            style={{ scaleX: line1ScaleX }}
           />
         </div>
 
-        <motion.div style={{ opacity: textOp, y: textY }}>
+        <motion.div style={{ opacity: textOp, y: textY }} className="mb-16">
           <p className="text-white/45 text-base md:text-lg font-light leading-relaxed mb-2">
             ATL과 BTL의 경계를 허물고,
           </p>
@@ -287,6 +289,34 @@ const Chapter5: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             TTL로 브랜드를 완성합니다.
           </p>
         </motion.div>
+
+        {/* Line 2 */}
+        <div className="relative mb-10">
+          <div className="h-[1px] w-full bg-white/8" />
+          <motion.div
+            className="absolute top-0 left-0 h-[1px] bg-white/60 origin-left w-full"
+            style={{ scaleX: line2ScaleX }}
+          />
+        </div>
+
+        <motion.div style={{ opacity: ctaOp, y: ctaY }} className="flex items-center justify-between">
+          <div>
+            <p className="text-white/40 text-sm font-light mb-2 tracking-wide">ALL IN ONE 에이전시</p>
+            <p
+              className="text-white font-bold leading-tight"
+              style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2.8rem)', fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.02em' }}
+            >
+              프로젝트 문의하기
+            </p>
+          </div>
+          <button
+            onClick={onContactClick}
+            className="shrink-0 ml-8 flex items-center gap-2 border border-white/20 rounded-full px-7 py-3.5 text-sm font-bold text-white hover:bg-white hover:text-black transition-all duration-300"
+          >
+            문의하기
+            <span className="text-base leading-none">→</span>
+          </button>
+        </motion.div>
       </StickyPanel>
     </div>
   );
@@ -296,9 +326,10 @@ const Chapter5: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 interface AboutOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onContactClick?: () => void;
 }
 
-const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
+const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactClick }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
@@ -359,7 +390,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
             <Chapter2 g={progress} />
             <Chapter3 g={progress} />
             <Chapter4 g={progress} />
-            <Chapter5 g={progress} />
+            <Chapter5 g={progress} onContactClick={onContactClick} />
           </div>
         </motion.div>
       )}
