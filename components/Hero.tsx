@@ -5,16 +5,13 @@ type Phase = 'c-only' | 'reveal';
 
 // Portfolio & campaign shots + people folder portraits
 const ALL_IMAGES = [
-  { src: '/hero/pepsi-festa.webp',          pos: 'center 35%' },
-  { src: '/hero/hd-hyundai.webp',           pos: 'center 40%' },
-  { src: '/people/estevan-00.webp',         pos: 'center 20%' },
-  { src: '/hero/royal-salute.webp',         pos: 'center 30%' },
-  { src: '/people/thenewgrey-00.webp',      pos: 'center 25%' },
-  { src: '/hero/banyan-tree.webp',          pos: 'center 30%' },
-  { src: '/people/dong-wook-00.webp',       pos: 'center 20%' },
-  { src: '/hero/varilux-seoul.webp',        pos: 'center 40%' },
-  { src: '/people/laon-band-00.webp',       pos: 'center 25%' },
-  { src: 'https://framerusercontent.com/images/QllGUMDkWAUR6xJgI8Qg44fwoZ4.jpg?scale-down-to=2048', pos: 'center 18%' },
+  { src: '/hero/pepsi-festa.webp',    pos: 'center 35%' },
+  { src: '/hero/hd-hyundai.webp',     pos: 'center 40%' },
+  { src: '/hero/royal-salute.webp',   pos: 'center 30%' },
+  { src: '/hero/banyan-tree.webp',    pos: 'center 30%' },
+  { src: '/people/dong-wook-00.webp', pos: 'center 20%' },
+  { src: '/hero/varilux-seoul.webp',  pos: 'center 40%' },
+  { src: '/people/laon-band-00.webp', pos: 'center 25%' },
 ];
 
 const SECTION_H = 320; // vh — outer scroll height
