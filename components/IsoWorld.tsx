@@ -3,34 +3,77 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
-const UNIVERSE_DATA = [
-  { id: 'space',   title: 'NADAUN SPACE',        subtitle: 'INFRA SOLUTION',         desc: '모든 창작의 시작,\n압도적 기술력의 인프라',   url: 'https://www.rainbowbene.com/',                                         color: '#00C2FF', position: [-7,   0,  1.5] as [number,number,number], height: 3.5 },
-  { id: 'studio',  title: 'NADAUN STUDIO',       subtitle: 'VISUAL MASTERPIECE',     desc: '찰나를 영원으로 기록하는\n비주얼 디렉팅',       url: 'https://nadaun.framer.website/',                                        color: '#FFB800', position: [-3.5, 0, -0.5] as [number,number,number], height: 4.5 },
-  { id: 'ailab',   title: 'AI INNOVATION LAB',   subtitle: 'FUTURE INTELLIGENCE',    desc: '데이터로 예측하는\n마케팅의 새로운 차원',       url: '',                                                                      color: '#00FF94', position: [0,    0, -2.5] as [number,number,number], height: 5.2 },
-  { id: 'project', title: 'NADAUN PROJECT',      subtitle: 'CREATIVE PERFORMANCE',   desc: '시장을 뒤흔드는\n압도적 퍼포먼스',             url: '',                                                                      color: '#FF4D4D', position: [3.5,  0, -0.5] as [number,number,number], height: 4.0 },
-  { id: 'agency',  title: 'NAN AGENCY',          subtitle: 'FUTURE ENTERTAINMENT',   desc: '뉴미디어 시대의\n아이콘을 육성',               url: 'https://nanofficial.imweb.me/',                                         color: '#9D4DFF', position: [7,    0,  1.5] as [number,number,number], height: 3.8 },
-  { id: 'moment',  title: 'NADAUN MOMENT',       subtitle: 'CORPORATE VISUAL ARCHIVE',desc: '기업의 순간을 정제된\n감각으로 영원히 기록',  url: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',            color: '#FF8C00', position: [10.5, 0,  4.5] as [number,number,number], height: 3.2 },
+type BuildingData = {
+  id: string;
+  title: string;
+  subtitle: string;
+  desc: string;
+  url?: string;
+  b2b?: string;   // B2B link (기업 전용)
+  b2c?: string;   // B2C link (개인)
+  color: string;
+  position: [number, number, number];
+  height: number;
+};
+
+const UNIVERSE_DATA: BuildingData[] = [
+  {
+    id: 'space',
+    title: 'NADAUN SPACE',
+    subtitle: 'INFRA SOLUTION',
+    desc: '모든 창작의 시작,\n압도적 기술력의 인프라',
+    url: 'https://www.rainbowbene.com/',
+    color: '#00C2FF',
+    position: [-7, 0, 1.5],
+    height: 3.5,
+  },
+  {
+    id: 'ailab',
+    title: 'AI INNOVATION LAB',
+    subtitle: 'FUTURE INTELLIGENCE',
+    desc: '데이터로 예측하는\n마케팅의 새로운 차원',
+    color: '#00FF94',
+    position: [-2, 0, -3],
+    height: 5.2,
+  },
+  {
+    id: 'moment',
+    title: 'NADAUN MOMENT',
+    subtitle: 'CORPORATE VISUAL ARCHIVE',
+    desc: '기업의 순간을 정제된\n감각으로 영원히 기록',
+    b2b: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',
+    b2c: '',   // B2C 링크 추후 연결
+    color: '#FF8C00',
+    position: [3, 0, -2],
+    height: 4.0,
+  },
+  {
+    id: 'agency',
+    title: 'NAN AGENCY',
+    subtitle: 'FUTURE ENTERTAINMENT',
+    desc: '뉴미디어 시대의\n아이콘을 육성',
+    url: 'https://nanofficial.imweb.me/',
+    color: '#9D4DFF',
+    position: [7, 0, 1.5],
+    height: 3.8,
+  },
 ];
 
 // Shared geometry cache
 const BOX_GEOMETRIES: Record<number, THREE.BoxGeometry> = {};
-const getBoxGeometry = (height: number) => {
-  if (!BOX_GEOMETRIES[height]) BOX_GEOMETRIES[height] = new THREE.BoxGeometry(2, height, 2);
-  return BOX_GEOMETRIES[height];
+const getBoxGeometry = (h: number) => {
+  if (!BOX_GEOMETRIES[h]) BOX_GEOMETRIES[h] = new THREE.BoxGeometry(2, h, 2);
+  return BOX_GEOMETRIES[h];
 };
 
-const Building: React.FC<{ data: typeof UNIVERSE_DATA[0]; onAiLabClick?: () => void; showLabel?: boolean }> = ({ data, onAiLabClick, showLabel = true }) => {
+const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLabel?: boolean }> = ({ data, onAiLabClick, showLabel = true }) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  // Individual slow spin — group also rotates, so keep this subtle
   useFrame((_, delta) => {
     if (meshRef.current) meshRef.current.rotation.y += delta * 0.15;
   });
 
-  const handleCardClick = () => {
-    if (data.id === 'ailab' && onAiLabClick) onAiLabClick();
-    else if (data.url) window.open(data.url, '_blank');
-  };
+  const isMoment = data.id === 'moment';
 
   return (
     <group position={data.position}>
@@ -46,40 +89,66 @@ const Building: React.FC<{ data: typeof UNIVERSE_DATA[0]; onAiLabClick?: () => v
         />
       </mesh>
 
-      {showLabel && <Html
-        position={[0, data.height / 2 + 1.8, 0]}
-        center
-        distanceFactor={15}
-        style={{ pointerEvents: 'auto' }}
-      >
-        <div
-          className="flex flex-col items-center text-center w-[170px] select-none group cursor-pointer"
-          onClick={handleCardClick}
+      {showLabel && (
+        <Html
+          position={[0, data.height / 2 + 1.8, 0]}
+          center
+          distanceFactor={15}
+          style={{ pointerEvents: 'auto' }}
         >
-          <div className="bg-black/90 backdrop-blur-md border border-white/10 p-3 rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:border-white/20 shadow-xl">
-            <h3 className="text-sm font-bold tracking-tight mb-0.5" style={{ color: data.color }}>
-              {data.title}
-            </h3>
-            <p className="text-[8px] font-bold tracking-[0.2em] text-gray-500 uppercase">
-              {data.subtitle}
-            </p>
-            <div className="h-[1px] w-full my-2" style={{ background: `linear-gradient(to right, transparent, ${data.color}44, transparent)` }} />
-            <p className="text-[10px] text-gray-300 leading-relaxed whitespace-pre-line">
-              {data.desc}
-            </p>
-            <div className="mt-2 text-[8px] uppercase tracking-widest transition-colors" style={{ color: data.url || data.id === 'ailab' ? data.color : '#555' }}>
-              {data.id === 'ailab' ? 'Explore →' : (data.url ? 'Enter →' : 'Coming Soon')}
+          <div className="flex flex-col items-center text-center select-none" style={{ width: isMoment ? 190 : 170 }}>
+            <div className="bg-black/90 backdrop-blur-md border border-white/10 p-3 rounded-lg shadow-xl w-full">
+              <h3 className="text-sm font-bold tracking-tight mb-0.5" style={{ color: data.color }}>
+                {data.title}
+              </h3>
+              <p className="text-[8px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                {data.subtitle}
+              </p>
+              <div className="h-[1px] w-full my-2" style={{ background: `linear-gradient(to right, transparent, ${data.color}44, transparent)` }} />
+              <p className="text-[10px] text-gray-300 leading-relaxed whitespace-pre-line mb-2">
+                {data.desc}
+              </p>
+
+              {/* MOMENT: two link buttons */}
+              {isMoment ? (
+                <div className="flex gap-1.5 mt-1">
+                  <button
+                    className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors cursor-pointer"
+                    style={{ borderColor: data.color + '60', color: data.color }}
+                    onClick={() => data.b2b && window.open(data.b2b, '_blank')}
+                  >
+                    B2B →
+                  </button>
+                  <button
+                    className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors"
+                    style={data.b2c ? { borderColor: data.color + '60', color: data.color, cursor: 'pointer' } : { borderColor: '#333', color: '#555', cursor: 'default' }}
+                    onClick={() => data.b2c && window.open(data.b2c, '_blank')}
+                  >
+                    {data.b2c ? 'B2C →' : 'B2C Soon'}
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="mt-1 text-[8px] uppercase tracking-widest cursor-pointer"
+                  style={{ color: data.url || data.id === 'ailab' ? data.color : '#555' }}
+                  onClick={() => {
+                    if (data.id === 'ailab' && onAiLabClick) onAiLabClick();
+                    else if (data.url) window.open(data.url, '_blank');
+                  }}
+                >
+                  {data.id === 'ailab' ? 'Explore →' : (data.url ? 'Enter →' : 'Coming Soon')}
+                </div>
+              )}
             </div>
+            <div className="w-[1px] h-5 bg-gradient-to-b from-white/20 to-transparent" />
           </div>
-          <div className="w-[1px] h-5 bg-gradient-to-b from-white/20 to-transparent" />
-        </div>
-      </Html>}
+        </Html>
+      )}
     </group>
   );
 };
 
-// On mobile: show only 3 core buildings to reduce draw calls
-const MOBILE_IDS = new Set(['studio', 'ailab', 'project']);
+const MOBILE_IDS = new Set(['ailab', 'moment', 'agency']);
 
 const Scene: React.FC<{ onAiLabClick?: () => void; isMobile?: boolean }> = ({ onAiLabClick, isMobile }) => {
   const groupRef = useRef<THREE.Group>(null);
@@ -93,13 +162,12 @@ const Scene: React.FC<{ onAiLabClick?: () => void; isMobile?: boolean }> = ({ on
       <ambientLight intensity={0.6} />
       <pointLight position={[10, 10, 10]} intensity={1.2} />
       <pointLight position={[-10, 8, -8]} intensity={0.4} color="#4444ff" />
-      {/* Single Environment (lighter than HDR city) */}
       <Environment preset="night" />
 
       <group ref={groupRef} position={[0, -2.0, 0]}>
         {UNIVERSE_DATA
           .filter(item => !isMobile || MOBILE_IDS.has(item.id))
-          .map((item) => (
+          .map(item => (
             <Building key={item.id} data={item} onAiLabClick={onAiLabClick} showLabel={!isMobile} />
           ))}
       </group>
@@ -125,38 +193,61 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
     return () => observer.disconnect();
   }, []);
 
-  // Mobile: replace 3D with a 2D card grid — better UX, much lighter
+  // Mobile: 2D card grid
   if (isMobile) {
     return (
-      <section id="isoworld" className="snap-section h-screen w-full bg-black flex flex-col overflow-hidden">
+      <section id="isoworld" className="snap-section h-screen w-full bg-black flex flex-col overflow-hidden relative">
         <div className="absolute inset-0 opacity-[0.12]"
           style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="relative z-10 flex flex-col h-full px-5 py-16">
-          <h2 className="text-3xl font-bold tracking-tighter text-white mb-6">
+        <div className="relative z-10 flex flex-col h-full px-5 py-14">
+          <h2 className="text-3xl font-bold tracking-tighter text-white mb-5">
             NADAUN <span className="text-[#FFB800]">UNIVERSE</span>
           </h2>
           <div className="grid grid-cols-2 gap-3 flex-1 overflow-y-auto pb-4">
-            {UNIVERSE_DATA.map((item) => (
-              <button
+            {UNIVERSE_DATA.map(item => (
+              <div
                 key={item.id}
-                className="flex flex-col p-4 rounded-xl border border-white/10 bg-white/5 text-left active:scale-95 transition-transform"
+                className="flex flex-col p-4 rounded-xl border bg-white/5 text-left"
                 style={{ borderColor: item.color + '30' }}
-                onClick={() => {
-                  if (item.id === 'ailab' && onAiLabClick) onAiLabClick();
-                  else if (item.url) window.open(item.url, '_blank');
-                }}
               >
                 <div className="w-2 h-2 rounded-full mb-2" style={{ background: item.color }} />
-                <h3 className="text-xs font-bold leading-tight mb-1" style={{ color: item.color }}>
+                <h3 className="text-xs font-bold leading-tight mb-0.5" style={{ color: item.color }}>
                   {item.title}
                 </h3>
-                <p className="text-[9px] text-gray-500 uppercase tracking-wider">
+                <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-2">
                   {item.subtitle}
                 </p>
-                <p className="text-[10px] text-gray-400 mt-2 leading-relaxed whitespace-pre-line">
+                <p className="text-[10px] text-gray-400 leading-relaxed whitespace-pre-line flex-1">
                   {item.desc}
                 </p>
-              </button>
+
+                {/* MOMENT — two link buttons */}
+                {item.id === 'moment' ? (
+                  <div className="flex gap-1.5 mt-3">
+                    <button
+                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform"
+                      style={{ borderColor: item.color + '60', color: item.color }}
+                      onClick={() => item.b2b && window.open(item.b2b, '_blank')}
+                    >B2B</button>
+                    <button
+                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border"
+                      style={item.b2c ? { borderColor: item.color + '60', color: item.color } : { borderColor: '#333', color: '#555' }}
+                      onClick={() => item.b2c && window.open(item.b2c, '_blank')}
+                    >{item.b2c ? 'B2C' : 'Soon'}</button>
+                  </div>
+                ) : (
+                  <button
+                    className="mt-3 text-[9px] uppercase tracking-wider text-left active:scale-95 transition-transform"
+                    style={{ color: item.url || item.id === 'ailab' ? item.color : '#444' }}
+                    onClick={() => {
+                      if (item.id === 'ailab' && onAiLabClick) onAiLabClick();
+                      else if (item.url) window.open(item.url, '_blank');
+                    }}
+                  >
+                    {item.id === 'ailab' ? 'Explore →' : (item.url ? 'Enter →' : 'Coming Soon')}
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -183,16 +274,15 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
         </div>
       </div>
 
-      {/* pointer-events: none → scroll passes through to page */}
       <div className="w-full h-full absolute inset-0 z-0" style={{ pointerEvents: 'none' }}>
         <Canvas
-          camera={{ position: [0, 5, isMobile ? 22 : 16], fov: isMobile ? 45 : 35 }}
-          dpr={isMobile ? 0.75 : 1}        // Lower DPR on mobile — biggest GPU win
-          frameloop={frameloop}            // Pause GPU when section off-screen
+          camera={{ position: [0, 5, 16], fov: 35 }}
+          dpr={1}
+          frameloop={frameloop}
           performance={{ min: 0.3 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
-          <Scene onAiLabClick={onAiLabClick} isMobile={isMobile} />
+          <Scene onAiLabClick={onAiLabClick} isMobile={false} />
         </Canvas>
       </div>
 
