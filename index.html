@@ -1,55 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="NADAUN COLLECTIVE — Seamless Brand Experience through TTL. 나다운 컬렉티브" />
     <title>NADAUN COLLECTIVE</title>
+
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/symbol-white.webp" as="image" type="image/webp" />
+    <link rel="preload" href="/symbol-black.webp" as="image" type="image/webp" />
+    <link rel="preload" href="/hero/pepsi-festa.webp" as="image" type="image/webp" />
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Barlow:wght@900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+
     <style>
-      .font-barlow { font-family: 'Barlow', sans-serif; }
-      .font-barlow-condensed { font-family: 'Barlow Condensed', sans-serif; }
-    </style>
-    <style>
-      html {
-        scroll-behavior: smooth;
-      }
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
       body {
         font-family: 'Manrope', sans-serif;
         background-color: #000;
         color: #fff;
         overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
-      .snap-section {
-        scroll-snap-align: start;
+      .snap-section { scroll-snap-align: start; }
+      /* Scrollbar — desktop only */
+      @media (min-width: 768px) {
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
       }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #111;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #333;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-      .gradient-text {
-        background: linear-gradient(to right, #fff, #999);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
+      /* Prevent FOUC */
+      #root { background: #000; min-height: 100dvh; }
     </style>
-
-
-</head>
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

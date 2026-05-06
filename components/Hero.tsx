@@ -12,6 +12,7 @@ const ALL_IMAGES = [
 ];
 
 const SECTION_H = 320;
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
 const Hero: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,7 @@ const Hero: React.FC = () => {
   const mouseX = useSpring(rawX, { stiffness: 100, damping: 20, restDelta: 0.5 });
   const mouseY = useSpring(rawY, { stiffness: 100, damping: 20, restDelta: 0.5 });
 
+  // Lens mask disabled on mobile — saves GPU/paint cost
   const lensMask   = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
   const lensWebkit = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
 
@@ -62,7 +64,8 @@ const Hero: React.FC = () => {
 
   // ── All-words dissolve exit ────────────────────────────────────
   const dissolveOp   = useTransform(scrollYProgress, [0.72, 0.92], [1, 0]);
-  const dissolveBlur = useTransform(scrollYProgress, [0.72, 0.92], [0, 12]);
+  // blur disabled on mobile — expensive repaint on low-end GPUs
+  const dissolveBlur = useTransform(scrollYProgress, [0.72, 0.92], [0, isMobile ? 0 : 12]);
   const dissolveFilter = useMotionTemplate`blur(${dissolveBlur}px)`;
 
   const taglineOp = useTransform(scrollYProgress, [0.68, 0.82], [1, 0]);
@@ -129,16 +132,18 @@ const Hero: React.FC = () => {
           ))}
         </div>
 
-        {/* ── Lens ────────────────────────────────────── */}
-        <motion.div className="absolute inset-0 z-[1] pointer-events-none"
-          style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}>
-          {ALL_IMAGES.map(({ src, pos }, i) => (
-            <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}>
-              <img src={src} alt="" className="w-full h-full object-cover"
-                style={{ objectPosition: pos, filter: 'brightness(0.82) contrast(1.06) saturate(1.1)' }} />
-            </div>
-          ))}
-        </motion.div>
+        {/* ── Lens — desktop only (mask + radial-gradient is GPU-heavy on mobile) ── */}
+        {!isMobile && (
+          <motion.div className="absolute inset-0 z-[1] pointer-events-none"
+            style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}>
+            {ALL_IMAGES.map(({ src, pos }, i) => (
+              <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}>
+                <img src={src} alt="" className="w-full h-full object-cover"
+                  style={{ objectPosition: pos, filter: 'brightness(0.82) contrast(1.06) saturate(1.1)' }} />
+              </div>
+            ))}
+          </motion.div>
+        )}
 
         {/* ── Vignette ────────────────────────────────── */}
         <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/70 via-transparent to-black/20 pointer-events-none" />
