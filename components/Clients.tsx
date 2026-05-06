@@ -81,7 +81,7 @@ const NodeLabel: React.FC<{ node: ClientNode }> = ({ node }) => (
         ? 'rgba(255,255,255,0.85)'
         : 'rgba(255,255,255,0.6)',
       whiteSpace: 'nowrap',
-      textShadow: node.size === 'lg' ? '0 0 20px rgba(255,184,0,0.4)' : 'none',
+      textShadow: node.size === 'lg' ? '0 0 20px rgba(255,255,255,0.15)' : 'none',
     }}
   >
     {node.name}
@@ -90,129 +90,156 @@ const NodeLabel: React.FC<{ node: ClientNode }> = ({ node }) => (
 
 const Clients: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  // spreadFactor: 2.8 (spread) → 1.0 (final constellation)
-  const [spread, setSpread] = useState(2.8);
+
+  // tier visibility (lg → md → sm)
+  const [lgVisible, setLgVisible] = useState(false);
+  const [mdVisible, setMdVisible] = useState(false);
+  const [smVisible, setSmVisible] = useState(false);
+
+  // spread: 2.6 (scattered) → 1.0 (final constellation)
+  const [spread, setSpread] = useState(2.6);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start 85%', 'center 45%'],
+    offset: ['start start', 'end end'],
   });
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    // Ease-in-out: clamp 0→1, then map to 2.8→1.0
-    const clamped = Math.max(0, Math.min(1, v));
-    const eased = clamped < 0.5
-      ? 2 * clamped * clamped
-      : 1 - Math.pow(-2 * clamped + 2, 2) / 2;
-    setSpread(2.8 - eased * 1.8);
+    // tier gates
+    if (v >= 0.06)  setLgVisible(true);
+    if (v >= 0.28)  setMdVisible(true);
+    if (v >= 0.52)  setSmVisible(true);
+
+    // spread converges 0.15 → 0.80
+    const sp = Math.max(0, Math.min(1, (v - 0.15) / 0.65));
+    const eased = sp < 0.5 ? 2 * sp * sp : 1 - Math.pow(-2 * sp + 2, 2) / 2;
+    setSpread(2.6 - eased * 1.6);
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.4], [0.2, 1]);
-  const lineOpacity = useTransform(scrollYProgress, [0.1, 0.6], [0, 0.35]);
+  const headerOp   = useTransform(scrollYProgress, [0.00, 0.08], [0, 1]);
+  const headerY    = useTransform(scrollYProgress, [0.00, 0.08], ['20px', '0px']);
+  const lineOp     = useTransform(scrollYProgress, [0.55, 0.85], [0, 0.35]);
+  const counterOp  = useTransform(scrollYProgress, [0.70, 0.90], [0, 1]);
 
-  // Compute current node positions based on spread factor
+  // live count label: "4 BRANDS" → "11 BRANDS" → "37 BRANDS"
+  const lgCount = NODES.filter(n => n.size === 'lg').length;
+  const mdCount = NODES.filter(n => n.size !== 'sm').length;
+  const count = smVisible ? NODES.length : mdVisible ? mdCount : lgVisible ? lgCount : 0;
+
   const computed = NODES.map(n => ({
     ...n,
     cx: CX + (n.x - CX) * spread,
     cy: CY + (n.y - CY) * spread,
   }));
 
+  // per-tier node indices for stagger delays
+  const lgNodes = NODES.map((n, i) => ({ ...n, i })).filter(n => n.size === 'lg');
+  const mdNodes = NODES.map((n, i) => ({ ...n, i })).filter(n => n.size === 'md');
+  const smNodes = NODES.map((n, i) => ({ ...n, i })).filter(n => n.size === 'sm');
+
+  const getDelay = (node: { size?: string; i: number }) => {
+    if (node.size === 'lg') return lgNodes.findIndex(n => n.i === node.i) * 0.06;
+    if (node.size === 'md') return mdNodes.findIndex(n => n.i === node.i) * 0.04;
+    return smNodes.findIndex(n => n.i === node.i) * 0.025;
+  };
+
+  const isVisible = (size?: string) =>
+    size === 'lg' ? lgVisible : size === 'md' ? mdVisible : smVisible;
+
   return (
-    <section ref={sectionRef} id="clients" className="relative w-full bg-black overflow-hidden" style={{ minHeight: '100vh' }}>
+    // Tall outer — provides scroll distance
+    <div ref={sectionRef} style={{ height: '300vh' }} className="relative">
 
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px)',
-          backgroundSize: '44px 44px',
-        }}
-      />
+      <div className="sticky top-0 w-full h-screen bg-black overflow-hidden">
 
-      <motion.div className="relative z-10 px-8 md:px-16 lg:px-24 pt-20 pb-16" style={{ opacity }}>
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(rgba(255,255,255,0.022) 1px, transparent 1px)',
+            backgroundSize: '44px 44px',
+          }}
+        />
 
-        {/* Header */}
-        <div className="mb-10 flex items-baseline justify-between">
-          <div>
-            <p className="text-[10px] tracking-[0.5em] uppercase text-white/40 font-light mb-3">
-              OUR PARTNERS
-            </p>
-            <h2
-              className="font-black leading-none text-white"
-              style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', letterSpacing: '-0.03em' }}
-            >
-              최고의 파트너
-            </h2>
-          </div>
-          <p className="text-white/15 text-xs tracking-widest hidden md:block">TRUSTED BY THE BEST</p>
-        </div>
+        <div className="relative z-10 h-full flex flex-col px-8 md:px-16 lg:px-24 pt-16 pb-10">
 
-        {/* Constellation */}
-        <div className="relative w-full" style={{ height: 'clamp(420px, 56vw, 660px)' }}>
+          {/* Header */}
+          <motion.div style={{ opacity: headerOp, y: headerY }} className="mb-8 flex items-baseline justify-between shrink-0">
+            <div>
+              <p className="text-[10px] tracking-[0.5em] uppercase text-white/40 font-light mb-3">
+                OUR PARTNERS
+              </p>
+              <h2
+                className="font-black leading-none text-white"
+                style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', letterSpacing: '-0.03em' }}
+              >
+                최고의 파트너
+              </h2>
+            </div>
+            <motion.p style={{ opacity: counterOp }} className="text-white/20 text-xs tracking-widest hidden md:block tabular-nums">
+              {count}+ BRANDS
+            </motion.p>
+          </motion.div>
 
-          {/* SVG lines */}
-          <motion.svg
-            className="absolute inset-0 w-full h-full"
-            style={{ overflow: 'visible', opacity: lineOpacity }}
-          >
-            {EDGES.map(([ai, bi], ei) => {
-              const a = computed[ai];
-              const b = computed[bi];
-              if (!a || !b) return null;
+          {/* Constellation */}
+          <div className="relative flex-1">
+
+            {/* SVG lines */}
+            <motion.svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible', opacity: lineOp }}>
+              {EDGES.map(([ai, bi], ei) => {
+                const a = computed[ai];
+                const b = computed[bi];
+                if (!a || !b) return null;
+                return (
+                  <line
+                    key={ei}
+                    x1={`${a.cx}%`} y1={`${a.cy}%`}
+                    x2={`${b.cx}%`} y2={`${b.cy}%`}
+                    stroke="rgba(255,255,255,0.12)"
+                    strokeWidth="0.5"
+                  />
+                );
+              })}
+            </motion.svg>
+
+            {/* Nodes */}
+            {computed.map((node, i) => {
+              const dotSize = node.size === 'lg' ? 7 : node.size === 'md' ? 5 : 3;
+              const dotColor = node.size === 'lg' ? 'rgba(255,255,255,0.9)'
+                : node.size === 'md' ? 'rgba(255,255,255,0.5)'
+                : 'rgba(255,255,255,0.25)';
+              const visible = isVisible(node.size);
+              const delay = getDelay({ ...node, i });
+
               return (
-                <line
-                  key={ei}
-                  x1={`${a.cx}%`} y1={`${a.cy}%`}
-                  x2={`${b.cx}%`} y2={`${b.cy}%`}
-                  stroke="rgba(255,184,0,0.5)"
-                  strokeWidth="0.6"
-                />
+                <motion.div
+                  key={node.name}
+                  className="absolute flex flex-col items-center cursor-default"
+                  style={{
+                    left: `${node.cx}%`,
+                    top: `${node.cy}%`,
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: node.size === 'lg' ? 3 : node.size === 'md' ? 2 : 1,
+                  }}
+                  animate={visible
+                    ? { opacity: 1, scale: 1, y: 0 }
+                    : { opacity: 0, scale: 0.7, y: 8 }
+                  }
+                  transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div
+                    className="rounded-full mb-1.5"
+                    style={{ width: dotSize, height: dotSize, backgroundColor: dotColor }}
+                  />
+                  <NodeLabel node={node} />
+                </motion.div>
               );
             })}
-          </motion.svg>
+          </div>
 
-          {/* Nodes */}
-          {computed.map((node, i) => {
-            const dotSize = node.size === 'lg' ? 7 : node.size === 'md' ? 5 : 3;
-            const dotColor = node.size === 'lg' ? '#FFB800'
-              : node.size === 'md' ? 'rgba(255,184,0,0.55)'
-              : 'rgba(255,255,255,0.3)';
-
-            return (
-              <motion.div
-                key={node.name}
-                className="absolute flex flex-col items-center group cursor-default"
-                style={{
-                  left: `${node.cx}%`,
-                  top: `${node.cy}%`,
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: node.size === 'lg' ? 3 : node.size === 'md' ? 2 : 1,
-                }}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: i * 0.02 }}
-              >
-                {/* Dot */}
-                <div
-                  className="rounded-full mb-1.5 group-hover:scale-[2] transition-transform duration-300"
-                  style={{
-                    width: dotSize, height: dotSize,
-                    backgroundColor: dotColor,
-                    boxShadow: node.size === 'lg' ? `0 0 10px ${dotColor}` : 'none',
-                  }}
-                />
-                <NodeLabel node={node} />
-              </motion.div>
-            );
-          })}
         </div>
-
-        <p className="text-white/12 text-[10px] tracking-[0.4em] uppercase mt-8 text-center">
-          SAMSUNG · HYUNDAI · PEPSI · EMIRATES · AMOREPACIFIC · OLIVE YOUNG +{NODES.length - 6} MORE
-        </p>
-      </motion.div>
-    </section>
+      </div>
+    </div>
   );
 };
 
