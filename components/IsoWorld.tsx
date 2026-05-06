@@ -53,6 +53,16 @@ const UNIVERSE_DATA = [
     color: '#9D4DFF',
     position: [7, 0, 1.5] as [number, number, number],
     height: 3.8
+  },
+  {
+    id: 'moment',
+    title: 'NADAUN MOMENT',
+    subtitle: 'CORPORATE VISUAL ARCHIVE',
+    desc: '기업의 순간을 정제된\n감각으로 영원히 기록',
+    url: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',
+    color: '#FF8C00',
+    position: [10.5, 0, 4.5] as [number, number, number],
+    height: 3.2
   }
 ];
 
