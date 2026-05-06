@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const HEADER_H = 57;
@@ -332,6 +332,10 @@ interface AboutOverlayProps {
 const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Overlay-internal scroll progress → yellow bar
+  const { scrollYProgress } = useScroll({ container: scrollRef });
+  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+
   useEffect(() => {
     if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [isOpen]);
@@ -353,6 +357,12 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
           exit={{ y: '100%' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
+          {/* Yellow scroll progress bar */}
+          <motion.div
+            className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
+            style={{ scaleX }}
+          />
+
           {/* Fixed header */}
           <div
             className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/8 bg-[#080808]/95 backdrop-blur-md"
