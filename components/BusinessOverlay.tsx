@@ -70,10 +70,20 @@ const SlideWord: React.FC<{
 const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
 
-  // Three words occupy ~0.33 each; overlap slightly for smooth transition
-  const tagOp = useTransform(p, [0.02, 0.16], [0, 1]);
-  const subOp = useTransform(p, [0.66, 0.80], [0, 1]);
-  const subX  = useTransform(p, [0.66, 0.80], ['-4%', '0%']);
+  // Word 1: visible from p=0 (no enter), exits left
+  const w1Op = useTransform(p, [0.28, 0.42], [1, 0]);
+  const w1X  = useTransform(p, [0.28, 0.42], ['0vw', '-80vw']);
+  // Word 2: enters from right, exits left
+  const w2Op = useTransform(p, [0.28, 0.44, 0.58, 0.68], [0, 1, 1, 0]);
+  const w2X  = useTransform(p, [0.28, 0.44, 0.58, 0.68], ['80vw', '0vw', '0vw', '-80vw']);
+  // Word 3: enters from right, stays
+  const w3Op = useTransform(p, [0.58, 0.72, 0.92, 1.00], [0, 1, 1, 0]);
+  const w3X  = useTransform(p, [0.58, 0.72], ['80vw', '0vw']);
+
+  const subOp = useTransform(p, [0.68, 0.80], [0, 1]);
+  const subX  = useTransform(p, [0.68, 0.80], ['4%', '0%']);
+
+  const FS = { fontSize: 'clamp(5.5rem, 20vw, 17rem)' } as const;
 
   return (
     <div style={{ height: `${H1}vh` }}>
@@ -81,21 +91,25 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
         className="relative overflow-hidden flex items-center"
       >
-        <motion.p
-          style={{ opacity: tagOp, position: 'absolute', top: '2rem' }}
-          className="left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold"
-        >
+        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold">
           Business Overview
-        </motion.p>
+        </p>
 
-        {/* Word 1 */}
-        <SlideWord p={p} enter={[0.00, 0.16]} exit={[0.28, 0.42]} text="WE BUILD" color="#ffffff" />
-        {/* Word 2 */}
-        <SlideWord p={p} enter={[0.30, 0.44]} exit={[0.56, 0.68]} text="THE NEXT" color="rgba(255,255,255,0.22)" />
-        {/* Word 3 */}
-        <SlideWord p={p} enter={[0.58, 0.72]} exit={[0.94, 1.00]} text="LEVEL." color="#FFB800" />
+        <motion.h1 style={{ opacity: w1Op, x: w1X, position: 'absolute', color: '#ffffff', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
+          <span style={FS}>WE BUILD</span>
+        </motion.h1>
 
-        {/* Subtext appears with word 3 */}
+        <motion.h1 style={{ opacity: w2Op, x: w2X, position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
+          <span style={FS}>THE NEXT</span>
+        </motion.h1>
+
+        <motion.h1 style={{ opacity: w3Op, x: w3X, position: 'absolute', color: '#FFB800', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
+          <span style={FS}>LEVEL.</span>
+        </motion.h1>
+
         <motion.p
           style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%' }}
           className="left-8 md:left-16 lg:left-24 text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
