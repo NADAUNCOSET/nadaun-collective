@@ -1,14 +1,23 @@
-import React, { useRef, useEffect, useLayoutEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 
 const HEADER_H = 57;
 
+// Chapter heights (vh)
+const H1 = 260, H2 = 380, H3 = 320, H4 = 340;
+const TOTAL = H1 + H2 + H3 + H4; // 1300
+
+const C1S = 0,               C1E = H1 / TOTAL;
+const C2S = C1E,             C2E = (H1 + H2) / TOTAL;
+const C3S = C2E,             C3E = (H1 + H2 + H3) / TOTAL;
+const C4S = C3E,             C4E = 1;
+
 const DOMAINS = [
-  { id: '01', title: 'INTEGRATED SOLUTION', desc: '온/오프라인의 경계를 허무는 통합 마케팅 전략. 데이터 기반의 미디어 믹스와 퍼널 설계로 브랜드의 성장을 가속화합니다.', tags: ['Media Planning', 'Brand Consulting', 'Performance Funnel'], icon: Lightbulb },
+  { id: '01', title: 'INTEGRATED SOLUTION', desc: '온/오프라인의 경계를 허무는 통합 마케팅 전략.', tags: ['Media Planning', 'Brand Consulting', 'Performance Funnel'], icon: Lightbulb },
   { id: '02', title: 'AD-TECH PLATFORM', desc: '독자적인 AI 알고리즘과 DMP를 통해 타겟 오디언스를 정밀 타격하고 광고 효율을 극대화합니다.', tags: ['AI Optimization', 'Programmatic Buying', 'DMP Analysis'], icon: Cpu },
-  { id: '03', title: 'IMMERSIVE CREATIVE', desc: '3D, WebGL, AR/VR 등 최첨단 기술과 예술적 감각을 결합하여 단순한 광고를 넘어선 브랜드 경험을 창조합니다.', tags: ['Interactive Web', '3D Motion', 'Virtual Experience'], icon: Zap },
-  { id: '04', title: 'GLOBAL NETWORK', desc: '전 세계 파트너사 네트워크로 로컬라이제이션부터 글로벌 미디어 바잉까지 국경 없는 비즈니스를 지원합니다.', tags: ['Global Media', 'Localization', 'Cross-border'], icon: Globe },
+  { id: '03', title: 'IMMERSIVE CREATIVE', desc: '3D, WebGL, AR/VR 등 최첨단 기술로 단순한 광고를 넘어선 브랜드 경험을 창조합니다.', tags: ['Interactive Web', '3D Motion', 'Virtual Experience'], icon: Zap },
+  { id: '04', title: 'GLOBAL NETWORK', desc: '전 세계 파트너사 네트워크로 로컬라이제이션부터 글로벌 미디어 바잉까지 지원합니다.', tags: ['Global Media', 'Localization', 'Cross-border'], icon: Globe },
   { id: '05', title: 'AI INNOVATION LAB', desc: 'Gemini 기반 AI 엔진으로 시장의 흐름을 예측하고 초개인화 마케팅 전략을 실시간으로 제안합니다.', tags: ['Gen AI', 'Predictive Analytics', 'Auto-Optimization'], icon: Sparkles },
 ];
 
@@ -37,17 +46,15 @@ const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
-// ── Ch1: 올인원 에이전시 ──────────────────────────────────────────────────────
-const Ch1: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Ch1 ───────────────────────────────────────────────────────────────────────
+const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C1S, C1E], [0, 1]);
   const exitOp = useTransform(p, [0.5, 0.82], [1, 0]);
   const exitY  = useTransform(p, [0.5, 0.82], ['0%', '-8%']);
   const subOp  = useTransform(p, [0.06, 0.25, 0.5, 0.78], [0, 1, 1, 0]);
 
   return (
-    <div ref={ref} style={{ height: '260vh' }}>
+    <div style={{ height: `${H1}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
           <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">Business Overview</p>
@@ -69,11 +76,9 @@ const Ch1: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scr
   );
 };
 
-// ── Ch2: 5 Domains (전체 리스트) ─────────────────────────────────────────────
-const Ch2: React.FC<{ scrollRef: React.RefObject<HTMLElement | null>; onAiLabClick?: () => void; onIntegratedClick?: () => void }> = ({ scrollRef, onAiLabClick, onIntegratedClick }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Ch2 ───────────────────────────────────────────────────────────────────────
+const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onIntegratedClick?: () => void }> = ({ g, onAiLabClick, onIntegratedClick }) => {
+  const p = useTransform(g, [C2S, C2E], [0, 1]);
   const titleOp = useTransform(p, [0.00, 0.10], [0, 1]);
   const titleY  = useTransform(p, [0.00, 0.10], ['5%', '0%']);
   const d0Op = useTransform(p, [0.08, 0.18], [0, 1]); const d0Y = useTransform(p, [0.08, 0.18], ['3%', '0%']);
@@ -83,18 +88,16 @@ const Ch2: React.FC<{ scrollRef: React.RefObject<HTMLElement | null>; onAiLabCli
   const d4Op = useTransform(p, [0.48, 0.58], [0, 1]); const d4Y = useTransform(p, [0.48, 0.58], ['3%', '0%']);
   const exitOp = useTransform(p, [0.76, 0.94], [1, 0]);
   const exitY  = useTransform(p, [0.76, 0.94], ['0%', '-6%']);
-
   const dOps = [d0Op, d1Op, d2Op, d3Op, d4Op];
   const dYs  = [d0Y,  d1Y,  d2Y,  d3Y,  d4Y];
 
   return (
-    <div ref={ref} style={{ height: '380vh' }}>
+    <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
           <motion.p style={{ opacity: titleOp, y: titleY }}
             className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold"
           >BUSINESS DOMAINS</motion.p>
-
           <div className="flex flex-col gap-0">
             {DOMAINS.map((d, i) => {
               const Icon = d.icon;
@@ -132,11 +135,9 @@ const Ch2: React.FC<{ scrollRef: React.RefObject<HTMLElement | null>; onAiLabCli
   );
 };
 
-// ── Ch3: Team ─────────────────────────────────────────────────────────────────
-const Ch3: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Ch3 ───────────────────────────────────────────────────────────────────────
+const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C3S, C3E], [0, 1]);
   const titleOp = useTransform(p, [0.00, 0.14], [0, 1]);
   const titleY  = useTransform(p, [0.00, 0.14], ['5%', '0%']);
   const t0Op = useTransform(p, [0.12, 0.24], [0, 1]); const t0Y = useTransform(p, [0.12, 0.24], ['4%', '0%']);
@@ -144,12 +145,11 @@ const Ch3: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scr
   const t2Op = useTransform(p, [0.32, 0.44], [0, 1]); const t2Y = useTransform(p, [0.32, 0.44], ['4%', '0%']);
   const t3Op = useTransform(p, [0.42, 0.54], [0, 1]); const t3Y = useTransform(p, [0.42, 0.54], ['4%', '0%']);
   const exitOp = useTransform(p, [0.76, 0.94], [1, 0]);
-
   const tOps = [t0Op, t1Op, t2Op, t3Op];
   const tYs  = [t0Y,  t1Y,  t2Y,  t3Y];
 
   return (
-    <div ref={ref} style={{ height: '320vh' }}>
+    <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp }}>
           <motion.p style={{ opacity: titleOp, y: titleY }}
@@ -174,8 +174,7 @@ const Ch3: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scr
                 <ul className="flex flex-col gap-2 mt-auto">
                   {team.items.map(item => (
                     <li key={item} className="flex items-center gap-2.5 text-xs text-white/45">
-                      <span className="w-1 h-1 rounded-full bg-[#FFB800]/50 shrink-0" />
-                      {item}
+                      <span className="w-1 h-1 rounded-full bg-[#FFB800]/50 shrink-0" />{item}
                     </li>
                   ))}
                 </ul>
@@ -188,38 +187,32 @@ const Ch3: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scr
   );
 };
 
-// ── Ch4: Process ──────────────────────────────────────────────────────────────
-const Ch4: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Ch4 ───────────────────────────────────────────────────────────────────────
+const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C4S, C4E], [0, 1]);
   const titleOp    = useTransform(p, [0.00, 0.12], [0, 1]);
   const titleY     = useTransform(p, [0.00, 0.12], ['5%', '0%']);
   const lineScaleX = useTransform(p, [0.10, 0.72], [0, 1]);
-
   const p0Op = useTransform(p, [0.10, 0.20], [0, 1]); const p0Y = useTransform(p, [0.10, 0.20], ['30px', '0px']);
   const p1Op = useTransform(p, [0.20, 0.30], [0, 1]); const p1Y = useTransform(p, [0.20, 0.30], ['30px', '0px']);
   const p2Op = useTransform(p, [0.30, 0.40], [0, 1]); const p2Y = useTransform(p, [0.30, 0.40], ['30px', '0px']);
   const p3Op = useTransform(p, [0.40, 0.50], [0, 1]); const p3Y = useTransform(p, [0.40, 0.50], ['30px', '0px']);
   const p4Op = useTransform(p, [0.50, 0.60], [0, 1]); const p4Y = useTransform(p, [0.50, 0.60], ['30px', '0px']);
   const p5Op = useTransform(p, [0.60, 0.72], [0, 1]); const p5Y = useTransform(p, [0.60, 0.72], ['30px', '0px']);
-
   const pOps = [p0Op, p1Op, p2Op, p3Op, p4Op, p5Op];
   const pYs  = [p0Y,  p1Y,  p2Y,  p3Y,  p4Y,  p5Y];
 
   return (
-    <div ref={ref} style={{ height: '340vh' }}>
+    <div style={{ height: `${H4}vh` }}>
       <StickyPanel>
         <motion.p style={{ opacity: titleOp, y: titleY }}
           className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-4 font-bold"
         >PRODUCTION PROCESS</motion.p>
-
         <div className="relative my-8">
           <div className="h-[1px] w-full bg-white/10" />
           <motion.div className="absolute top-0 left-0 h-[1px] bg-[#FFB800] origin-left w-full"
             style={{ scaleX: lineScaleX }} />
         </div>
-
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-5">
           {PROCESS.map((step, i) => (
             <motion.div key={step.num} style={{ opacity: pOps[i], y: pYs[i] }} className="flex flex-col gap-3">
@@ -234,7 +227,6 @@ const Ch4: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scr
             </motion.div>
           ))}
         </div>
-
         <motion.div style={{ opacity: pOps[5] }}
           className="mt-14 pt-6 border-t border-white/10 flex items-center justify-between"
         >
@@ -259,12 +251,6 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
   const { scrollYProgress } = useScroll({ container: scrollRef });
   const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
-  useLayoutEffect(() => {
-    if (!isOpen) return;
-    const el = scrollRef.current;
-    if (el) { el.scrollTop = 0; }
-  }, [isOpen]);
-
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -286,7 +272,6 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
             className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
             style={{ scaleX }}
           />
-
           <div
             className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
@@ -298,16 +283,15 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
               <X className="w-4 h-4" />
             </button>
           </div>
-
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Ch1 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
-            <Ch2 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} />
-            <Ch3 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
-            <Ch4 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
+            <Ch1 g={scrollYProgress} />
+            <Ch2 g={scrollYProgress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} />
+            <Ch3 g={scrollYProgress} />
+            <Ch4 g={scrollYProgress} />
           </div>
         </motion.div>
       )}

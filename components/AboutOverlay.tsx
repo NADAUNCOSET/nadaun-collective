@@ -1,8 +1,19 @@
-import React, { useRef, useEffect, useLayoutEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const HEADER_H = 57;
+
+// Chapter heights (vh)
+const H1 = 250, H2 = 270, H3 = 360, H4 = 270, H5 = 220;
+const TOTAL = H1 + H2 + H3 + H4 + H5; // 1370
+
+// Normalized start/end for each chapter
+const C1S = 0,               C1E = H1 / TOTAL;
+const C2S = C1E,             C2E = (H1 + H2) / TOTAL;
+const C3S = C2E,             C3E = (H1 + H2 + H3) / TOTAL;
+const C4S = C3E,             C4E = (H1 + H2 + H3 + H4) / TOTAL;
+const C5S = C4E,             C5E = 1;
 
 const TIMELINE = [
   { year: '2020', title: '사진 장비 판매샵' },
@@ -23,7 +34,6 @@ const PARTNERS = [
   'BEREX', 'PREED', 'MIRAEMI', '3 HOURS AHEAD', 'CESTI', 'ROOTONIX',
 ];
 
-// ── Shared sticky panel ───────────────────────────────────────────────────────
 const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> = ({ children, centered }) => (
   <div
     style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
@@ -33,17 +43,15 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
   </div>
 );
 
-// ── Chapter 1: HAIEND CONTENT SOLUTION ── starts VISIBLE, exits on scroll ────
-const Chapter1: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Chapter 1 ─────────────────────────────────────────────────────────────────
+const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C1S, C1E], [0, 1]);
   const exitOp = useTransform(p, [0.5, 0.82], [1, 0]);
   const exitY  = useTransform(p, [0.5, 0.82], ['0%', '-8%']);
-  const tagOp  = useTransform(p, [0.05, 0.25, 0.5, 0.78], [0, 1, 1, 0]);
+  const tagOp  = useTransform(p, [0.05, 0.28, 0.5, 0.78], [0, 1, 1, 0]);
 
   return (
-    <div ref={ref} style={{ height: '250vh' }}>
+    <div style={{ height: `${H1}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
           <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">
@@ -67,11 +75,9 @@ const Chapter1: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = (
   );
 };
 
-// ── Chapter 2: 올인원 에이전시 ────────────────────────────────────────────────
-const Chapter2: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Chapter 2 ─────────────────────────────────────────────────────────────────
+const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C2S, C2E], [0, 1]);
   const line1Op = useTransform(p, [0.00, 0.18], [0, 1]);
   const line1Y  = useTransform(p, [0.00, 0.18], ['6%', '0%']);
   const line2Op = useTransform(p, [0.12, 0.30], [0, 1]);
@@ -83,16 +89,14 @@ const Chapter2: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = (
   const exitY   = useTransform(p, [0.74, 0.94], ['0%', '-6%']);
 
   return (
-    <div ref={ref} style={{ height: '270vh' }}>
+    <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
           <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
-          <motion.h2 style={{ opacity: line1Op, y: line1Y,
-            fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
+          <motion.h2 style={{ opacity: line1Op, y: line1Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
           >올인원</motion.h2>
-          <motion.h2 style={{ opacity: line2Op, y: line2Y,
-            fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
+          <motion.h2 style={{ opacity: line2Op, y: line2Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white/30 block"
           >에이전시.</motion.h2>
           <motion.p style={{ opacity: bodyOp, y: bodyY }}
@@ -114,59 +118,42 @@ const Chapter2: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = (
   );
 };
 
-// ── Chapter 3: Timeline 2020→2026 ─────────────────────────────────────────────
-const Chapter3: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Chapter 3 ─────────────────────────────────────────────────────────────────
+const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C3S, C3E], [0, 1]);
   const titleOp    = useTransform(p, [0.00, 0.12], [0, 1]);
   const titleY     = useTransform(p, [0.00, 0.12], ['5%', '0%']);
   const lineScaleX = useTransform(p, [0.10, 0.75], [0, 1]);
   const exitOp     = useTransform(p, [0.80, 0.96], [1, 0]);
 
-  const op0 = useTransform(p, [0.10, 0.20], [0, 1]);
-  const op1 = useTransform(p, [0.20, 0.30], [0, 1]);
-  const op2 = useTransform(p, [0.30, 0.40], [0, 1]);
-  const op3 = useTransform(p, [0.40, 0.50], [0, 1]);
-  const op4 = useTransform(p, [0.50, 0.60], [0, 1]);
-  const op5 = useTransform(p, [0.60, 0.70], [0, 1]);
-  const op6 = useTransform(p, [0.70, 0.78], [0, 1]);
-  const y0  = useTransform(p, [0.10, 0.20], ['30px', '0px']);
-  const y1  = useTransform(p, [0.20, 0.30], ['30px', '0px']);
-  const y2  = useTransform(p, [0.30, 0.40], ['30px', '0px']);
-  const y3  = useTransform(p, [0.40, 0.50], ['30px', '0px']);
-  const y4  = useTransform(p, [0.50, 0.60], ['30px', '0px']);
-  const y5  = useTransform(p, [0.60, 0.70], ['30px', '0px']);
-  const y6  = useTransform(p, [0.70, 0.78], ['30px', '0px']);
-
+  const op0 = useTransform(p, [0.10, 0.20], [0, 1]); const y0 = useTransform(p, [0.10, 0.20], ['30px', '0px']);
+  const op1 = useTransform(p, [0.20, 0.30], [0, 1]); const y1 = useTransform(p, [0.20, 0.30], ['30px', '0px']);
+  const op2 = useTransform(p, [0.30, 0.40], [0, 1]); const y2 = useTransform(p, [0.30, 0.40], ['30px', '0px']);
+  const op3 = useTransform(p, [0.40, 0.50], [0, 1]); const y3 = useTransform(p, [0.40, 0.50], ['30px', '0px']);
+  const op4 = useTransform(p, [0.50, 0.60], [0, 1]); const y4 = useTransform(p, [0.50, 0.60], ['30px', '0px']);
+  const op5 = useTransform(p, [0.60, 0.70], [0, 1]); const y5 = useTransform(p, [0.60, 0.70], ['30px', '0px']);
+  const op6 = useTransform(p, [0.70, 0.78], [0, 1]); const y6 = useTransform(p, [0.70, 0.78], ['30px', '0px']);
   const ops = [op0, op1, op2, op3, op4, op5, op6];
   const ys  = [y0,  y1,  y2,  y3,  y4,  y5,  y6];
 
   return (
-    <div ref={ref} style={{ height: '360vh' }}>
+    <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp }}>
           <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-8 font-bold">OUR STORY</p>
-          <motion.h2 style={{ opacity: titleOp, y: titleY,
-            fontSize: 'clamp(3.5rem, 10vw, 9rem)' }}
+          <motion.h2 style={{ opacity: titleOp, y: titleY, fontSize: 'clamp(3.5rem, 10vw, 9rem)' }}
             className="font-black tracking-[-0.03em] leading-none text-white mb-12"
-          >
-            2020 <span className="text-white/25">→</span> 2026
-          </motion.h2>
-
-          {/* Scroll-drawn line */}
+          >2020 <span className="text-white/25">→</span> 2026</motion.h2>
           <div className="relative mb-12">
             <div className="h-[1px] w-full bg-white/10" />
             <motion.div className="absolute top-0 left-0 h-[1px] bg-[#FFB800] origin-left w-full"
               style={{ scaleX: lineScaleX }} />
           </div>
-
           <div className="grid grid-cols-4 md:grid-cols-7 gap-4 md:gap-6">
             {TIMELINE.map((item, i) => (
               <motion.div key={item.year} style={{ opacity: ops[i], y: ys[i] }} className="flex flex-col gap-2">
                 <span className="font-mono font-black leading-none"
-                  style={{ fontSize: 'clamp(2.2rem, 5.5vw, 5rem)',
-                    color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.12)' }}>
+                  style={{ fontSize: 'clamp(2.2rem, 5.5vw, 5rem)', color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.12)' }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span className="text-[11px] tracking-[0.2em] uppercase text-white/50 font-medium">{item.year}</span>
@@ -182,11 +169,9 @@ const Chapter3: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = (
   );
 };
 
-// ── Chapter 4: IP Partnership ─────────────────────────────────────────────────
-const Chapter4: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Chapter 4 ─────────────────────────────────────────────────────────────────
+const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C4S, C4E], [0, 1]);
   const word1Op = useTransform(p, [0.00, 0.18], [0, 1]);
   const word1Y  = useTransform(p, [0.00, 0.18], ['6%', '0%']);
   const word2Op = useTransform(p, [0.12, 0.30], [0, 1]);
@@ -197,21 +182,18 @@ const Chapter4: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = (
   const exitOp  = useTransform(p, [0.78, 0.96], [1, 0]);
 
   return (
-    <div ref={ref} style={{ height: '270vh' }}>
+    <div style={{ height: `${H4}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp }}
           className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center"
         >
           <div>
             <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">IP PARTNERSHIP</p>
-            <motion.h2 style={{ opacity: word1Op, y: word1Y,
-              fontSize: 'clamp(5rem, 16vw, 13rem)' }}
+            <motion.h2 style={{ opacity: word1Op, y: word1Y, fontSize: 'clamp(5rem, 16vw, 13rem)' }}
               className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
             >IP</motion.h2>
-            <motion.h2 style={{ opacity: word2Op, y: word2Y,
-              fontSize: 'clamp(5rem, 16vw, 13rem)' }}
+            <motion.h2 style={{ opacity: word2Op, y: word2Y, fontSize: 'clamp(5rem, 16vw, 13rem)', color: '#FFB800' }}
               className="font-black tracking-[-0.03em] leading-[0.85] block"
-              style={{ fontSize: 'clamp(5rem, 16vw, 13rem)', color: '#FFB800' }}
             >CONNECT.</motion.h2>
             <motion.p style={{ opacity: bodyOp }}
               className="mt-10 text-white/75 text-lg md:text-xl leading-relaxed max-w-md font-light"
@@ -247,18 +229,16 @@ const Chapter4: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = (
   );
 };
 
-// ── Chapter 5: Partners ───────────────────────────────────────────────────────
-const Chapter5: React.FC<{ scrollRef: React.RefObject<HTMLElement | null> }> = ({ scrollRef }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: p } = useScroll({ target: ref, container: scrollRef, offset: ['start start', 'end start'] });
-
+// ── Chapter 5 ─────────────────────────────────────────────────────────────────
+const Chapter5: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C5S, C5E], [0, 1]);
   const titleOp = useTransform(p, [0.00, 0.18], [0, 1]);
   const titleY  = useTransform(p, [0.00, 0.18], ['5%', '0%']);
   const gridOp  = useTransform(p, [0.14, 0.38], [0, 1]);
   const gridY   = useTransform(p, [0.14, 0.38], ['4%', '0%']);
 
   return (
-    <div ref={ref} style={{ height: '220vh' }}>
+    <div style={{ height: `${H5}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: titleOp, y: titleY }}
           className="flex items-baseline justify-between mb-12"
@@ -298,10 +278,6 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
   const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
-    if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [isOpen, scrollRef]);
-
-  useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -318,13 +294,10 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
           exit={{ y: '100%' }}
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Yellow scroll progress bar */}
           <motion.div
             className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
             style={{ scaleX }}
           />
-
-          {/* Header */}
           <div
             className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
@@ -337,17 +310,16 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Scroll container */}
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Chapter1 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
-            <Chapter2 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
-            <Chapter3 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
-            <Chapter4 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
-            <Chapter5 scrollRef={scrollRef as React.RefObject<HTMLElement | null>} />
+            <Chapter1 g={scrollYProgress} />
+            <Chapter2 g={scrollYProgress} />
+            <Chapter3 g={scrollYProgress} />
+            <Chapter4 g={scrollYProgress} />
+            <Chapter5 g={scrollYProgress} />
           </div>
         </motion.div>
       )}
