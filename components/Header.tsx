@@ -40,7 +40,11 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
           isScrolled ? 'bg-black/90 backdrop-blur-md py-4 border-b border-white/10' : 'bg-transparent py-6 md:py-8'
         }`}
       >
-        <div className="container mx-auto px-6 flex justify-between items-center overflow-hidden">
+        {/* padding synced to COLLECTIVE text edges via --header-pad CSS var set in Hero */}
+        <div
+          className="flex justify-between items-center w-full transition-[padding] duration-300 ease-out"
+          style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
+        >
           {/* Logo Section */}
           <motion.a 
             href="#" 
