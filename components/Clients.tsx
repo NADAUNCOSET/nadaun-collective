@@ -1,294 +1,197 @@
-import React, { useRef, useMemo, useState } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import React, { useRef, useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
-const CLIENT_LIST = [
-  { name: "AENTIO", category: "FASHION" },
-  { name: "M2", category: "ENTERTAINMENT" },
-  { name: "OLIVE YOUNG", category: "RETAIL" },
-  { name: "COWAY", category: "LIFESTYLE" },
-  { name: "EMIRATES", category: "AIRLINE" },
-  { name: "SAMSUNG", category: "ELECTRONICS" },
-  { name: "HYUNDAI STEEL", category: "INDUSTRY" },
-  { name: "GAONCHIPS", category: "SEMICONDUCTOR" },
-  { name: "PEPSI", category: "F&B" },
-  { name: "PAT", category: "FASHION" },
-  { name: "PREED", category: "SERVICE" },
-  { name: "BEREX", category: "LIFESTYLE" },
-  { name: "K2 SAFETY", category: "FASHION" },
-  { name: "KWDA", category: "DESIGN AWARDS" },
-  { name: "KOVA", category: "ORGANIZATION" },
-  { name: "AMOREPACIFIC", category: "BEAUTY" },
-  { name: "NUMBUZIN", category: "BEAUTY" },
-  { name: "HECTO INNOVATION", category: "TECH" },
-  { name: "JUNG SAEM MOOL", category: "BEAUTY" },
-  { name: "ACMÉ DE LA VIE", category: "FASHION" },
-  { name: "THE NEW GREY", category: "FASHION" },
-  { name: "NUDAKE", category: "F&B" },
-  { name: "MIRAEMI", category: "LIFESTYLE" },
-  { name: "KIA", category: "MOBILITY" },
-  { name: "THE MATTERS", category: "MEDIA" },
-  { name: "3 HOURS AHEAD", category: "TRAVEL" },
-  { name: "HD HYUNDAI", category: "HEAVY INDUSTRY" },
-  { name: "CESTI", category: "FASHION" },
-  { name: "ELLE", category: "MEDIA" },
-  { name: "HD HYUNDAI C.E.", category: "INDUSTRIAL" },
-  { name: "DASIQUE", category: "BEAUTY" },
-  { name: "SKINFOOD", category: "BEAUTY" },
-  { name: "TONYMOLY", category: "BEAUTY" },
-  { name: "ABIB", category: "BEAUTY" },
-  { name: "ROOTONIX", category: "LIFESTYLE" },
-  { name: "SKIN1004", category: "BEAUTY" },
-  { name: "SKEDERM", category: "BEAUTY" },
-  { name: "THE SAEM", category: "BEAUTY" },
-  { name: "2aN", category: "BEAUTY" },
-  { name: "CALVIN KLEIN", category: "FASHION" },
-  { name: "TORHOP", category: "BEAUTY" },
-  { name: "DIOR BEAUTY", category: "BEAUTY" },
+interface ClientLogo {
+  name: string;
+  domain?: string;   // clearbit domain → logo image
+  color?: string;    // brand color for text fallback
+  wide?: boolean;    // wider logos
+}
+
+const CLIENT_LIST: ClientLogo[] = [
+  { name: 'SAMSUNG',        domain: 'samsung.com',       wide: true },
+  { name: 'HYUNDAI STEEL',  domain: 'hyundai-steel.com'  },
+  { name: 'HYUNDAI',        domain: 'hyundai.com'        },
+  { name: 'PEPSI',          domain: 'pepsi.com'          },
+  { name: 'EMIRATES',       domain: 'emirates.com'       },
+  { name: 'COWAY',          domain: 'coway.com'          },
+  { name: 'AMOREPACIFIC',   domain: 'amorepacific.com',  wide: true },
+  { name: 'OLIVE YOUNG',    domain: 'oliveyoung.com',    wide: true },
+  { name: 'GAONCHIPS',      domain: 'gaonchips.com'      },
+  { name: 'NUMBUZIN',                                     },
+  { name: 'HECTO',          domain: 'hecto.co.kr'        },
+  { name: 'K2 SAFETY',      domain: 'k2safety.co.kr'     },
+  { name: 'KOVA',           domain: 'kova.or.kr'         },
+  { name: 'BEREX',          domain: 'berex.co.kr'        },
+  { name: 'PAT',            domain: 'pat.co.kr'          },
+  { name: 'PREED',                                        },
+  { name: 'KWDA',                                         },
+  { name: 'M2美度',                                        },
+  { name: 'JUNG SAEM MOOL', domain: 'jungsaemmool.com',  wide: true },
+  { name: 'ACMÉ DE LA VIE', domain: 'adlv.co.kr',        wide: true },
+  { name: 'HD HYUNDAI',     domain: 'hdhyundai.com'      },
+  { name: 'KIA',            domain: 'kia.com'            },
+  { name: 'CALVIN KLEIN',   domain: 'calvinklein.com',   wide: true },
+  { name: 'DIOR',           domain: 'dior.com'           },
+  { name: 'DASIQUE',                                      },
+  { name: 'ABIB',                                         },
+  { name: 'SKINFOOD',       domain: 'skinfood.co.kr'     },
+  { name: 'TONYMOLY',       domain: 'tonymoly.com'       },
+  { name: 'THE SAEM',       domain: 'thesaem.com',       wide: true },
+  { name: 'SKIN1004',                                     },
+  { name: 'ELLE',           domain: 'elle.com'           },
+  { name: 'THE NEW GREY',                                 },
+  { name: 'NUDAKE',                                       },
 ];
 
-const SPACING = 105;
+// Split into two rows
+const ROW1 = CLIENT_LIST.slice(0, Math.ceil(CLIENT_LIST.length / 2));
+const ROW2 = CLIENT_LIST.slice(Math.ceil(CLIENT_LIST.length / 2));
 
-interface NodeData {
-  name: string;
-  category: string;
-  x: number;
-  y: number;
-  id: number;
+interface LogoItemProps {
+  client: ClientLogo;
 }
 
-interface ClientNodeProps {
-  node: NodeData;
-  mouseX: any;
-  mouseY: any;
-  entered: boolean;
-}
-
-const ClientNode: React.FC<ClientNodeProps> = ({ node, mouseX, mouseY, entered }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const distance = useTransform([mouseX, mouseY], ([mx, my]) => {
-    const dx = node.x - (mx as number);
-    const dy = node.y - (my as number);
-    return Math.sqrt(dx * dx + dy * dy);
-  });
-
-  const x = useTransform([mouseX, mouseY, distance], ([mx, my, dist]) => {
-    const dx = node.x - (mx as number);
-    const dy = node.y - (my as number);
-    const d = dist as number;
-    let repelX = 0;
-    if (d < 400) {
-      repelX = Math.cos(Math.atan2(dy, dx)) * (1 - d / 400) * 180;
-    }
-    return node.x + (mx as number) * 0.05 + repelX;
-  });
-
-  const y = useTransform([mouseX, mouseY, distance], ([mx, my, dist]) => {
-    const dx = node.x - (mx as number);
-    const dy = node.y - (my as number);
-    const d = dist as number;
-    let repelY = 0;
-    if (d < 400) {
-      repelY = Math.sin(Math.atan2(dy, dx)) * (1 - d / 400) * 180;
-    }
-    return node.y + (my as number) * 0.05 + repelY;
-  });
-
-  const scale = useTransform(distance, (d) =>
-    d < 300 ? 1 + Math.pow(1 - d / 300, 2) * 1.6 : 1
-  );
-  const proximity = useTransform(distance, (d) => (d < 300 ? 1 : 0.72));
+const LogoItem: React.FC<LogoItemProps> = ({ client }) => {
+  const [imgOk, setImgOk] = useState(!!client.domain);
 
   return (
-    <motion.div
-      style={{ x, y, zIndex: isHovered ? 50 : 10, willChange: 'transform' }}
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
-      initial={{ opacity: 0 }}
-      animate={entered ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ delay: node.id * 0.016, duration: 0.5, ease: 'easeOut' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onTouchStart={() => setIsHovered(true)}
-      onTouchEnd={() => setIsHovered(false)}
-    >
-      <motion.div style={{ scale, opacity: proximity }} className="flex flex-col items-center justify-center">
-        {/* Node dot */}
-        <motion.div
-          className="rounded-full mb-2.5"
-          style={{ width: 8, height: 8 }}
-          animate={{
-            backgroundColor: isHovered ? '#FFB800' : 'rgba(255,255,255,0.75)',
-            boxShadow: isHovered
-              ? '0 0 18px 5px #FFB800, 0 0 40px 10px rgba(255,184,0,0.25)'
-              : '0 0 5px 1px rgba(255,255,255,0.15)',
-          }}
-          transition={{ duration: 0.18 }}
-        />
-        {/* Name */}
-        <motion.h3
-          className="text-[12px] md:text-[13px] font-bold leading-none tracking-tight whitespace-nowrap"
-          animate={{ color: isHovered ? '#ffffff' : 'rgba(255,255,255,0.68)' }}
-          transition={{ duration: 0.15 }}
-        >
-          {node.name}
-        </motion.h3>
-        {/* Category — only shown when scaled up enough */}
-        <motion.span
-          className="text-[8px] uppercase tracking-widest text-[#FFB800] mt-1.5 absolute top-full whitespace-nowrap"
-          style={{ opacity: useTransform(scale, (s) => (s > 1.9 ? 1 : 0)) }}
-        >
-          {node.category}
-        </motion.span>
+    <div className="flex items-center justify-center px-10 md:px-14 h-full shrink-0 group">
+      <div className="relative flex items-center justify-center" style={{ height: 36 }}>
+        {imgOk && client.domain ? (
+          <img
+            src={`https://logo.clearbit.com/${client.domain}?size=80`}
+            alt={client.name}
+            onError={() => setImgOk(false)}
+            className="max-h-[28px] w-auto object-contain transition-all duration-300"
+            style={{
+              filter: 'brightness(0) invert(1)',
+              opacity: 0.6,
+            }}
+          />
+        ) : (
+          <span
+            className="font-bold tracking-tight whitespace-nowrap"
+            style={{
+              fontFamily: 'Manrope, sans-serif',
+              fontSize: 'clamp(11px, 1.3vw, 15px)',
+              color: 'rgba(255,255,255,0.55)',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {client.name}
+          </span>
+        )}
+        {/* Hover underline */}
+        <div className="absolute -bottom-1 left-0 right-0 h-[1px] bg-[#FFB800] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      </div>
+    </div>
+  );
+};
+
+interface MarqueeRowProps {
+  clients: ClientLogo[];
+  reverse?: boolean;
+  speed?: number;
+}
+
+const MarqueeRow: React.FC<MarqueeRowProps> = ({ clients, reverse = false, speed = 40 }) => {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    if (rowRef.current) setWidth(rowRef.current.scrollWidth / 2);
+  }, []);
+
+  // Duplicate for seamless loop
+  const doubled = [...clients, ...clients];
+
+  return (
+    <div className="overflow-hidden" style={{ height: 64 }}>
+      <motion.div
+        ref={rowRef}
+        className="flex items-center h-full"
+        animate={{ x: reverse ? [0, width] : [0, -width] }}
+        transition={{
+          duration: speed,
+          ease: 'linear',
+          repeat: Infinity,
+          repeatType: 'loop',
+        }}
+        style={{ willChange: 'transform' }}
+      >
+        {doubled.map((client, i) => (
+          <LogoItem key={`${client.name}-${i}`} client={client} />
+        ))}
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const Clients: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [hasEntered, setHasEntered] = useState(false);
-  // Mouse physics disabled on touch devices — no benefit and wastes RAF cycles
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const smoothMouseX = useSpring(mouseX, { stiffness: 80, damping: 25, mass: 0.5 });
-  const smoothMouseY = useSpring(mouseY, { stiffness: 80, damping: 25, mass: 0.5 });
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isMobile || !containerRef.current) return;
-    const r = containerRef.current.getBoundingClientRect();
-    mouseX.set(e.clientX - r.left - r.width / 2);
-    mouseY.set(e.clientY - r.top - r.height / 2);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!containerRef.current) return;
-    const t = e.touches[0];
-    const r = containerRef.current.getBoundingClientRect();
-    mouseX.set(t.clientX - r.left - r.width / 2);
-    mouseY.set(t.clientY - r.top - r.height / 2);
-  };
-
-  // Precompute node positions + constellation edges
-  const { nodes, lines } = useMemo(() => {
-    const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
-    const nodes: NodeData[] = CLIENT_LIST.map((c, i) => {
-      const n = i + 1;
-      const r = SPACING * Math.sqrt(n);
-      const theta = n * GOLDEN_ANGLE;
-      return { ...c, x: r * Math.cos(theta), y: r * Math.sin(theta), id: i };
-    });
-
-    const lines: { x1: number; y1: number; x2: number; y2: number; len: number; key: string }[] = [];
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const dx = nodes[i].x - nodes[j].x;
-        const dy = nodes[i].y - nodes[j].y;
-        const len = Math.sqrt(dx * dx + dy * dy);
-        if (len < 175) {
-          lines.push({ x1: nodes[i].x, y1: nodes[i].y, x2: nodes[j].x, y2: nodes[j].y, len, key: `${i}-${j}` });
-        }
-      }
-    }
-    return { nodes, lines };
-  }, []);
-
   return (
-    <section
-      id="clients"
-      ref={containerRef}
-      className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col"
-      onMouseMove={handleMouseMove}
-      onTouchMove={handleTouchMove}
-    >
+    <section id="clients" className="relative w-full bg-black py-20 overflow-hidden">
       {/* Subtle dot grid */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+          backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
+          backgroundSize: '44px 44px',
         }}
       />
 
-      {/* Minimal header — OUR PARTNERS + brand count only */}
-      <div
-        className="absolute top-8 left-0 w-full z-20 pointer-events-none"
-        style={{ paddingLeft: 'var(--header-pad, 1.5rem)' }}
-      >
+      {/* Header */}
+      <div className="relative z-10 px-8 md:px-16 lg:px-24 mb-14">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex items-baseline gap-5"
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="text-[#FFB800] font-bold tracking-[0.3em] text-xs uppercase">
+          <p className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-3">
             OUR PARTNERS
-          </span>
-          <span className="text-white/20 text-xs tracking-widest font-light tabular-nums">
-            {CLIENT_LIST.length} BRANDS
-          </span>
+          </p>
+          <div className="flex items-baseline justify-between">
+            <h2
+              className="font-black leading-none text-white"
+              style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(2.2rem, 6vw, 5rem)', letterSpacing: '-0.03em' }}
+            >
+              {CLIENT_LIST.length}+ BRANDS
+            </h2>
+            <p className="text-white/20 text-xs tracking-widest hidden md:block">
+              TRUSTED BY THE BEST
+            </p>
+          </div>
         </motion.div>
       </div>
 
-      {/* Constellation map */}
+      {/* Divider */}
+      <div className="w-full h-[1px] bg-white/8 mb-0" />
+
+      {/* Row 1 — left */}
+      <div className="relative z-10 border-b border-white/8">
+        <MarqueeRow clients={ROW1} reverse={false} speed={50} />
+      </div>
+
+      {/* Row 2 — right (reverse) */}
+      <div className="relative z-10 border-b border-white/8">
+        <MarqueeRow clients={ROW2} reverse={true} speed={45} />
+      </div>
+
+      {/* CTA line */}
       <motion.div
-        className="relative flex-1 flex items-center justify-center z-10"
-        onViewportEnter={() => setHasEntered(true)}
-        viewport={{ once: true, amount: 0.25 }}
+        className="relative z-10 px-8 md:px-16 lg:px-24 mt-14 flex items-center justify-between"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.3 }}
       >
-        {/* Container anchored at center (0,0) */}
-        <div
-          className="relative scale-[0.52] sm:scale-[0.72] md:scale-[0.88] lg:scale-100 origin-center"
-          style={{ width: 0, height: 0 }}
-        >
-          {/* ── SVG constellation lines — draw-on effect via strokeDashoffset ── */}
-          <svg
-            className="absolute pointer-events-none"
-            style={{ left: '-660px', top: '-660px', width: '1320px', height: '1320px', overflow: 'visible' }}
-          >
-            {lines.map((line, i) => (
-              <line
-                key={line.key}
-                x1={line.x1 + 660}
-                y1={line.y1 + 660}
-                x2={line.x2 + 660}
-                y2={line.y2 + 660}
-                stroke="#FFB800"
-                strokeWidth="0.7"
-                strokeLinecap="round"
-                strokeDasharray={line.len}
-                strokeDashoffset={hasEntered ? 0 : line.len}
-                style={{
-                  opacity: hasEntered ? 0.2 : 0,
-                  // CSS transitions handle the draw-on — better perf than framer-motion for many SVG lines
-                  transition: [
-                    `stroke-dashoffset 1.6s cubic-bezier(0.16,1,0.3,1) ${(0.15 + i * 0.011).toFixed(3)}s`,
-                    `opacity 0.5s ease ${(0.3 + i * 0.011).toFixed(3)}s`,
-                  ].join(', '),
-                }}
-              />
-            ))}
-          </svg>
-
-          {/* ── Client nodes ── */}
-          {nodes.map((node) => (
-            <ClientNode
-              key={node.id}
-              node={node}
-              mouseX={smoothMouseX}
-              mouseY={smoothMouseY}
-              entered={hasEntered}
-            />
-          ))}
-        </div>
+        <p className="text-white/20 text-[11px] tracking-widest">
+          SAMSUNG · HYUNDAI · PEPSI · EMIRATES · AMOREPACIFIC · OLIVE YOUNG +{CLIENT_LIST.length - 6} MORE
+        </p>
       </motion.div>
-
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
     </section>
   );
 };
