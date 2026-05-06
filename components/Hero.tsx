@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useMotionTemplate, useSpring, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
 
-type Phase = 'c-only' | 'reveal';
+type Phase = 'idle' | 'reveal';
 
-// Portfolio & campaign shots + people folder portraits
 const ALL_IMAGES = [
   { src: '/hero/pepsi-festa.webp',    pos: 'center 35%' },
   { src: '/hero/hd-hyundai.webp',     pos: 'center 40%' },
@@ -14,76 +13,39 @@ const ALL_IMAGES = [
   { src: '/people/laon-band-00.webp', pos: 'center 25%' },
 ];
 
-const SECTION_H = 320; // vh — outer scroll height
+const SECTION_H = 320;
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.065, delayChildren: 0.05 } },
+const WORD_BASE: React.CSSProperties = {
+  fontFamily: 'Manrope, sans-serif',
+  fontWeight: 900,
+  fontSize: 'clamp(4rem, 14vw, 11rem)',
+  letterSpacing: '-0.03em',
+  lineHeight: 0.9,
+  color: '#ffffff',
+  display: 'block',
+  whiteSpace: 'nowrap',
 };
-const letterVariants = {
-  hidden: { opacity: 0, filter: 'blur(10px)', y: 6 },
-  visible: {
-    opacity: 1, filter: 'blur(0px)', y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
-// COLLECTIVE letter: scroll-exit (dissolves out letter by letter)
-const LetterSpan: React.FC<{
-  char: string;
-  index: number;
-  dissolve: MotionValue<number>;
-  phase: Phase;
-}> = ({ char, index, dissolve, phase }) => {
-  const exitOpacity = useTransform(dissolve, [index, index + 0.8], [1, 0]);
-  const exitY       = useTransform(dissolve, [index, index + 0.8], [0, -18]);
-  const exitBlur    = useTransform(dissolve, [index, index + 0.8], [0, 8]);
-  const filter      = useMotionTemplate`blur(${exitBlur}px)`;
-  return (
-    <motion.span
-      variants={letterVariants}
-      initial="hidden"
-      animate={phase === 'reveal' ? 'visible' : 'hidden'}
-      style={{
-        display: 'inline-block',
-        fontFamily: 'Manrope, sans-serif',
-        fontWeight: 600,
-        fontSize: 'clamp(4rem, 13.5vw, 12rem)',
-        letterSpacing: '-0.01em',
-        lineHeight: 0.92,
-        color: '#ffffff',
-        opacity: exitOpacity,
-        y: exitY,
-        filter,
-      }}
-    >
-      {char}
-    </motion.span>
-  );
-};
-
 
 interface HeroProps {
   startAnimation?: boolean;
 }
 
 const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
-  const sectionRef  = useRef<HTMLDivElement>(null);
-  const stickyRef   = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const stickyRef  = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
-  const [phase, setPhase] = useState<Phase>('c-only');
+  const [phase, setPhase] = useState<Phase>('idle');
   const lastMousePos = useRef({ x: 0, y: 0 });
-  const scrollLocked = useRef(false); // true once user has scrolled past hero
+  const scrollLocked = useRef(false);
 
   const rawX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 500);
   const rawY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
   const mouseX = useSpring(rawX, { stiffness: 100, damping: 20, restDelta: 0.5 });
   const mouseY = useSpring(rawY, { stiffness: 100, damping: 20, restDelta: 0.5 });
 
-  const lensMask    = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
-  const lensWebkit  = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+  const lensMask   = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
+  const lensWebkit = useMotionTemplate`radial-gradient(circle 680px at ${mouseX}px ${mouseY}px, black 30%, transparent 100%)`;
 
-  // Scroll drives background cycling
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
@@ -95,11 +57,35 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     setActiveImage(idx);
   });
 
-  // COLLECTIVE dissolve on exit (scroll 0.60→0.92, C exits first)
-  const dissolveProgress = useTransform(scrollYProgress, [0.60, 0.92], [0, 10]);
+  // ── Word scroll transforms ────────────────────────────────────
+  // W1 "Seamless" — phase-reveal in, scroll out
+  const w1Out  = useTransform(scrollYProgress, [0.11, 0.21], [1, 0]);
+  const w1OutY = useTransform(scrollYProgress, [0.11, 0.21], ['0%', '-5%']);
 
-  // tagline fades out earlier
-  const taglineOpacity = useTransform(scrollYProgress, [0.55, 0.72], [1, 0]);
+  // W2 "Brand"
+  const w2In  = useTransform(scrollYProgress, [0.17, 0.27], [0, 1]);
+  const w2InY = useTransform(scrollYProgress, [0.17, 0.27], ['7%', '0%']);
+  const w2Out  = useTransform(scrollYProgress, [0.34, 0.44], [1, 0]);
+  const w2OutY = useTransform(scrollYProgress, [0.34, 0.44], ['0%', '-5%']);
+
+  // W3 "Experience"
+  const w3In  = useTransform(scrollYProgress, [0.40, 0.50], [0, 1]);
+  const w3InY = useTransform(scrollYProgress, [0.40, 0.50], ['7%', '0%']);
+  const w3Out  = useTransform(scrollYProgress, [0.57, 0.67], [1, 0]);
+  const w3OutY = useTransform(scrollYProgress, [0.57, 0.67], ['0%', '-5%']);
+
+  // W4 "through" — thin weight
+  const w4In  = useTransform(scrollYProgress, [0.62, 0.70], [0, 1]);
+  const w4InY = useTransform(scrollYProgress, [0.62, 0.70], ['7%', '0%']);
+  const w4Out  = useTransform(scrollYProgress, [0.75, 0.83], [1, 0]);
+  const w4OutY = useTransform(scrollYProgress, [0.75, 0.83], ['0%', '-5%']);
+
+  // W5 "TTL" — stays
+  const w5In  = useTransform(scrollYProgress, [0.77, 0.88], [0, 1]);
+  const w5InY = useTransform(scrollYProgress, [0.77, 0.88], ['7%', '0%']);
+
+  // tagline
+  const taglineOp = useTransform(scrollYProgress, [0.55, 0.72], [1, 0]);
 
   useEffect(() => {
     ALL_IMAGES.forEach(({ src }) => { const img = new Image(); img.src = src; });
@@ -126,7 +112,6 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     const { clientX, clientY } = e;
     rawX.set(clientX);
     rawY.set(clientY);
-    // Mouse still changes image when not scrolled
     if (!scrollLocked.current) {
       const d = Math.sqrt(
         (clientX - lastMousePos.current.x) ** 2 + (clientY - lastMousePos.current.y) ** 2
@@ -138,92 +123,108 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     }
   };
 
-  const collectiveLetters = 'COLLECTIVE'.split('');
-
   return (
-    // Outer tall div — provides scroll distance
     <div ref={sectionRef} style={{ height: `${SECTION_H}vh` }} className="relative">
-
-      {/* Sticky viewport — stays fixed while scrolling through outer */}
       <div
         ref={stickyRef}
         className="sticky top-0 w-full overflow-hidden bg-black cursor-none"
         style={{ height: '100vh' }}
         onMouseMove={handleMouseMove}
       >
-        {/* ── Background images ─────────────────────────── */}
+        {/* ── Background ──────────────────────────────── */}
         <div className="absolute inset-0 z-0">
           {ALL_IMAGES.map(({ src, pos }, i) => (
-            <div
-              key={i}
-              className={`absolute inset-0 transition-opacity duration-1000 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
-            >
-              <img
-                src={src}
-                alt=""
-                className="w-full h-full object-cover"
-                style={{ objectPosition: pos, filter: 'brightness(0.32) saturate(0.85)' }}
-              />
+            <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}>
+              <img src={src} alt="" className="w-full h-full object-cover"
+                style={{ objectPosition: pos, filter: 'brightness(0.32) saturate(0.85)' }} />
             </div>
           ))}
         </div>
 
-        {/* ── Lens ──────────────────────────────────────── */}
-        <motion.div
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}
-        >
+        {/* ── Lens ────────────────────────────────────── */}
+        <motion.div className="absolute inset-0 z-[1] pointer-events-none"
+          style={{ maskImage: lensMask, WebkitMaskImage: lensWebkit }}>
           {ALL_IMAGES.map(({ src, pos }, i) => (
-            <div
-              key={i}
-              className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}
-            >
-              <img
-                src={src}
-                alt=""
-                className="w-full h-full object-cover"
-                style={{ objectPosition: pos, filter: 'brightness(0.82) contrast(1.06) saturate(1.1)' }}
-              />
+            <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}>
+              <img src={src} alt="" className="w-full h-full object-cover"
+                style={{ objectPosition: pos, filter: 'brightness(0.82) contrast(1.06) saturate(1.1)' }} />
             </div>
           ))}
         </motion.div>
 
-        {/* ── Vignette ──────────────────────────────────── */}
+        {/* ── Vignette ────────────────────────────────── */}
         <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
-        {/* ── Text ──────────────────────────────────────── */}
-        <div className="z-10 pointer-events-none w-full px-8 md:px-16 lg:px-24 flex flex-col absolute inset-0 justify-end pb-16 md:pb-20">
-          <div className="overflow-visible leading-none">
-            <motion.div
-              className="inline-flex items-baseline"
-              variants={containerVariants}
-              initial="hidden"
-              animate={phase === 'reveal' ? 'visible' : 'hidden'}
-            >
-              {collectiveLetters.map((char, i) => (
-                <LetterSpan
-                  key={i}
-                  char={char}
-                  index={i}
-                  dissolve={dissolveProgress}
-                  phase={phase}
-                />
-              ))}
+        {/* ── Words ───────────────────────────────────── */}
+        <div className="z-10 pointer-events-none absolute inset-0">
+
+          {/* All words stack at bottom-left */}
+          <div className="absolute bottom-16 md:bottom-20 left-8 md:left-16 lg:left-24">
+
+            {/* W1: Seamless — phase entry, scroll exit */}
+            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w1Out, y: w1OutY }}>
+              <motion.span
+                style={WORD_BASE}
+                initial={{ opacity: 0, y: '7%' }}
+                animate={phase === 'reveal' ? { opacity: 1, y: '0%' } : {}}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              >
+                Seamless
+              </motion.span>
             </motion.div>
+
+            {/* W2: Brand */}
+            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w2Out, y: w2OutY }}>
+              <motion.span style={{ ...WORD_BASE, opacity: w2In, y: w2InY }}>
+                Brand
+              </motion.span>
+            </motion.div>
+
+            {/* W3: Experience */}
+            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w3Out, y: w3OutY }}>
+              <motion.span style={{ ...WORD_BASE, opacity: w3In, y: w3InY }}>
+                Experience
+              </motion.span>
+            </motion.div>
+
+            {/* W4: through — thin */}
+            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w4Out, y: w4OutY }}>
+              <motion.span style={{
+                ...WORD_BASE,
+                fontWeight: 200,
+                fontSize: 'clamp(2.2rem, 6vw, 5rem)',
+                color: 'rgba(255,255,255,0.55)',
+                opacity: w4In,
+                y: w4InY,
+              }}>
+                through
+              </motion.span>
+            </motion.div>
+
+            {/* W5: TTL — big, stays */}
+            <motion.span style={{
+              ...WORD_BASE,
+              fontSize: 'clamp(4.5rem, 16vw, 13rem)',
+              opacity: w5In,
+              y: w5InY,
+            }}>
+              TTL
+            </motion.span>
           </div>
 
+          {/* Tagline */}
           <motion.p
-            className="mt-8 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
+            className="absolute bottom-6 left-8 md:left-16 lg:left-24 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
             initial={{ opacity: 0 }}
             animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            style={{ opacity: taglineOpacity }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+            style={{ opacity: taglineOp }}
           >
             EST. 2020 — SEOUL, KOREA
           </motion.p>
         </div>
 
-        {/* ── Bottom blend to next section ──────────────── */}
+        {/* ── Bottom blend ────────────────────────────── */}
         <div className="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
       </div>
     </div>

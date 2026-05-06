@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 340;
+const H1 = 250, H2 = 270, H3 = 360, H4 = 360, H5 = 440;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 // Normalized start/end for each chapter
@@ -22,7 +22,7 @@ const TIMELINE = [
   { year: '2023', title: '브랜드 필름·VCR 제작' },
   { year: '2024', title: '난컴퍼니 설립 · MCN' },
   { year: '2025', title: 'TVC 송출 · 오프라인 광고' },
-  { year: '2026', title: 'ALL IN ONE 에이전시', highlight: true },
+  { year: '2026', title: 'ALL IN ONE 솔루션', highlight: true },
 ];
 
 const PARTNERS = [
@@ -259,12 +259,14 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
   const p = useTransform(g, [C5S, C5E], [0, 1]);
 
-  const line1ScaleX = useTransform(p, [0.00, 0.40], [0, 1]);
-  const textOp      = useTransform(p, [0.28, 0.52], [0, 1]);
-  const textY       = useTransform(p, [0.28, 0.52], ['4%', '0%']);
-  const line2ScaleX = useTransform(p, [0.52, 0.76], [0, 1]);
-  const ctaOp       = useTransform(p, [0.68, 0.90], [0, 1]);
-  const ctaY        = useTransform(p, [0.68, 0.90], ['4%', '0%']);
+  const line1ScaleX = useTransform(p, [0.00, 0.35], [0, 1]);
+  const titleOp     = useTransform(p, [0.22, 0.42], [0, 1]);
+  const titleY      = useTransform(p, [0.22, 0.42], ['4%', '0%']);
+  const bodyOp      = useTransform(p, [0.38, 0.56], [0, 1]);
+  const bodyY       = useTransform(p, [0.38, 0.56], ['3%', '0%']);
+  const line2ScaleX = useTransform(p, [0.58, 0.76], [0, 1]);
+  const ctaOp       = useTransform(p, [0.72, 0.90], [0, 1]);
+  const ctaY        = useTransform(p, [0.72, 0.90], ['4%', '0%']);
 
   return (
     <div style={{ height: `${H5}vh` }}>
@@ -273,20 +275,33 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
         <div className="relative mb-10">
           <div className="h-[1px] w-full bg-white/8" />
           <motion.div
-            className="absolute top-0 left-0 h-[1px] bg-white/60 origin-left w-full"
+            className="absolute top-0 left-0 h-[1px] bg-white/50 origin-left w-full"
             style={{ scaleX: line1ScaleX }}
           />
         </div>
 
-        <motion.div style={{ opacity: textOp, y: textY }} className="mb-16">
-          <p className="text-white/45 text-base md:text-lg font-light leading-relaxed mb-2">
-            ATL과 BTL의 경계를 허물고,
+        {/* Title */}
+        <motion.div style={{ opacity: titleOp, y: titleY }} className="mb-8">
+          <p className="text-white/35 text-xs tracking-[0.35em] uppercase font-light mb-4">
+            Through The Line
           </p>
           <p
-            className="text-white font-semibold leading-tight"
-            style={{ fontSize: 'clamp(1.6rem, 4vw, 3.2rem)', fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.02em' }}
+            className="text-white font-bold leading-tight"
+            style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3.8rem)', fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.025em' }}
           >
-            TTL로 브랜드를 완성합니다.
+            Integrated Architecture<br />for Modern Brands.
+          </p>
+        </motion.div>
+
+        {/* Body */}
+        <motion.div style={{ opacity: bodyOp, y: bodyY }} className="mb-12 max-w-2xl">
+          <p className="text-white/55 text-sm md:text-base leading-relaxed font-light">
+            현대의 브랜드는 어느 한 곳에 머물지 않습니다. 나다운 그룹은 하이엔드 시네마틱 제작 역량과
+            독보적인 기술 인프라를 바탕으로 TTL(Through The Line) 솔루션을 제공합니다.
+          </p>
+          <p className="text-white/35 text-sm leading-relaxed font-light mt-4">
+            기획부터 하이엔드 송출, 오프라인 공간 운영까지 — 우리는 브랜드가 고객을 만나는
+            모든 접점을 하나의 유기적인 워크플로우로 통합합니다.
           </p>
         </motion.div>
 
@@ -294,14 +309,15 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
         <div className="relative mb-10">
           <div className="h-[1px] w-full bg-white/8" />
           <motion.div
-            className="absolute top-0 left-0 h-[1px] bg-white/60 origin-left w-full"
+            className="absolute top-0 left-0 h-[1px] bg-white/50 origin-left w-full"
             style={{ scaleX: line2ScaleX }}
           />
         </div>
 
+        {/* CTA */}
         <motion.div style={{ opacity: ctaOp, y: ctaY }} className="flex items-center justify-between">
           <div>
-            <p className="text-white/40 text-sm font-light mb-2 tracking-wide">ALL IN ONE 에이전시</p>
+            <p className="text-white/35 text-xs font-light mb-2 tracking-widest uppercase">ALL IN ONE 솔루션</p>
             <p
               className="text-white font-bold leading-tight"
               style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2.8rem)', fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.02em' }}
