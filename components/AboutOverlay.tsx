@@ -162,15 +162,15 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             <motion.div className="absolute top-0 left-0 h-[1px] bg-[#FFB800] origin-left w-full"
               style={{ scaleX: lineScaleX }} />
           </div>
-          <div className="grid grid-cols-4 md:grid-cols-7 gap-4 md:gap-6">
+          <div className="grid grid-cols-4 md:grid-cols-7 gap-4 md:gap-8">
             {TIMELINE.map((item, i) => (
-              <motion.div key={item.year} style={{ opacity: ops[i], y: ys[i] }} className="flex flex-col gap-2">
+              <motion.div key={item.year} style={{ opacity: ops[i], y: ys[i] }} className="flex flex-col gap-3">
                 <span className="font-mono font-black leading-none"
-                  style={{ fontSize: 'clamp(2.2rem, 5.5vw, 5rem)', color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.12)' }}>
+                  style={{ fontSize: 'clamp(2.8rem, 6.5vw, 6rem)', color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.12)' }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span className="text-[11px] tracking-[0.2em] uppercase text-white/50 font-medium">{item.year}</span>
-                <p className={`text-xs md:text-sm font-semibold leading-tight ${item.highlight ? 'text-white' : 'text-white/60'}`}>
+                <span className="text-[12px] tracking-[0.2em] uppercase text-white/50 font-medium">{item.year}</span>
+                <p className={`text-sm md:text-base font-semibold leading-snug ${item.highlight ? 'text-white' : 'text-white/65'}`}>
                   {item.title}
                 </p>
               </motion.div>
