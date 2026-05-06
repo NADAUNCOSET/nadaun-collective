@@ -89,7 +89,7 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
 
   return (
     <section
-      className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black cursor-none"
+      className="snap-section relative h-screen w-full flex items-center justify-center overflow-hidden bg-black cursor-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
     >

@@ -14,20 +14,20 @@ import Overlay from './components/Overlay';
 import Intro from './components/Intro';
 import Manifesto from './components/Manifesto';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
-import { motion, useScroll, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform, AnimatePresence, useMotionValue } from 'framer-motion';
 
-// Wraps each major section with a scroll-triggered slide-up entrance
-const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => (
-  <motion.div
-    id={id}
-    initial={{ opacity: 0, y: 60 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.12 }}
-    transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-  >
-    {children}
-  </motion.div>
-);
+// Scroll-driven enter + exit per section — cinematic parallax feel
+const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const opacity = useTransform(scrollYProgress, [0, 0.08, 0.88, 1], [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.08, 0.88, 1], [50, 0, 0, -30]);
+  return (
+    <motion.div ref={ref} id={id} style={{ opacity, y }} className="snap-section">
+      {children}
+    </motion.div>
+  );
+};
 
 const App: React.FC = () => {
   const { scrollYProgress } = useScroll();

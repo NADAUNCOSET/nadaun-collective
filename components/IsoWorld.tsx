@@ -125,8 +125,47 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
     return () => observer.disconnect();
   }, []);
 
+  // Mobile: replace 3D with a 2D card grid — better UX, much lighter
+  if (isMobile) {
+    return (
+      <section id="isoworld" className="snap-section h-screen w-full bg-black flex flex-col overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.12]"
+          style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="relative z-10 flex flex-col h-full px-5 py-16">
+          <h2 className="text-3xl font-bold tracking-tighter text-white mb-6">
+            NADAUN <span className="text-[#FFB800]">UNIVERSE</span>
+          </h2>
+          <div className="grid grid-cols-2 gap-3 flex-1 overflow-y-auto pb-4">
+            {UNIVERSE_DATA.map((item) => (
+              <button
+                key={item.id}
+                className="flex flex-col p-4 rounded-xl border border-white/10 bg-white/5 text-left active:scale-95 transition-transform"
+                style={{ borderColor: item.color + '30' }}
+                onClick={() => {
+                  if (item.id === 'ailab' && onAiLabClick) onAiLabClick();
+                  else if (item.url) window.open(item.url, '_blank');
+                }}
+              >
+                <div className="w-2 h-2 rounded-full mb-2" style={{ background: item.color }} />
+                <h3 className="text-xs font-bold leading-tight mb-1" style={{ color: item.color }}>
+                  {item.title}
+                </h3>
+                <p className="text-[9px] text-gray-500 uppercase tracking-wider">
+                  {item.subtitle}
+                </p>
+                <p className="text-[10px] text-gray-400 mt-2 leading-relaxed whitespace-pre-line">
+                  {item.desc}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section ref={sectionRef} id="isoworld" className="h-[100vh] w-full bg-black relative overflow-hidden">
+    <section ref={sectionRef} id="isoworld" className="snap-section h-[100vh] w-full bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-black z-0" />
       <div
         className="absolute inset-0 z-0 opacity-[0.15]"

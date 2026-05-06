@@ -38,7 +38,7 @@ const Manifesto: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen bg-[#080808] flex flex-col items-center justify-center overflow-hidden"
+      className="snap-section relative w-full h-screen bg-[#080808] flex flex-col items-center justify-center overflow-hidden"
     >
       {/* Video background — desktop only (mobile saves bandwidth) */}
       <video
