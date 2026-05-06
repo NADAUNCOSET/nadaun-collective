@@ -9,8 +9,9 @@ type BuildingData = {
   subtitle: string;
   desc: string;
   url?: string;
-  b2b?: string;   // B2B link (기업 전용)
-  b2c?: string;   // B2C link (개인)
+  b2b?: string;
+  b2c?: string;
+  btnLabels?: { b2b: string; b2c: string };  // custom button labels
   color: string;
   position: [number, number, number];
   height: number;
@@ -57,6 +58,18 @@ const UNIVERSE_DATA: BuildingData[] = [
     position: [7, 0, 1.5],
     height: 3.8,
   },
+  {
+    id: 'starlogin',
+    title: 'STAR LOGIN',
+    subtitle: 'IP CONNECT — GLOBAL',
+    desc: '글로벌 IP 네트워크로\n브랜드를 세계와 연결',
+    b2b: 'https://starlogin.com',
+    b2c: 'https://starlogin.com',
+    btnLabels: { b2b: 'IP CONNECT →', b2c: 'Global Agency →' },
+    color: '#FF6B35',
+    position: [0, 0, 5],
+    height: 2.8,
+  },
 ];
 
 // Shared geometry cache
@@ -74,6 +87,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
   });
 
   const isMoment = data.id === 'moment';
+  const hasTwoLinks = isMoment || data.id === 'starlogin';
 
   return (
     <group position={data.position}>
@@ -96,7 +110,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
           distanceFactor={15}
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="flex flex-col items-center text-center select-none" style={{ width: isMoment ? 190 : 170 }}>
+          <div className="flex flex-col items-center text-center select-none" style={{ width: hasTwoLinks ? 200 : 170 }}>
             <div className="bg-black/90 backdrop-blur-md border border-white/10 p-3 rounded-lg shadow-xl w-full">
               <h3 className="text-sm font-bold tracking-tight mb-0.5" style={{ color: data.color }}>
                 {data.title}
@@ -109,22 +123,22 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
                 {data.desc}
               </p>
 
-              {/* MOMENT: two link buttons */}
-              {isMoment ? (
+              {/* Two-link buttons (MOMENT, STARLOGIN) */}
+              {hasTwoLinks ? (
                 <div className="flex gap-1.5 mt-1">
                   <button
                     className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors cursor-pointer"
                     style={{ borderColor: data.color + '60', color: data.color }}
                     onClick={() => data.b2b && window.open(data.b2b, '_blank')}
                   >
-                    B2B →
+                    {data.btnLabels?.b2b ?? 'B2B →'}
                   </button>
                   <button
                     className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors"
                     style={data.b2c ? { borderColor: data.color + '60', color: data.color, cursor: 'pointer' } : { borderColor: '#333', color: '#555', cursor: 'default' }}
                     onClick={() => data.b2c && window.open(data.b2c, '_blank')}
                   >
-                    {data.b2c ? 'B2C →' : 'B2C Soon'}
+                    {data.b2c ? (data.btnLabels?.b2c ?? 'B2C →') : 'Coming Soon'}
                   </button>
                 </div>
               ) : (
@@ -148,7 +162,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
   );
 };
 
-const MOBILE_IDS = new Set(['ailab', 'moment', 'agency']);
+const MOBILE_IDS = new Set(['ailab', 'moment', 'agency', 'starlogin']);
 
 const Scene: React.FC<{ onAiLabClick?: () => void; isMobile?: boolean }> = ({ onAiLabClick, isMobile }) => {
   const groupRef = useRef<THREE.Group>(null);

@@ -78,29 +78,42 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 // ── Chapter 2 ─────────────────────────────────────────────────────────────────
 const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C2S, C2E], [0, 1]);
-  const line1Op = useTransform(p, [0.00, 0.18], [0, 1]);
-  const line1Y  = useTransform(p, [0.00, 0.18], ['6%', '0%']);
-  const line2Op = useTransform(p, [0.12, 0.30], [0, 1]);
-  const line2Y  = useTransform(p, [0.12, 0.30], ['6%', '0%']);
-  const bodyOp  = useTransform(p, [0.32, 0.50], [0, 1]);
-  const bodyY   = useTransform(p, [0.32, 0.50], ['3%', '0%']);
-  const pillOp  = useTransform(p, [0.46, 0.64], [0, 1]);
-  const exitOp  = useTransform(p, [0.74, 0.94], [1, 0]);
-  const exitY   = useTransform(p, [0.74, 0.94], ['0%', '-6%']);
+
+  // "올인원" — enters early, stays
+  const line1Op = useTransform(p, [0.00, 0.16], [0, 1]);
+  const line1Y  = useTransform(p, [0.00, 0.16], ['5%', '0%']);
+
+  // "에이전시." — starts very faint, progressively darkens with scroll
+  const line2Y   = useTransform(p, [0.10, 0.22], ['5%', '0%']);
+  const agencyColor = useTransform(p, [0.10, 0.68], [
+    'rgba(255,255,255,0.06)',
+    'rgba(255,255,255,1.00)',
+  ]);
+
+  // Body text + pills — appear after "에이전시" is mostly visible
+  const bodyOp = useTransform(p, [0.42, 0.60], [0, 1]);
+  const bodyY  = useTransform(p, [0.42, 0.60], ['3%', '0%']);
+  const pillOp = useTransform(p, [0.56, 0.74], [0, 1]);
+
+  // Exit
+  const exitOp = useTransform(p, [0.78, 0.96], [1, 0]);
+  const exitY  = useTransform(p, [0.78, 0.96], ['0%', '-5%']);
 
   return (
     <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
           <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
-          <motion.h2 style={{ opacity: line1Op, y: line1Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
+          <motion.h2
+            style={{ opacity: line1Op, y: line1Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
           >올인원</motion.h2>
-          <motion.h2 style={{ opacity: line2Op, y: line2Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
-            className="font-black tracking-[-0.03em] leading-[0.85] text-white/30 block"
+          <motion.h2
+            style={{ y: line2Y, color: agencyColor, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
+            className="font-black tracking-[-0.03em] leading-[0.85] block"
           >에이전시.</motion.h2>
           <motion.p style={{ opacity: bodyOp, y: bodyY }}
-            className="mt-12 text-white/80 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
+            className="mt-12 text-white/75 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
           >
             커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
             단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
@@ -169,59 +182,51 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   );
 };
 
+const GLOBAL_NODES = [
+  'SEOUL', 'TOKYO', 'NEW YORK', 'LONDON', 'PARIS', 'DUBAI', 'LOS ANGELES', 'SINGAPORE',
+];
+
 // ── Chapter 4 ─────────────────────────────────────────────────────────────────
 const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C4S, C4E], [0, 1]);
+
   const word1Op = useTransform(p, [0.00, 0.18], [0, 1]);
   const word1Y  = useTransform(p, [0.00, 0.18], ['6%', '0%']);
   const word2Op = useTransform(p, [0.12, 0.30], [0, 1]);
   const word2Y  = useTransform(p, [0.12, 0.30], ['6%', '0%']);
   const bodyOp  = useTransform(p, [0.32, 0.50], [0, 1]);
-  const cardOp  = useTransform(p, [0.40, 0.58], [0, 1]);
-  const cardX   = useTransform(p, [0.40, 0.58], ['6%', '0%']);
-  const exitOp  = useTransform(p, [0.78, 0.96], [1, 0]);
+  const nodesOp = useTransform(p, [0.44, 0.62], [0, 1]);
+  const nodesY  = useTransform(p, [0.44, 0.62], ['12px', '0px']);
+  const exitOp  = useTransform(p, [0.80, 0.96], [1, 0]);
 
   return (
     <div style={{ height: `${H4}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: exitOp }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center"
-        >
-          <div>
-            <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">IP PARTNERSHIP</p>
-            <motion.h2 style={{ opacity: word1Op, y: word1Y, fontSize: 'clamp(5rem, 16vw, 13rem)' }}
-              className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-            >IP</motion.h2>
-            <motion.h2 style={{ opacity: word2Op, y: word2Y, fontSize: 'clamp(5rem, 16vw, 13rem)', color: '#FFB800' }}
-              className="font-black tracking-[-0.03em] leading-[0.85] block"
-            >CONNECT.</motion.h2>
-            <motion.p style={{ opacity: bodyOp }}
-              className="mt-10 text-white/75 text-lg md:text-xl leading-relaxed max-w-md font-light"
-            >
-              중요 IP가 필요한 클라이언트에게 최적의 가격에 IP를 연결하여
-              콘텐츠를 제작합니다. 협력사 STAR LOGIN과 함께합니다.
-            </motion.p>
-          </div>
-          <motion.div style={{ opacity: cardOp, x: cardX }}
-            className="border border-white/15 rounded-2xl overflow-hidden bg-white/[0.03]"
+        <motion.div style={{ opacity: exitOp }}>
+          <p className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold">IP CONNECT — GLOBAL</p>
+          <motion.h2 style={{ opacity: word1Op, y: word1Y, fontSize: 'clamp(5rem, 16vw, 13rem)' }}
+            className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
+          >IP</motion.h2>
+          <motion.h2 style={{ opacity: word2Op, y: word2Y, fontSize: 'clamp(5rem, 16vw, 13rem)', color: '#FFB800' }}
+            className="font-black tracking-[-0.03em] leading-[0.85] block"
+          >CONNECT.</motion.h2>
+          <motion.p style={{ opacity: bodyOp }}
+            className="mt-8 text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl font-light"
           >
-            <img src="https://starlogin.com/wp-content/uploads/2024/10/스타로그인_홈페이지.png"
-              alt="Star Login" className="w-full h-48 object-cover opacity-60"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-            <div className="p-7">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#FFB800]" />
-                <span className="text-[11px] tracking-[0.2em] uppercase text-[#FFB800] font-bold">IP Partner</span>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">STAR LOGIN</h3>
-              <p className="text-sm text-white/60 leading-relaxed mb-5">
-                핵심 인물 네트워크와 IP 포트폴리오로 최고의 콘텐츠 솔루션을 제공하는 파트너사.
-              </p>
-              <a href="https://starlogin.com" target="_blank" rel="noopener noreferrer"
-                className="text-xs font-bold uppercase tracking-widest text-white/50 hover:text-white border-b border-white/20 pb-0.5 transition-colors"
-              >starlogin.com →</a>
-            </div>
+            핵심 IP부터 글로벌 에이전시 네트워크까지 — 모든 것을 하나로 연결하는<br className="hidden md:block" />
+            올인원 파트너. 세계 어디서도, 어떤 브랜드든 완성합니다.
+          </motion.p>
+          {/* Global nodes */}
+          <motion.div style={{ opacity: nodesOp, y: nodesY }} className="flex flex-wrap gap-2 mt-8">
+            {GLOBAL_NODES.map((city, i) => (
+              <span
+                key={city}
+                className="text-[10px] font-bold uppercase tracking-[0.3em] px-4 py-2 border border-white/15 rounded-full"
+                style={{ color: i === 0 ? '#FFB800' : 'rgba(255,255,255,0.45)' }}
+              >
+                {i === 0 ? '● ' : '○ '}{city}
+              </span>
+            ))}
           </motion.div>
         </motion.div>
       </StickyPanel>
