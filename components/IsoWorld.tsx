@@ -42,7 +42,7 @@ const UNIVERSE_DATA: BuildingData[] = [
     subtitle: 'CORPORATE VISUAL ARCHIVE',
     desc: '기업의 순간을 정제된\n감각으로 영원히 기록',
     b2b: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',
-    b2c: '',   // B2C 링크 추후 연결
+    b2c: 'https://nadaun.framer.website/',
     color: '#FF8C00',
     position: [3, 0, -2],
     height: 4.0,

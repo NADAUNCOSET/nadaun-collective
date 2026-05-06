@@ -189,47 +189,48 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
 const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
 
-  const titleOp = useTransform(p, [0.00, 0.14], [0, 1]);
-  const titleX  = useTransform(p, [0.00, 0.14], ['-5%', '0%']);
+  const titleOp = useTransform(p, [0.00, 0.12], [0, 1]);
+  const titleY  = useTransform(p, [0.00, 0.12], ['12px', '0px']);
 
-  const t0Op = useTransform(p, [0.12, 0.26], [0, 1]); const t0X = useTransform(p, [0.12, 0.26], ['6%', '0%']);
-  const t1Op = useTransform(p, [0.22, 0.36], [0, 1]); const t1X = useTransform(p, [0.22, 0.36], ['6%', '0%']);
-  const t2Op = useTransform(p, [0.32, 0.46], [0, 1]); const t2X = useTransform(p, [0.32, 0.46], ['6%', '0%']);
-  const t3Op = useTransform(p, [0.42, 0.56], [0, 1]); const t3X = useTransform(p, [0.42, 0.56], ['6%', '0%']);
+  const t0Op = useTransform(p, [0.08, 0.22], [0, 1]); const t0Y = useTransform(p, [0.08, 0.22], ['28px', '0px']);
+  const t1Op = useTransform(p, [0.18, 0.32], [0, 1]); const t1Y = useTransform(p, [0.18, 0.32], ['28px', '0px']);
+  const t2Op = useTransform(p, [0.28, 0.42], [0, 1]); const t2Y = useTransform(p, [0.28, 0.42], ['28px', '0px']);
+  const t3Op = useTransform(p, [0.38, 0.52], [0, 1]); const t3Y = useTransform(p, [0.38, 0.52], ['28px', '0px']);
 
-  const exitOp = useTransform(p, [0.76, 0.94], [1, 0]);
-  const exitX  = useTransform(p, [0.76, 0.94], ['0%', '-5%']);
+  const exitOp = useTransform(p, [0.80, 0.96], [1, 0]);
+  const exitY  = useTransform(p, [0.80, 0.96], ['0px', '-16px']);
 
   const tOps = [t0Op, t1Op, t2Op, t3Op];
-  const tXs  = [t0X, t1X, t2X, t3X];
+  const tYs  = [t0Y, t1Y, t2Y, t3Y];
 
   return (
     <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: exitOp, x: exitX }}>
-          <motion.p style={{ opacity: titleOp, x: titleX }}
-            className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold"
+        <motion.div style={{ opacity: exitOp, y: exitY }}>
+          <motion.p style={{ opacity: titleOp, y: titleY }}
+            className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] mb-8 font-bold"
           >CONTENT PRODUCTION — TEAM</motion.p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-0">
             {TEAMS.map((team, i) => (
               <motion.div
                 key={team.name}
-                style={{ opacity: tOps[i], x: tXs[i] }}
-                className="group border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl p-7 flex flex-col gap-4 relative overflow-hidden transition-colors duration-400"
+                style={{ opacity: tOps[i], y: tYs[i] }}
+                className="pr-6 lg:pr-8 border-r border-white/10 last:border-r-0 first:pl-0 pl-6 lg:pl-8"
               >
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#FFB800]/50 via-[#FFB800]/15 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                <div>
-                  <span className="block text-[#FFB800] font-black tracking-tighter leading-none mb-1.5"
-                    style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
+                <div className="pb-3 border-b border-white/15 mb-4">
+                  <span
+                    className="block font-black tracking-tight leading-none text-white"
+                    style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)' }}
+                  >
                     {team.name}
                   </span>
-                  <span className="text-[10px] tracking-[0.22em] uppercase text-white/40 font-medium">{team.role}</span>
                 </div>
-                <p className="text-sm text-white/55 leading-relaxed">{team.desc}</p>
-                <ul className="flex flex-col gap-2 mt-auto">
+                <p className="text-[10px] tracking-[0.3em] uppercase text-[#FFB800]/80 font-semibold mb-3">{team.role}</p>
+                <p className="text-[11px] text-white/50 leading-relaxed mb-4">{team.desc}</p>
+                <ul className="flex flex-col gap-1.5">
                   {team.items.map(item => (
-                    <li key={item} className="flex items-center gap-2.5 text-xs text-white/45">
-                      <span className="w-1 h-1 rounded-full bg-[#FFB800]/50 shrink-0" />{item}
+                    <li key={item} className="flex items-start gap-2 text-[10px] text-white/35 leading-relaxed">
+                      <span className="mt-1.5 w-[3px] h-[3px] rounded-full bg-[#FFB800]/40 shrink-0" />{item}
                     </li>
                   ))}
                 </ul>
@@ -246,49 +247,50 @@ const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C4S, C4E], [0, 1]);
 
-  const titleOp    = useTransform(p, [0.00, 0.12], [0, 1]);
-  const titleX     = useTransform(p, [0.00, 0.12], ['-5%', '0%']);
-  const lineScaleX = useTransform(p, [0.10, 0.72], [0, 1]);
+  const titleOp = useTransform(p, [0.00, 0.12], [0, 1]);
+  const titleY  = useTransform(p, [0.00, 0.12], ['12px', '0px']);
 
-  const p0Op = useTransform(p, [0.10, 0.20], [0, 1]); const p0X = useTransform(p, [0.10, 0.20], ['-4%', '0%']);
-  const p1Op = useTransform(p, [0.20, 0.30], [0, 1]); const p1X = useTransform(p, [0.20, 0.30], ['-4%', '0%']);
-  const p2Op = useTransform(p, [0.30, 0.40], [0, 1]); const p2X = useTransform(p, [0.30, 0.40], ['-4%', '0%']);
-  const p3Op = useTransform(p, [0.40, 0.50], [0, 1]); const p3X = useTransform(p, [0.40, 0.50], ['-4%', '0%']);
-  const p4Op = useTransform(p, [0.50, 0.60], [0, 1]); const p4X = useTransform(p, [0.50, 0.60], ['-4%', '0%']);
-  const p5Op = useTransform(p, [0.60, 0.72], [0, 1]); const p5X = useTransform(p, [0.60, 0.72], ['-4%', '0%']);
+  const p0Op = useTransform(p, [0.08, 0.22], [0, 1]); const p0Y = useTransform(p, [0.08, 0.22], ['32px', '0px']);
+  const p1Op = useTransform(p, [0.16, 0.30], [0, 1]); const p1Y = useTransform(p, [0.16, 0.30], ['32px', '0px']);
+  const p2Op = useTransform(p, [0.24, 0.38], [0, 1]); const p2Y = useTransform(p, [0.24, 0.38], ['32px', '0px']);
+  const p3Op = useTransform(p, [0.38, 0.52], [0, 1]); const p3Y = useTransform(p, [0.38, 0.52], ['32px', '0px']);
+  const p4Op = useTransform(p, [0.46, 0.60], [0, 1]); const p4Y = useTransform(p, [0.46, 0.60], ['32px', '0px']);
+  const p5Op = useTransform(p, [0.54, 0.70], [0, 1]); const p5Y = useTransform(p, [0.54, 0.70], ['32px', '0px']);
   const pOps = [p0Op, p1Op, p2Op, p3Op, p4Op, p5Op];
-  const pXs  = [p0X, p1X, p2X, p3X, p4X, p5X];
+  const pYs  = [p0Y, p1Y, p2Y, p3Y, p4Y, p5Y];
 
   return (
     <div style={{ height: `${H4}vh` }}>
       <StickyPanel>
-        <motion.p style={{ opacity: titleOp, x: titleX }}
-          className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-4 font-bold"
+        <motion.p style={{ opacity: titleOp, y: titleY }}
+          className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] mb-8 font-bold"
         >PRODUCTION PROCESS</motion.p>
-        <div className="relative my-8">
-          <div className="h-[1px] w-full bg-white/10" />
-          <motion.div className="absolute top-0 left-0 h-[1px] bg-[#FFB800] origin-left w-full"
-            style={{ scaleX: lineScaleX }} />
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-5">
+        <div className="grid grid-cols-3 gap-0">
           {PROCESS.map((step, i) => (
-            <motion.div key={step.num} style={{ opacity: pOps[i], x: pXs[i] }} className="flex flex-col gap-3">
-              <span className="font-mono font-black text-white/10 leading-none"
-                style={{ fontSize: 'clamp(3.5rem, 8vw, 6rem)' }}>
-                {step.num}
-              </span>
-              <div>
-                <h4 className="text-sm font-bold text-white mb-1.5">{step.title}</h4>
-                <p className="text-xs text-white/50 leading-relaxed">{step.desc}</p>
+            <motion.div
+              key={step.num}
+              style={{ opacity: pOps[i], y: pYs[i] }}
+              className="pr-6 lg:pr-10 border-r border-white/10 last:border-r-0 pl-0 [&:nth-child(3n+2)]:pl-6 lg:[&:nth-child(3n+2)]:pl-10 [&:nth-child(3n)]:pl-6 lg:[&:nth-child(3n)]:pl-10"
+            >
+              <div className="pb-3 border-b border-white/12 mb-4">
+                <span
+                  className="block font-black leading-none text-white/85 tabular-nums"
+                  style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(3.5rem, 9vw, 7.5rem)' }}
+                >
+                  {step.num}
+                </span>
               </div>
+              <p className="text-[9px] tracking-[0.4em] uppercase text-white/30 font-medium mb-2">STEP {step.num}</p>
+              <h4 className="font-bold text-white mb-2" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1rem)' }}>{step.title}</h4>
+              <p className="text-[11px] text-white/45 leading-relaxed">{step.desc}</p>
             </motion.div>
           ))}
         </div>
-        <motion.div style={{ opacity: pOps[5] }}
-          className="mt-14 pt-6 border-t border-white/10 flex items-center justify-between"
+        <motion.div style={{ opacity: p5Op }}
+          className="mt-10 pt-5 border-t border-white/10 flex items-center justify-between"
         >
-          <p className="text-white/30 text-[11px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
-          <p className="text-[#FFB800] text-[11px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
+          <p className="text-white/25 text-[10px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
+          <p className="text-[#FFB800] text-[10px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
         </motion.div>
       </StickyPanel>
     </div>
