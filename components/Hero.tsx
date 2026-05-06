@@ -27,8 +27,8 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   const mouseY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
   const lastMousePos = useRef({ x: 0, y: 0 });
 
-  const maskImage = useMotionTemplate`radial-gradient(circle 500px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
-  const webkitMaskImage = useMotionTemplate`radial-gradient(circle 500px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
+  const maskImage = useMotionTemplate`radial-gradient(circle 750px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
+  const webkitMaskImage = useMotionTemplate`radial-gradient(circle 750px at ${mouseX}px ${mouseY}px, black 50%, transparent 100%)`;
 
   useEffect(() => {
     HERO_IMAGES.forEach((src) => { new Image().src = src; });
@@ -71,7 +71,7 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     const d = Math.sqrt(
       (clientX - lastMousePos.current.x) ** 2 + (clientY - lastMousePos.current.y) ** 2
     );
-    if (d > 200) {
+    if (d > 150) {
       setActiveImage(p => (p + 1) % HERO_IMAGES.length);
       lastMousePos.current = { x: clientX, y: clientY };
     }
