@@ -1,7 +1,6 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
-// Client List
 const CLIENT_LIST = [
   { name: "AENTIO", category: "FASHION" },
   { name: "M2", category: "ENTERTAINMENT" },
@@ -47,135 +46,96 @@ const CLIENT_LIST = [
   { name: "DIOR BEAUTY", category: "BEAUTY" },
 ];
 
-// Configuration
-const SPACING = 90; 
-const CANVAS_SIZE = 1200; 
+const SPACING = 90;
 
-interface ClientNodeProps {
-  node: any;
-  mouseX: any;
-  mouseY: any;
+interface NodeData {
+  name: string;
+  category: string;
+  x: number;
+  y: number;
+  id: number;
 }
 
-// Individual Node Component for Physics & Interaction
-const ClientNode: React.FC<ClientNodeProps> = ({ 
-  node, 
-  mouseX, 
-  mouseY 
-}) => {
-  const [isHovered, setIsHovered] = React.useState(false);
+interface ClientNodeProps {
+  node: NodeData;
+  mouseX: any;
+  mouseY: any;
+  entered: boolean;
+}
 
-  // 1. Calculate Distance
-  // We need distance for both Repulsion (X/Y) and Scaling
+const ClientNode: React.FC<ClientNodeProps> = ({ node, mouseX, mouseY, entered }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const distance = useTransform([mouseX, mouseY], ([mx, my]) => {
     const dx = node.x - (mx as number);
     const dy = node.y - (my as number);
     return Math.sqrt(dx * dx + dy * dy);
   });
 
-  // 2. Repulsion Logic (X/Y)
   const x = useTransform([mouseX, mouseY, distance], ([mx, my, dist]) => {
     const dx = node.x - (mx as number);
     const dy = node.y - (my as number);
-    
-    // Repulsion
-    const radius = 400; 
-    const maxRepel = 180;
-    let repelX = 0;
-    
     const d = dist as number;
-    if (d < radius) {
-      const force = (1 - d / radius) * maxRepel;
-      const angle = Math.atan2(dy, dx);
-      repelX = Math.cos(angle) * force;
+    let repelX = 0;
+    if (d < 400) {
+      repelX = Math.cos(Math.atan2(dy, dx)) * (1 - d / 400) * 180;
     }
-
-    // Sway
-    const swayX = (mx as number) * 0.05; 
-
-    return node.x + swayX + repelX;
+    return node.x + (mx as number) * 0.05 + repelX;
   });
 
   const y = useTransform([mouseX, mouseY, distance], ([mx, my, dist]) => {
     const dx = node.x - (mx as number);
     const dy = node.y - (my as number);
-    
-    // Repulsion
-    const radius = 400; 
-    const maxRepel = 180;
-    let repelY = 0;
-    
     const d = dist as number;
-    if (d < radius) {
-      const force = (1 - d / radius) * maxRepel;
-      const angle = Math.atan2(dy, dx);
-      repelY = Math.sin(angle) * force;
+    let repelY = 0;
+    if (d < 400) {
+      repelY = Math.sin(Math.atan2(dy, dx)) * (1 - d / 400) * 180;
     }
-
-    // Sway
-    const swayY = (my as number) * 0.05;
-
-    return node.y + swayY + repelY;
+    return node.y + (my as number) * 0.05 + repelY;
   });
 
-  // 3. Proximity Scaling Logic
-  const scale = useTransform(distance, (dist) => {
-    const hoverRadius = 300; // Distance where scaling starts
-    const baseScale = 1;
-    const maxScale = 2.5; // Grow up to 2.5x
-
-    if (dist < hoverRadius) {
-      // Create a smooth curve (quadratic ease-in-out feel)
-      const factor = Math.pow(1 - dist / hoverRadius, 2); 
-      return baseScale + factor * (maxScale - baseScale);
-    }
-    return baseScale;
-  });
-
-  // Opacity boost when close
-  const opacity = useTransform(distance, (dist) => {
-    return dist < 300 ? 1 : 0.6;
-  });
+  const scale = useTransform(distance, (d) =>
+    d < 300 ? 1 + Math.pow(1 - d / 300, 2) * 1.6 : 1
+  );
+  const proximity = useTransform(distance, (d) => (d < 300 ? 1 : 0.5));
 
   return (
     <motion.div
-      style={{ 
-        x, 
-        y,
-        zIndex: isHovered ? 50 : 10, // Bring strictly hovered item to very front
-        willChange: 'transform' // Optimize for mobile
-      }}
-      className="absolute flex flex-col items-center justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
+      style={{ x, y, zIndex: isHovered ? 50 : 10, willChange: 'transform' }}
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
+      initial={{ opacity: 0 }}
+      animate={entered ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ delay: node.id * 0.016, duration: 0.5, ease: 'easeOut' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      // Add touch handlers for mobile tap interaction
       onTouchStart={() => setIsHovered(true)}
       onTouchEnd={() => setIsHovered(false)}
     >
-      <motion.div
-        style={{ scale, opacity }}
-        className="flex flex-col items-center justify-center"
-      >
-        <motion.div 
-          className="w-1.5 h-1.5 rounded-full mb-2 bg-white/80"
+      <motion.div style={{ scale, opacity: proximity }} className="flex flex-col items-center justify-center">
+        {/* Node dot */}
+        <motion.div
+          className="rounded-full mb-2"
+          style={{ width: 6, height: 6 }}
           animate={{
-            backgroundColor: isHovered ? "#FFB800" : "rgba(255,255,255,0.8)",
-            boxShadow: isHovered ? "0 0 15px #FFB800" : "none"
+            backgroundColor: isHovered ? '#FFB800' : 'rgba(255,255,255,0.75)',
+            boxShadow: isHovered
+              ? '0 0 18px 5px #FFB800, 0 0 40px 10px rgba(255,184,0,0.25)'
+              : '0 0 5px 1px rgba(255,255,255,0.15)',
           }}
+          transition={{ duration: 0.18 }}
         />
-        <motion.h3 
-          className="text-[10px] md:text-xs font-bold leading-none tracking-tight whitespace-nowrap text-center"
-          animate={{
-            color: isHovered ? "#ffffff" : "#cccccc",
-          }}
+        {/* Name */}
+        <motion.h3
+          className="text-[10px] md:text-[11px] font-bold leading-none tracking-tight whitespace-nowrap"
+          animate={{ color: isHovered ? '#ffffff' : '#888888' }}
+          transition={{ duration: 0.15 }}
         >
           {node.name}
         </motion.h3>
-        <motion.span 
-          className="text-[6px] uppercase tracking-widest text-[#FFB800] mt-1 absolute top-full"
-          style={{ 
-            opacity: useTransform(scale, s => (s > 1.5 ? 1 : 0)) // Only show category when big enough
-          }}
+        {/* Category — only shown when scaled up enough */}
+        <motion.span
+          className="text-[6px] uppercase tracking-widest text-[#FFB800] mt-1 absolute top-full whitespace-nowrap"
+          style={{ opacity: useTransform(scale, (s) => (s > 1.9 ? 1 : 0)) }}
         >
           {node.category}
         </motion.span>
@@ -184,113 +144,149 @@ const ClientNode: React.FC<ClientNodeProps> = ({
   );
 };
 
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 const Clients: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [hasEntered, setHasEntered] = useState(false);
 
-  // Mouse Motion Values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-
-  // Smooth Spring for fluid movement
   const smoothMouseX = useSpring(mouseX, { stiffness: 100, damping: 20, mass: 0.5 });
   const smoothMouseY = useSpring(mouseY, { stiffness: 100, damping: 20, mass: 0.5 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    // Calculate mouse position relative to the center of the container
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    mouseX.set(x);
-    mouseY.set(y);
+    const r = containerRef.current.getBoundingClientRect();
+    mouseX.set(e.clientX - r.left - r.width / 2);
+    mouseY.set(e.clientY - r.top - r.height / 2);
   };
 
-  // Touch Move handler for mobile interaction
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!containerRef.current) return;
-    const touch = e.touches[0];
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = touch.clientX - rect.left - rect.width / 2;
-    const y = touch.clientY - rect.top - rect.height / 2;
-    mouseX.set(x);
-    mouseY.set(y);
+    const t = e.touches[0];
+    const r = containerRef.current.getBoundingClientRect();
+    mouseX.set(t.clientX - r.left - r.width / 2);
+    mouseY.set(t.clientY - r.top - r.height / 2);
   };
 
-  // 1. Generate positions using Golden Spiral
-  const nodes = useMemo(() => {
-    const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); 
-
-    return CLIENT_LIST.map((client, index) => {
-      // Start slightly offset to avoid perfect center overlap
-      const n = index + 1; 
+  // Precompute node positions + constellation edges
+  const { nodes, lines } = useMemo(() => {
+    const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+    const nodes: NodeData[] = CLIENT_LIST.map((c, i) => {
+      const n = i + 1;
       const r = SPACING * Math.sqrt(n);
       const theta = n * GOLDEN_ANGLE;
-
-      const x = r * Math.cos(theta);
-      const y = r * Math.sin(theta);
-      
-      return { ...client, x, y, id: index };
+      return { ...c, x: r * Math.cos(theta), y: r * Math.sin(theta), id: i };
     });
+
+    const lines: { x1: number; y1: number; x2: number; y2: number; len: number; key: string }[] = [];
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len < 175) {
+          lines.push({ x1: nodes[i].x, y1: nodes[i].y, x2: nodes[j].x, y2: nodes[j].y, len, key: `${i}-${j}` });
+        }
+      }
+    }
+    return { nodes, lines };
   }, []);
 
   return (
     <section
       id="clients"
       ref={containerRef}
-      className="relative w-full min-h-[85vh] md:h-[100vh] bg-black overflow-hidden flex flex-col justify-center"
+      className="relative w-full h-[100vh] bg-black overflow-hidden flex flex-col"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
     >
-      {/* Background Grid */}
-      <div 
-        className="absolute inset-0 z-0 opacity-10 pointer-events-none" 
-        style={{ 
-          backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', 
-          backgroundSize: '40px 40px' 
-        }} 
+      {/* Subtle dot grid */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
       />
 
-      {/* Header - Matching Scale of Business and Reference */}
-      <div className="absolute top-0 left-0 w-full z-20 pointer-events-none p-6 md:p-12">
-        <div className="container mx-auto mt-24 md:mt-16">
-          <motion.div
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-          >
-             <span className="block text-[#FFB800] font-bold tracking-[0.2em] text-xs uppercase mb-4">
-                OUR PARTNERS
-              </span>
-             {/* Scaled up to 6xl / 8xl to match Business & Reference Grandeur */}
-             <h2 className="text-6xl md:text-8xl font-bold tracking-tighter leading-none text-white">
-                WE GROW <br/> TOGETHER.
-             </h2>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Interactive Universe Area */}
-      <div className="relative w-full h-full flex items-center justify-center z-10 pt-48 md:pt-0">
+      {/* Minimal header — OUR PARTNERS + brand count only */}
+      <div
+        className="absolute top-8 left-0 w-full z-20 pointer-events-none"
+        style={{ paddingLeft: 'var(--header-pad, 1.5rem)' }}
+      >
         <motion.div
-           initial={{ opacity: 0, scale: 0.8 }}
-           whileInView={{ opacity: 1, scale: 1 }}
-           transition={{ duration: 1.5, ease: "easeOut" }}
-           className="relative scale-[0.45] md:scale-100 origin-center"
-           style={{ width: 0, height: 0 }} // Anchor point at center
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex items-baseline gap-5"
         >
-          {nodes.map((node) => (
-            <ClientNode 
-              key={node.id} 
-              node={node} 
-              mouseX={smoothMouseX} 
-              mouseY={smoothMouseY} 
-            />
-          ))}
+          <span className="text-[#FFB800] font-bold tracking-[0.3em] text-xs uppercase">
+            OUR PARTNERS
+          </span>
+          <span className="text-white/20 text-xs tracking-widest font-light tabular-nums">
+            {CLIENT_LIST.length} BRANDS
+          </span>
         </motion.div>
       </div>
 
-      {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
+      {/* Constellation map */}
+      <motion.div
+        className="relative flex-1 flex items-center justify-center z-10"
+        onViewportEnter={() => setHasEntered(true)}
+        viewport={{ once: true, amount: 0.25 }}
+      >
+        {/* Container anchored at center (0,0) */}
+        <div
+          className="relative scale-[0.42] sm:scale-[0.65] md:scale-[0.82] lg:scale-100 origin-center"
+          style={{ width: 0, height: 0 }}
+        >
+          {/* ── SVG constellation lines — draw-on effect via strokeDashoffset ── */}
+          <svg
+            className="absolute pointer-events-none"
+            style={{ left: '-660px', top: '-660px', width: '1320px', height: '1320px', overflow: 'visible' }}
+          >
+            {lines.map((line, i) => (
+              <line
+                key={line.key}
+                x1={line.x1 + 660}
+                y1={line.y1 + 660}
+                x2={line.x2 + 660}
+                y2={line.y2 + 660}
+                stroke="#FFB800"
+                strokeWidth="0.7"
+                strokeLinecap="round"
+                strokeDasharray={line.len}
+                strokeDashoffset={hasEntered ? 0 : line.len}
+                style={{
+                  opacity: hasEntered ? 0.2 : 0,
+                  // CSS transitions handle the draw-on — better perf than framer-motion for many SVG lines
+                  transition: [
+                    `stroke-dashoffset 1.6s cubic-bezier(0.16,1,0.3,1) ${(0.15 + i * 0.011).toFixed(3)}s`,
+                    `opacity 0.5s ease ${(0.3 + i * 0.011).toFixed(3)}s`,
+                  ].join(', '),
+                }}
+              />
+            ))}
+          </svg>
+
+          {/* ── Client nodes ── */}
+          {nodes.map((node) => (
+            <ClientNode
+              key={node.id}
+              node={node}
+              mouseX={smoothMouseX}
+              mouseY={smoothMouseY}
+              entered={hasEntered}
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
     </section>
   );
 };
