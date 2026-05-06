@@ -46,24 +46,41 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
 // ── Chapter 1 ─────────────────────────────────────────────────────────────────
 const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
-  const exitOp = useTransform(p, [0.5, 0.82], [1, 0]);
-  const exitY  = useTransform(p, [0.5, 0.82], ['0%', '-8%']);
-  const tagOp  = useTransform(p, [0.05, 0.28, 0.5, 0.78], [0, 1, 1, 0]);
+
+  // Sequential word reveals
+  const h1Op = useTransform(p, [0.00, 0.16], [0, 1]);
+  const h1Y  = useTransform(p, [0.00, 0.16], ['6%', '0%']);
+
+  const h2Op = useTransform(p, [0.18, 0.34], [0, 1]);
+  const h2Y  = useTransform(p, [0.18, 0.34], ['6%', '0%']);
+
+  const h3Op = useTransform(p, [0.36, 0.52], [0, 1]);
+  const h3Y  = useTransform(p, [0.36, 0.52], ['6%', '0%']);
+
+  const tagOp = useTransform(p, [0.54, 0.70], [0, 1]);
+  const tagY  = useTransform(p, [0.54, 0.70], ['3%', '0%']);
+
+  // Exit
+  const exitOp = useTransform(p, [0.80, 0.96], [1, 0]);
+  const exitY  = useTransform(p, [0.80, 0.96], ['0%', '-5%']);
 
   return (
     <div style={{ height: `${H1}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-8 font-bold">
+          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold">
             NADAUN COLLECTIVE — Since 2020, Seoul
           </p>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white"
-            style={{ fontSize: 'clamp(5rem, 19vw, 15rem)' }}>HAIEND</h1>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85]"
-            style={{ fontSize: 'clamp(5rem, 19vw, 15rem)', color: '#FFB800' }}>CONTENT</h1>
-          <h1 className="font-black tracking-[-0.03em] leading-[0.85] text-white"
-            style={{ fontSize: 'clamp(5rem, 19vw, 15rem)' }}>SOLUTION</h1>
-          <motion.p style={{ opacity: tagOp }}
+          <motion.h1 style={{ opacity: h1Op, y: h1Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string }}
+            className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
+          >HAIEND</motion.h1>
+          <motion.h1 style={{ opacity: h2Op, y: h2Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string, color: '#FFB800' }}
+            className="font-black tracking-[-0.03em] leading-[0.85] block"
+          >CONTENT</motion.h1>
+          <motion.h1 style={{ opacity: h3Op, y: h3Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string }}
+            className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
+          >SOLUTION</motion.h1>
+          <motion.p style={{ opacity: tagOp, y: tagY }}
             className="mt-10 text-white/75 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
           >
             최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />

@@ -15,17 +15,6 @@ const ALL_IMAGES = [
 
 const SECTION_H = 320;
 
-const WORD_BASE: React.CSSProperties = {
-  fontFamily: 'Manrope, sans-serif',
-  fontWeight: 900,
-  fontSize: 'clamp(4rem, 14vw, 11rem)',
-  letterSpacing: '-0.03em',
-  lineHeight: 0.9,
-  color: '#ffffff',
-  display: 'block',
-  whiteSpace: 'nowrap',
-};
-
 interface HeroProps {
   startAnimation?: boolean;
 }
@@ -57,35 +46,27 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     setActiveImage(idx);
   });
 
-  // ── Word scroll transforms ────────────────────────────────────
-  // W1 "Seamless" — phase-reveal in, scroll out
-  const w1Out  = useTransform(scrollYProgress, [0.11, 0.21], [1, 0]);
-  const w1OutY = useTransform(scrollYProgress, [0.11, 0.21], ['0%', '-5%']);
+  // ── Word entries (stacking top → bottom) ─────────────────────
+  // W1 "Seamless" — phase reveal, no scroll needed
+  // W2–W5 — scroll-triggered entries
+  const w2Op = useTransform(scrollYProgress, [0.10, 0.20], [0, 1]);
+  const w2Y  = useTransform(scrollYProgress, [0.10, 0.20], ['28px', '0px']);
 
-  // W2 "Brand"
-  const w2In  = useTransform(scrollYProgress, [0.17, 0.27], [0, 1]);
-  const w2InY = useTransform(scrollYProgress, [0.17, 0.27], ['7%', '0%']);
-  const w2Out  = useTransform(scrollYProgress, [0.34, 0.44], [1, 0]);
-  const w2OutY = useTransform(scrollYProgress, [0.34, 0.44], ['0%', '-5%']);
+  const w3Op = useTransform(scrollYProgress, [0.24, 0.34], [0, 1]);
+  const w3Y  = useTransform(scrollYProgress, [0.24, 0.34], ['28px', '0px']);
 
-  // W3 "Experience"
-  const w3In  = useTransform(scrollYProgress, [0.40, 0.50], [0, 1]);
-  const w3InY = useTransform(scrollYProgress, [0.40, 0.50], ['7%', '0%']);
-  const w3Out  = useTransform(scrollYProgress, [0.57, 0.67], [1, 0]);
-  const w3OutY = useTransform(scrollYProgress, [0.57, 0.67], ['0%', '-5%']);
+  const w4Op = useTransform(scrollYProgress, [0.38, 0.47], [0, 1]);
+  const w4Y  = useTransform(scrollYProgress, [0.38, 0.47], ['20px', '0px']);
 
-  // W4 "through" — thin weight
-  const w4In  = useTransform(scrollYProgress, [0.62, 0.70], [0, 1]);
-  const w4InY = useTransform(scrollYProgress, [0.62, 0.70], ['7%', '0%']);
-  const w4Out  = useTransform(scrollYProgress, [0.75, 0.83], [1, 0]);
-  const w4OutY = useTransform(scrollYProgress, [0.75, 0.83], ['0%', '-5%']);
+  const w5Op = useTransform(scrollYProgress, [0.50, 0.62], [0, 1]);
+  const w5Y  = useTransform(scrollYProgress, [0.50, 0.62], ['28px', '0px']);
 
-  // W5 "TTL" — stays
-  const w5In  = useTransform(scrollYProgress, [0.77, 0.88], [0, 1]);
-  const w5InY = useTransform(scrollYProgress, [0.77, 0.88], ['7%', '0%']);
+  // ── All-words dissolve exit ────────────────────────────────────
+  const dissolveOp   = useTransform(scrollYProgress, [0.72, 0.92], [1, 0]);
+  const dissolveBlur = useTransform(scrollYProgress, [0.72, 0.92], [0, 12]);
+  const dissolveFilter = useMotionTemplate`blur(${dissolveBlur}px)`;
 
-  // tagline
-  const taglineOp = useTransform(scrollYProgress, [0.55, 0.72], [1, 0]);
+  const taglineOp = useTransform(scrollYProgress, [0.68, 0.82], [1, 0]);
 
   useEffect(() => {
     ALL_IMAGES.forEach(({ src }) => { const img = new Image(); img.src = src; });
@@ -123,6 +104,16 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
     }
   };
 
+  const wordBase: React.CSSProperties = {
+    fontFamily: 'Manrope, sans-serif',
+    fontWeight: 900,
+    fontSize: 'clamp(2.8rem, 8vw, 7.5rem)',
+    letterSpacing: '-0.03em',
+    lineHeight: 0.88,
+    color: '#ffffff',
+    display: 'block',
+  };
+
   return (
     <div ref={sectionRef} style={{ height: `${SECTION_H}vh` }} className="relative">
       <div
@@ -136,7 +127,7 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
           {ALL_IMAGES.map(({ src, pos }, i) => (
             <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${activeImage === i ? 'opacity-100' : 'opacity-0'}`}>
               <img src={src} alt="" className="w-full h-full object-cover"
-                style={{ objectPosition: pos, filter: 'brightness(0.32) saturate(0.85)' }} />
+                style={{ objectPosition: pos, filter: 'brightness(0.30) saturate(0.85)' }} />
             </div>
           ))}
         </div>
@@ -153,79 +144,71 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
         </motion.div>
 
         {/* ── Vignette ────────────────────────────────── */}
-        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/70 via-transparent to-black/20 pointer-events-none" />
 
-        {/* ── Words ───────────────────────────────────── */}
-        <div className="z-10 pointer-events-none absolute inset-0">
-
-          {/* All words stack at bottom-left */}
-          <div className="absolute bottom-16 md:bottom-20 left-8 md:left-16 lg:left-24">
-
-            {/* W1: Seamless — phase entry, scroll exit */}
-            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w1Out, y: w1OutY }}>
-              <motion.span
-                style={WORD_BASE}
-                initial={{ opacity: 0, y: '7%' }}
-                animate={phase === 'reveal' ? { opacity: 1, y: '0%' } : {}}
-                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-              >
-                Seamless
-              </motion.span>
-            </motion.div>
-
-            {/* W2: Brand */}
-            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w2Out, y: w2OutY }}>
-              <motion.span style={{ ...WORD_BASE, opacity: w2In, y: w2InY }}>
-                Brand
-              </motion.span>
-            </motion.div>
-
-            {/* W3: Experience */}
-            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w3Out, y: w3OutY }}>
-              <motion.span style={{ ...WORD_BASE, opacity: w3In, y: w3InY }}>
-                Experience
-              </motion.span>
-            </motion.div>
-
-            {/* W4: through — thin */}
-            <motion.div className="absolute bottom-0 left-0" style={{ opacity: w4Out, y: w4OutY }}>
-              <motion.span style={{
-                ...WORD_BASE,
-                fontWeight: 200,
-                fontSize: 'clamp(2.2rem, 6vw, 5rem)',
-                color: 'rgba(255,255,255,0.55)',
-                opacity: w4In,
-                y: w4InY,
-              }}>
-                through
-              </motion.span>
-            </motion.div>
-
-            {/* W5: TTL — big, stays */}
-            <motion.span style={{
-              ...WORD_BASE,
-              fontSize: 'clamp(4.5rem, 16vw, 13rem)',
-              opacity: w5In,
-              y: w5InY,
-            }}>
-              TTL
-            </motion.span>
-          </div>
-
-          {/* Tagline */}
-          <motion.p
-            className="absolute bottom-6 left-8 md:left-16 lg:left-24 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
-            initial={{ opacity: 0 }}
-            animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.8, delay: 1.1 }}
-            style={{ opacity: taglineOp }}
+        {/* ── Words — stacking top → bottom ───────────── */}
+        <motion.div
+          className="z-10 pointer-events-none absolute left-8 md:left-16 lg:left-24 top-24 md:top-28 flex flex-col"
+          style={{ opacity: dissolveOp, filter: dissolveFilter }}
+        >
+          {/* W1: Seamless */}
+          <motion.span
+            style={wordBase}
+            initial={{ opacity: 0, y: '28px' }}
+            animate={phase === 'reveal' ? { opacity: 1, y: '0px' } : {}}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           >
-            EST. 2020 — SEOUL, KOREA
-          </motion.p>
-        </div>
+            Seamless
+          </motion.span>
+
+          {/* W2: Brand */}
+          <motion.span style={{ ...wordBase, opacity: w2Op, y: w2Y }}>
+            Brand
+          </motion.span>
+
+          {/* W3: Experience */}
+          <motion.span style={{ ...wordBase, opacity: w3Op, y: w3Y }}>
+            Experience
+          </motion.span>
+
+          {/* W4: through */}
+          <motion.span style={{
+            ...wordBase,
+            fontWeight: 200,
+            fontSize: 'clamp(1.4rem, 3.5vw, 3rem)',
+            color: 'rgba(255,255,255,0.5)',
+            marginTop: '0.2em',
+            opacity: w4Op,
+            y: w4Y,
+          }}>
+            through
+          </motion.span>
+
+          {/* W5: TTL */}
+          <motion.span style={{
+            ...wordBase,
+            fontSize: 'clamp(3.2rem, 10vw, 9rem)',
+            marginTop: '-0.04em',
+            opacity: w5Op,
+            y: w5Y,
+          }}>
+            TTL
+          </motion.span>
+        </motion.div>
+
+        {/* ── Tagline ─────────────────────────────────── */}
+        <motion.p
+          className="z-10 pointer-events-none absolute bottom-6 left-8 md:left-16 lg:left-24 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
+          initial={{ opacity: 0 }}
+          animate={phase === 'reveal' ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8, delay: 1.1 }}
+          style={{ opacity: taglineOp }}
+        >
+          EST. 2020 — SEOUL, KOREA
+        </motion.p>
 
         {/* ── Bottom blend ────────────────────────────── */}
-        <div className="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
+        <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
       </div>
     </div>
   );
