@@ -99,7 +99,7 @@ const Hero: React.FC<HeroProps> = ({ startAnimation = true }) => {
   });
 
   // COLLECTIVE dissolve on exit (scroll 0.60→0.92, C exits first)
-  const dissolveProgress = useTransform(scrollYProgress, [0.60, 0.92], [10, 0]);
+  const dissolveProgress = useTransform(scrollYProgress, [0.60, 0.92], [0, 10]);
 
   // tagline fades out earlier
   const taglineOpacity = useTransform(scrollYProgress, [0.55, 0.72], [1, 0]);
