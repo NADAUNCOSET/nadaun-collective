@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, MotionValue } from 'framer-motion';
 import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 
 const HEADER_H = 57;
@@ -248,8 +248,22 @@ interface BusinessOverlayProps {
 
 const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAiLabClick, onIntegratedClick }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ container: scrollRef });
-  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  const progress = useMotionValue(0);
+  const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    progress.set(0);
+    el.scrollTop = 0;
+    const onScroll = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      if (max > 0) progress.set(el.scrollTop / max);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [isOpen, progress]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -288,10 +302,10 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Ch1 g={scrollYProgress} />
-            <Ch2 g={scrollYProgress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} />
-            <Ch3 g={scrollYProgress} />
-            <Ch4 g={scrollYProgress} />
+            <Ch1 g={progress} />
+            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} />
+            <Ch3 g={progress} />
+            <Ch4 g={progress} />
           </div>
         </motion.div>
       )}
