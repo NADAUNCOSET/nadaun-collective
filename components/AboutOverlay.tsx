@@ -128,7 +128,7 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           <motion.h2
             style={{ y: line2Y, color: agencyColor, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] block"
-          >에이전시.</motion.h2>
+          >솔루션.</motion.h2>
           <motion.p style={{ opacity: bodyOp, y: bodyY }}
             className="mt-12 text-white/75 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
           >
