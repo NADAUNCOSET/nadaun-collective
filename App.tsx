@@ -100,7 +100,6 @@ const App: React.FC = () => {
         <InsightsOverlay
           isOpen={activeOverlay === 'insights'}
           onClose={closeOverlay}
-          onAiLabClick={() => setActiveOverlay('ai-lab')}
         />
         <ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />
         <IntegratedSolutionOverlay
