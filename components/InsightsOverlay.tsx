@@ -5,12 +5,13 @@ import { generateMarketingInsight } from '../services/geminiService';
 
 const HEADER_H = 57;
 
-const H1 = 300, H2 = 280, H3 = 300;
-const TOTAL = H1 + H2 + H3;
+const H_W = 1000, H1 = 300, H2 = 280, H3 = 300;
+const TOTAL = H_W + H1 + H2 + H3; // 1880
 
-const C1S = 0,   C1E = H1 / TOTAL;
-const C2S = C1E, C2E = (H1 + H2) / TOTAL;
-const C3S = C2E, C3E = 1;
+const CWS = 0,        CWE = H_W / TOTAL;
+const C1S = CWE,      C1E = (H_W + H1) / TOTAL;
+const C2S = C1E,      C2E = (H_W + H1 + H2) / TOTAL;
+const C3S = C2E,      C3E = 1;
 
 const CAPABILITIES = [
   { icon: TrendingUp, title: 'Market Prediction', desc: '실시간 데이터 기반으로 시장 트렌드를 예측하고 브랜드 기회를 발굴합니다.', tags: ['Trend Forecasting', 'Market Sizing', 'Opportunity Analysis'] },
@@ -47,6 +48,52 @@ const SlideWord: React.FC<{
     >
       <span style={{ fontSize: 'clamp(5.5rem, 20vw, 17rem)', display: 'block' }}>{text}</span>
     </motion.h1>
+  );
+};
+
+// ── ChW — 5 cinematic word slides (DATA / 인사이트. / PREDICT. / OPTIMIZE. / SCALE.) ──
+const ChW: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [CWS, CWE], [0, 1]);
+
+  const w1Op = useTransform(p, [0.00, 0.06, 0.14, 0.18], [0, 1, 1, 0]);
+  const w1X  = useTransform(p, [0.00, 0.06, 0.14, 0.18], ['80vw', '0vw', '0vw', '-80vw']);
+  const w2Op = useTransform(p, [0.20, 0.26, 0.34, 0.38], [0, 1, 1, 0]);
+  const w2X  = useTransform(p, [0.20, 0.26, 0.34, 0.38], ['80vw', '0vw', '0vw', '-80vw']);
+  const w3Op = useTransform(p, [0.40, 0.46, 0.54, 0.58], [0, 1, 1, 0]);
+  const w3X  = useTransform(p, [0.40, 0.46, 0.54, 0.58], ['80vw', '0vw', '0vw', '-80vw']);
+  const w4Op = useTransform(p, [0.60, 0.66, 0.74, 0.78], [0, 1, 1, 0]);
+  const w4X  = useTransform(p, [0.60, 0.66, 0.74, 0.78], ['80vw', '0vw', '0vw', '-80vw']);
+  const w5Op = useTransform(p, [0.80, 0.86, 0.96, 1.00], [0, 1, 1, 0]);
+  const w5X  = useTransform(p, [0.80, 0.86], ['80vw', '0vw']);
+
+  const FS_S = { fontSize: 'clamp(9rem, 32vw, 28rem)', fontWeight: 900, letterSpacing: '-0.04em', display: 'block', lineHeight: 1 } as const;
+  const FS_L = { fontSize: 'clamp(6rem, 21vw, 18rem)', fontWeight: 900, letterSpacing: '-0.04em', display: 'block', lineHeight: 1 } as const;
+
+  return (
+    <div style={{ height: `${H_W}vh` }}>
+      <div
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        className="relative overflow-hidden flex items-center"
+      >
+        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold">
+          AI INNOVATION LAB
+        </p>
+        {([
+          [w1Op, w1X, 'DATA',      'white',   FS_S],
+          [w2Op, w2X, '인사이트.', '#FFB800', FS_L],
+          [w3Op, w3X, 'PREDICT.',  'white',   FS_L],
+          [w4Op, w4X, 'OPTIMIZE.', '#FFB800', FS_L],
+          [w5Op, w5X, 'SCALE.',    'white',   FS_S],
+        ] as const).map(([op, x, text, color, fs], i) => (
+          <motion.div
+            key={i}
+            style={{ opacity: op as MotionValue<number>, x: x as MotionValue<string>, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}
+          >
+            <span style={{ ...fs, color }}>{text}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -299,6 +346,7 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
+            <ChW g={progress} />
             <Ch1 g={progress} />
             <Ch2 g={progress} />
             <Ch3 g={progress} />
