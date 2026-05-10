@@ -274,37 +274,51 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 };
 
 // ── Globe helpers ─────────────────────────────────────────────────────────────
-function latLonToVec3(lat: number, lon: number): [number, number, number] {
-  const phi = (90 - lat) * Math.PI / 180;
-  const theta = lon * Math.PI / 180;
-  return [Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta)];
+// ── 2D flat-map projection ────────────────────────────────────────────────────
+function latLonToXY(
+  lat: number, lon: number,
+  cx: number, cy: number,
+  scale: number, cLat: number, cLon: number,
+): [number, number] {
+  return [cx + (lon - cLon) * scale, cy - (lat - cLat) * scale];
 }
 
-function slerp(a: [number, number, number], b: [number, number, number], t: number): [number, number, number] {
-  const dot = Math.min(1, Math.max(-1, a[0]*b[0] + a[1]*b[1] + a[2]*b[2]));
-  const omega = Math.acos(dot);
-  if (omega < 0.001) return a;
-  const sinO = Math.sin(omega);
-  const s0 = Math.sin((1 - t) * omega) / sinO;
-  const s1 = Math.sin(t * omega) / sinO;
-  return [s0*a[0]+s1*b[0], s0*a[1]+s1*b[1], s0*a[2]+s1*b[2]];
-}
-
-function projectGlobe(
-  vec: [number, number, number],
-  rotX: number, rotY: number,
-  cx: number, cy: number, radius: number,
-): [number, number, boolean] {
-  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-  const x1 =  vec[0] * cosY + vec[2] * sinY;
-  const z1 = -vec[0] * sinY + vec[2] * cosY;
-  const y1 =  vec[1];
-  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-  const x2 = x1;
-  const y2 = y1 * cosX - z1 * sinX;
-  const z2 = y1 * sinX + z1 * cosX;
-  return [cx + x2 * radius, cy - y2 * radius, z2 > 0];
-}
+// Simplified continent coastlines [lat, lon][]
+const CONTINENTS: [number, number][][] = [
+  // North America
+  [[71,-165],[71,-140],[60,-140],[58,-137],[55,-130],[50,-125],[46,-124],
+   [40,-124],[36,-122],[32,-117],[30,-110],[22,-105],[16,-92],[16,-88],
+   [22,-80],[30,-80],[35,-76],[40,-74],[45,-67],[47,-53],[50,-56],[60,-65],
+   [65,-64],[70,-78],[72,-80],[72,-100],[70,-117],[71,-128],[71,-155],[71,-165]],
+  // South America
+  [[12,-71],[11,-63],[8,-60],[5,-52],[0,-50],[-5,-35],[-10,-37],[-15,-39],
+   [-20,-40],[-25,-48],[-30,-51],[-35,-57],[-40,-62],[-45,-65],[-53,-69],
+   [-55,-69],[-55,-63],[-50,-58],[-45,-58],[-40,-58],[-35,-58],[-30,-55],
+   [-25,-50],[-18,-46],[-10,-48],[-5,-48],[0,-48],[5,-52],[8,-60],[12,-71]],
+  // Eurasia
+  [[71,28],[65,14],[58,5],[51,2],[48,-5],[44,-9],[36,-9],[36,-5],[38,0],
+   [36,5],[37,10],[38,15],[38,22],[42,28],[42,35],[38,40],[36,36],[32,35],
+   [30,34],[22,38],[12,45],[12,51],[22,60],[27,57],[25,62],[25,68],[8,77],
+   [8,78],[14,80],[22,88],[24,90],[22,92],[22,93],[16,100],[10,100],
+   [4,104],[4,107],[14,108],[14,110],[20,110],[22,114],[22,120],
+   [24,122],[30,122],[37,122],[41,121],[41,130],[45,135],[48,135],
+   [52,141],[55,135],[60,140],[65,141],[68,160],[70,170],[71,180],
+   [71,175],[68,170],[65,170],[62,165],[60,165],[60,155],[62,140],
+   [60,128],[57,120],[55,110],[55,100],[57,90],[55,80],[55,68],[57,60],
+   [55,50],[50,46],[48,38],[45,38],[46,35],[43,33],[42,30],[42,28]],
+  // Africa
+  [[37,10],[37,12],[31,32],[22,37],[12,44],[11,42],[4,42],[0,42],
+   [-5,40],[-11,40],[-26,34],[-34,26],[-34,18],[-30,17],[-26,15],
+   [-22,14],[-18,12],[-14,12],[-4,9],[4,2],[4,7],[6,2],[5,-4],
+   [4,-9],[6,-14],[10,-15],[14,-17],[20,-17],[26,-15],[30,-10],[37,-6],
+   [37,0],[37,5],[37,10]],
+  // Australia
+  [[-14,129],[-13,136],[-12,137],[-14,140],[-16,145],[-20,149],
+   [-24,154],[-28,154],[-32,152],[-38,147],[-40,148],[-43,147],
+   [-39,146],[-38,142],[-36,140],[-38,140],[-35,137],[-32,134],
+   [-34,122],[-32,116],[-28,115],[-22,114],[-20,119],[-18,122],
+   [-16,122],[-14,127],[-14,129]],
+];
 
 // 11 cities covering all continents — all arcs complete before Ch4 exits
 const GLOBE_CITIES = [
@@ -334,19 +348,16 @@ const KOREA_OUTLINE: [number, number][] = [
   [34.39, 126.22],
 ];
 
-// ── Chapter 4 — Korea Map → Globe ────────────────────────────────────────────
+// ── Chapter 4 — Korea → 2D Flat World Map ────────────────────────────────────
 const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C4S, C4E], [0, 1]);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const progressRef  = useRef(0);
-  const rotRef       = useRef({ x: 0.28, y: 0.645 });
-  const targetRef    = useRef({ x: 0.28, y: 0.645 });
   const rafRef       = useRef(0);
 
   useMotionValueEvent(p, 'change', (v) => { progressRef.current = v; });
 
-  // Korea map lingers p=0.10→0.30 before globe zoom; text fades out as globe establishes
   const textOp = useTransform(p, [0.00, 0.10, 0.38, 0.68], [0, 1, 1, 0]);
   const exitOp = useTransform(p, [0.84, 0.97], [1, 0]);
 
@@ -367,19 +378,9 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
-    const onMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const nx = (e.clientX - rect.left) / rect.width  - 0.5;
-      const ny = (e.clientY - rect.top)  / rect.height - 0.5;
-      targetRef.current.y = 0.645 + nx * 2.2;
-      targetRef.current.x = 0.28  + ny * 0.6;
-    };
-    container.addEventListener('mousemove', onMouseMove);
-
-    const SEOUL = latLonToVec3(37.5665, 126.978);
-    const SEOUL_ROT = { x: 0.28, y: 0.645 };
-    // LINE_START + 10×LINE_GAP + LINE_DUR = 0.48 + 0.38 + 0.075 = 0.935 — all complete before exit
+    const SEOUL_LAT = 37.5665, SEOUL_LON = 126.978;
     const LINE_START = 0.48, LINE_GAP = 0.038, LINE_DUR = 0.075;
+    const eio = (t: number) => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
 
     const draw = () => {
       if (cancelled) return;
@@ -387,246 +388,157 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
       const w = canvas.offsetWidth, h = canvas.offsetHeight;
       ctx.clearRect(0, 0, w, h);
-
       const pv = progressRef.current;
+      const cx = w * 0.5, cy = h * 0.52;
 
-      // zoomPhase: 1 = Korea zoomed in, 0 = full globe
-      // Korea plateaus 0.10→0.30, then zooms out 0.30→0.66
+      // zoomPhase: 1=Korea zoomed in, 0=world flat map
       const zoomRaw = Math.max(0, Math.min(1, 1 - (pv - 0.30) / 0.36));
-      const zoomPhase = zoomRaw < 0.5
-        ? 2 * zoomRaw * zoomRaw
-        : 1 - Math.pow(-2 * zoomRaw + 2, 2) / 2;
+      const zoomPhase = eio(zoomRaw);
 
-      const baseRadius = Math.min(w, h) * 0.40;
-      const radius = baseRadius * (1 + zoomPhase * 6.2);
-      const cx = w * 0.5, cy = h * 0.5;
+      // Scale: world = w/360 px/deg, Korea = 20× zoom
+      const worldScale = w / 360;
+      const koreaScale = worldScale * 20;
+      const scale = worldScale + (koreaScale - worldScale) * zoomPhase;
+      // Center drifts from Seoul to (lat=20, lon=0) standard
+      const cLat = 20 + (SEOUL_LAT - 20) * zoomPhase;
+      const cLon = 0  + (SEOUL_LON - 0)  * zoomPhase;
 
-      const rot = rotRef.current, tgt = targetRef.current;
-      const blendX = zoomPhase * SEOUL_ROT.x + (1 - zoomPhase) * tgt.x;
-      const blendY = zoomPhase * SEOUL_ROT.y + (1 - zoomPhase) * tgt.y;
-      rot.x += (blendX - rot.x) * 0.05;
-      rot.y += (blendY - rot.y) * 0.05;
-      if (zoomPhase < 0.05) tgt.y += 0.0007;
+      const ll = (lat: number, lon: number) => latLonToXY(lat, lon, cx, cy, scale, cLat, cLon);
 
-      const koreaAlpha = zoomPhase;
-      const globeAlpha = 1 - zoomPhase;
-
-      // ── Globe ──────────────────────────────────────────────────────────────
-      if (globeAlpha > 0.01) {
-        ctx.globalAlpha = globeAlpha;
-
-        const sphGrad = ctx.createRadialGradient(
-          cx - baseRadius * 0.28, cy - baseRadius * 0.28, 0, cx, cy, baseRadius,
-        );
-        sphGrad.addColorStop(0,   'rgba(35,35,48,0.94)');
-        sphGrad.addColorStop(0.6, 'rgba(10,10,16,0.98)');
-        sphGrad.addColorStop(1,   'rgba(3,3,6,1)');
+      // ── Grid ────────────────────────────────────────────────────────────────
+      ctx.globalAlpha = 0.05;
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = 'rgba(255,255,255,1)';
+      for (let lat = -60; lat <= 90; lat += 30) {
         ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-        ctx.fillStyle = sphGrad;
-        ctx.fill();
-
-        // Rim light — makes sphere edge visible against dark background
-        ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,184,0,${globeAlpha * 0.14})`;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        // Inner atmosphere ring
-        ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius * 0.98, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(180,160,255,${globeAlpha * 0.06})`;
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        const glowGrad = ctx.createRadialGradient(cx, cy, baseRadius * 0.82, cx, cy, baseRadius * 1.18);
-        glowGrad.addColorStop(0,   'rgba(255,184,0,0)');
-        glowGrad.addColorStop(0.5, 'rgba(255,184,0,0.04)');
-        glowGrad.addColorStop(1,   'rgba(255,184,0,0)');
-        ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius * 1.18, 0, Math.PI * 2);
-        ctx.fillStyle = glowGrad;
-        ctx.fill();
-
-        ctx.globalAlpha = globeAlpha * 0.045;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.lineWidth = 0.5;
-        ctx.strokeStyle = 'rgba(255,255,255,1)';
-        for (let lat = -60; lat <= 60; lat += 30) {
-          ctx.beginPath();
-          let first = true;
-          for (let lon = 0; lon <= 360; lon += 4) {
-            const [px, py, vis] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, baseRadius);
-            if (!vis) { first = true; continue; }
-            first ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-            first = false;
-          }
-          ctx.stroke();
+        for (let lon = -180; lon <= 180; lon += 3) {
+          const [px, py] = ll(lat, lon);
+          lon === -180 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
-        for (let lon = 0; lon < 180; lon += 30) {
-          ctx.beginPath();
-          let first = true;
-          for (let lat = -85; lat <= 85; lat += 4) {
-            const [px, py, vis] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, baseRadius);
-            if (!vis) { first = true; continue; }
-            first ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-            first = false;
-          }
-          ctx.stroke();
-        }
-        ctx.restore();
-        ctx.globalAlpha = 1;
-
-        // Connection lines from Seoul to each city
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-        ctx.clip();
-
-        GLOBE_CITIES.forEach((dest, i) => {
-          const prog = Math.max(0, Math.min(1, (pv - LINE_START - i * LINE_GAP) / LINE_DUR));
-          if (prog <= 0) return;
-          const destVec = latLonToVec3(dest.lat, dest.lon);
-          const STEPS = 80;
-          const endStep = Math.round(STEPS * prog);
-          ctx.beginPath();
-          let first = true, lastX = 0, lastY = 0;
-          for (let s = 0; s <= endStep; s++) {
-            const pt = slerp(SEOUL, destVec, s / STEPS);
-            const [px, py, vis] = projectGlobe(pt, rot.x, rot.y, cx, cy, baseRadius);
-            if (!vis) { first = true; continue; }
-            first ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-            first = false; lastX = px; lastY = py;
-          }
-          const a = Math.min(1, prog * 4);
-          ctx.strokeStyle = `rgba(255,184,0,${0.6 * a})`;
-          ctx.lineWidth = 1.4;
-          ctx.stroke();
-
-          if (prog > 0.04 && prog < 0.97) {
-            ctx.beginPath();
-            ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255,184,0,${a})`;
-            ctx.fill();
-          }
-          if (prog >= 0.97) {
-            const [dpx, dpy, dvis] = projectGlobe(destVec, rot.x, rot.y, cx, cy, baseRadius);
-            if (dvis) {
-              ctx.beginPath(); ctx.arc(dpx, dpy, 3.5, 0, Math.PI * 2);
-              ctx.fillStyle = 'rgba(255,184,0,0.9)'; ctx.fill();
-              ctx.beginPath(); ctx.arc(dpx, dpy, 7.5, 0, Math.PI * 2);
-              ctx.strokeStyle = 'rgba(255,184,0,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
-              ctx.font = 'bold 9px Manrope, sans-serif';
-              ctx.fillStyle = 'rgba(255,255,255,0.75)';
-              ctx.fillText(dest.name, dpx + 12, dpy + 3);
-            }
-          }
-        });
-        ctx.restore();
+        ctx.stroke();
       }
-
-      // ── Korea outline (strongly visible) ───────────────────────────────────
-      if (koreaAlpha > 0.01) {
-        // Background glow circle (warm ambient)
-        ctx.globalAlpha = koreaAlpha * 0.18;
-        const bgGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.42);
-        bgGlow.addColorStop(0, 'rgba(255,184,0,0.25)');
-        bgGlow.addColorStop(1, 'rgba(255,184,0,0)');
-        ctx.fillStyle = bgGlow;
-        ctx.fillRect(0, 0, w, h);
-        ctx.globalAlpha = 1;
-
-        // Local lat/lon grid for Korea area
-        ctx.globalAlpha = koreaAlpha * 0.12;
-        ctx.lineWidth = 0.5;
-        ctx.strokeStyle = 'rgba(255,255,255,1)';
-        for (let lat = 33; lat <= 40; lat += 2) {
-          ctx.beginPath(); let first = true;
-          for (let lon = 124; lon <= 132; lon += 0.5) {
-            const [px, py] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, radius);
-            first ? ctx.moveTo(px, py) : ctx.lineTo(px, py); first = false;
-          }
-          ctx.stroke();
-        }
-        for (let lon = 124; lon <= 132; lon += 2) {
-          ctx.beginPath(); let first = true;
-          for (let lat = 33; lat <= 41; lat += 0.5) {
-            const [px, py] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, radius);
-            first ? ctx.moveTo(px, py) : ctx.lineTo(px, py); first = false;
-          }
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 1;
-
-        const traceProgress = Math.min(1, Math.max(0, pv / 0.10));
-        const traceCount = Math.floor(traceProgress * KOREA_OUTLINE.length);
-
-        // Korea filled area
+      for (let lon = -180; lon <= 180; lon += 30) {
         ctx.beginPath();
-        KOREA_OUTLINE.forEach(([lat, lon], i) => {
-          const [px, py] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, radius);
+        for (let lat = -80; lat <= 85; lat += 3) {
+          const [px, py] = ll(lat, lon);
+          lat === -80 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // ── Continent outlines ───────────────────────────────────────────────────
+      CONTINENTS.forEach(outline => {
+        ctx.beginPath();
+        outline.forEach(([lat, lon], i) => {
+          const [px, py] = ll(lat, lon);
           i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         });
         ctx.closePath();
-        ctx.fillStyle = `rgba(255,184,0,${koreaAlpha * 0.18})`;
+        ctx.fillStyle = 'rgba(255,255,255,0.025)';
         ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      });
 
-        // Korea outline — traces itself with strong glow
+      // ── Korea filled + traced outline ────────────────────────────────────────
+      const traceProgress = Math.min(1, pv / 0.10);
+      const traceCount = Math.floor(traceProgress * KOREA_OUTLINE.length);
+
+      ctx.beginPath();
+      KOREA_OUTLINE.forEach(([lat, lon], i) => {
+        const [px, py] = ll(lat, lon);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.closePath();
+      ctx.fillStyle = `rgba(255,184,0,${0.04 + zoomPhase * 0.14})`;
+      ctx.fill();
+
+      if (traceCount > 0) {
         ctx.save();
         ctx.shadowColor = '#FFB800';
-        ctx.shadowBlur = 32 * koreaAlpha;
+        ctx.shadowBlur = 28;
         ctx.beginPath();
         for (let i = 0; i < traceCount; i++) {
           const [lat, lon] = KOREA_OUTLINE[i];
-          const [px, py] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, radius);
+          const [px, py] = ll(lat, lon);
           i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
         if (traceCount >= KOREA_OUTLINE.length) ctx.closePath();
-        ctx.strokeStyle = `rgba(255,184,0,${koreaAlpha * 0.98})`;
-        ctx.lineWidth = 5;
+        ctx.strokeStyle = 'rgba(255,184,0,0.95)';
+        ctx.lineWidth = 3.5;
         ctx.stroke();
-
-        // Second pass — bright center line
         ctx.shadowBlur = 0;
         ctx.beginPath();
         for (let i = 0; i < traceCount; i++) {
           const [lat, lon] = KOREA_OUTLINE[i];
-          const [px, py] = projectGlobe(latLonToVec3(lat, lon), rot.x, rot.y, cx, cy, radius);
+          const [px, py] = ll(lat, lon);
           i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
         if (traceCount >= KOREA_OUTLINE.length) ctx.closePath();
-        ctx.strokeStyle = `rgba(255,255,255,${koreaAlpha * 0.60})`;
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 1.2;
         ctx.stroke();
         ctx.restore();
       }
 
-      // ── Seoul pulse dot ────────────────────────────────────────────────────
-      if (pv > 0.01) {
-        const [spx, spy, svis] = projectGlobe(SEOUL, rot.x, rot.y, cx, cy, radius);
-        if (svis) {
-          const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
-          const dotAlpha = Math.min(1, pv * 20);
-          const dotSize = 4 + zoomPhase * 4;
+      // ── Connection lines Seoul → cities ──────────────────────────────────────
+      GLOBE_CITIES.forEach((dest, i) => {
+        const prog = Math.max(0, Math.min(1, (pv - LINE_START - i * LINE_GAP) / LINE_DUR));
+        if (prog <= 0) return;
+        const STEPS = 60;
+        const endStep = Math.round(STEPS * prog);
+        const dLat = dest.lat - SEOUL_LAT;
+        let dLon = dest.lon - SEOUL_LON;
+        if (dLon > 180) dLon -= 360;
+        if (dLon < -180) dLon += 360;
 
-          for (let r = 1; r <= 3; r++) {
-            ctx.beginPath();
-            ctx.arc(spx, spy, dotSize + r * (5 + zoomPhase * 5) * pulse, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(255,184,0,${(0.2 / r) * dotAlpha})`;
-            ctx.lineWidth = 0.7;
-            ctx.stroke();
-          }
-          ctx.beginPath();
-          ctx.arc(spx, spy, dotSize, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,184,0,${dotAlpha})`;
-          ctx.fill();
-          ctx.font = `bold ${9 + zoomPhase * 4}px Manrope, sans-serif`;
-          ctx.fillStyle = `rgba(255,184,0,${0.95 * dotAlpha})`;
-          ctx.fillText('SEOUL', spx + dotSize + 6, spy + 4);
+        ctx.beginPath();
+        for (let s = 0; s <= endStep; s++) {
+          const t = s / STEPS;
+          const [px, py] = ll(SEOUL_LAT + dLat * t, SEOUL_LON + dLon * t);
+          s === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
+        const a = Math.min(1, prog * 4);
+        ctx.strokeStyle = `rgba(255,184,0,${0.65 * a})`;
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+
+        if (prog >= 0.97) {
+          const [dpx, dpy] = ll(dest.lat, dest.lon);
+          ctx.beginPath(); ctx.arc(dpx, dpy, 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,184,0,0.9)'; ctx.fill();
+          ctx.beginPath(); ctx.arc(dpx, dpy, 7, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255,184,0,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
+          ctx.font = 'bold 9px Manrope, sans-serif';
+          ctx.fillStyle = 'rgba(255,255,255,0.75)';
+          ctx.fillText(dest.name, dpx + 10, dpy + 3);
+        } else if (prog > 0.04) {
+          const t = endStep / STEPS;
+          const [lpx, lpy] = ll(SEOUL_LAT + dLat * t, SEOUL_LON + dLon * t);
+          ctx.beginPath(); ctx.arc(lpx, lpy, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,184,0,${a})`; ctx.fill();
+        }
+      });
+
+      // ── Seoul pulse dot ──────────────────────────────────────────────────────
+      if (pv > 0.01) {
+        const [spx, spy] = ll(SEOUL_LAT, SEOUL_LON);
+        const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
+        const dotAlpha = Math.min(1, pv * 20);
+        const dotSize = 4 + zoomPhase * 5;
+        for (let r = 1; r <= 3; r++) {
+          ctx.beginPath();
+          ctx.arc(spx, spy, dotSize + r * (5 + zoomPhase * 6) * pulse, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255,184,0,${(0.2/r) * dotAlpha})`;
+          ctx.lineWidth = 0.7; ctx.stroke();
+        }
+        ctx.beginPath(); ctx.arc(spx, spy, dotSize, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,184,0,${dotAlpha})`; ctx.fill();
+        ctx.font = `bold ${9 + Math.round(zoomPhase * 4)}px Manrope, sans-serif`;
+        ctx.fillStyle = `rgba(255,184,0,${0.95 * dotAlpha})`;
+        ctx.fillText('SEOUL', spx + dotSize + 6, spy + 4);
       }
     };
 
@@ -635,7 +547,6 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
       cancelled = true;
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      container.removeEventListener('mousemove', onMouseMove);
     };
   }, []);
 
