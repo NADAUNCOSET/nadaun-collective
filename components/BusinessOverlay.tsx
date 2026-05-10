@@ -13,11 +13,11 @@ const C3S = C2E, C3E = (H1 + H2 + H3) / TOTAL;
 const C4S = C3E, C4E = 1;
 
 const DOMAINS = [
-  { id: '01', title: 'INTEGRATED SOLUTION', tags: ['Media Planning', 'Brand Consulting', 'Performance Funnel'], icon: Lightbulb },
-  { id: '02', title: 'AD-TECH PLATFORM', tags: ['AI Optimization', 'Programmatic Buying', 'DMP Analysis'], icon: Cpu },
-  { id: '03', title: 'IMMERSIVE CREATIVE', tags: ['Interactive Web', '3D Motion', 'Virtual Experience'], icon: Zap },
-  { id: '04', title: 'GLOBAL NETWORK', tags: ['Global Media', 'Localization', 'Cross-border'], icon: Globe },
-  { id: '05', title: 'AI INNOVATION LAB', tags: ['Gen AI', 'Predictive Analytics', 'Auto-Optimization'], icon: Sparkles },
+  { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning', tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
+  { id: '02', title: 'IMMERSIVE CREATIVE', subtitle: 'High-End IP Production', tags: ['TVC Production', 'Brand Film', '3D Motion'], icon: Zap },
+  { id: '03', title: 'AI INNOVATION LAB', subtitle: 'Next-Gen Tech Enhancement', tags: ['AI Production', 'VFX Pipeline', 'Gen AI'], icon: Sparkles },
+  { id: '04', title: 'AD-TECH PLATFORM', subtitle: 'Targeted IP Distribution', tags: ['Programmatic', 'DMP Analytics', 'Performance'], icon: Cpu },
+  { id: '05', title: 'GLOBAL NETWORK', subtitle: 'Global Scale-Up', tags: ['Localization', 'Global Media Buying', 'IP Expansion'], icon: Globe },
 ];
 
 const TEAMS = [
@@ -157,16 +157,21 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
                   style={{ opacity: dOps[i], x: dXs[i] }}
                   className="group border-t border-white/10 py-5 md:py-6 flex items-center gap-5 md:gap-8 cursor-default"
                   onClick={() => {
-                    if (d.id === '05' && onAiLabClick) onAiLabClick();
+                    if (d.id === '03' && onAiLabClick) onAiLabClick();
                     if (d.id === '01' && onIntegratedClick) onIntegratedClick();
                   }}
                 >
                   <span className="font-mono text-sm text-white/25 shrink-0 w-6">{d.id}</span>
                   <Icon className="w-5 h-5 text-white/30 group-hover:text-[#FFB800] transition-colors shrink-0" />
-                  <h3 className="font-black tracking-[-0.02em] text-white/80 group-hover:text-white transition-colors"
-                    style={{ fontSize: 'clamp(1.6rem, 4vw, 3.5rem)' }}>
-                    {d.title}
-                  </h3>
+                  <div>
+                    <h3 className="font-black tracking-[-0.02em] text-white/80 group-hover:text-white transition-colors leading-none"
+                      style={{ fontSize: 'clamp(1.6rem, 4vw, 3.5rem)' }}>
+                      {d.title}
+                    </h3>
+                    <p className="text-[10px] tracking-[0.2em] uppercase text-[#FFB800]/50 font-bold mt-1 hidden md:block">
+                      {d.subtitle}
+                    </p>
+                  </div>
                   <div className="hidden md:flex flex-wrap gap-1.5 ml-auto">
                     {d.tags.map(tag => (
                       <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-[#FFB800]/60 border border-[#FFB800]/20 px-2.5 py-1 rounded-full">
