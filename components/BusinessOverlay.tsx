@@ -1,39 +1,32 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, MotionValue } from 'framer-motion';
+import React, { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
 import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 
 const HEADER_H = 57;
 
-const H1 = 300, H2 = 380, H3 = 320, H4 = 340;
-const TOTAL = H1 + H2 + H3 + H4;
+// Ch1 intro + Ch2 domain list + Ch3 production scroll-scrub
+const H1 = 300, H2 = 420, H3 = 700;
+const TOTAL = H1 + H2 + H3;
 
 const C1S = 0,   C1E = H1 / TOTAL;
 const C2S = C1E, C2E = (H1 + H2) / TOTAL;
-const C3S = C2E, C3E = (H1 + H2 + H3) / TOTAL;
-const C4S = C3E, C4E = 1;
+const C3S = C2E, C3E = 1;
 
 const DOMAINS = [
-  { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning', tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
-  { id: '02', title: 'IMMERSIVE CREATIVE', subtitle: 'High-End IP Production', tags: ['TVC Production', 'Brand Film', '3D Motion'], icon: Zap },
-  { id: '03', title: 'AI INNOVATION LAB', subtitle: 'Next-Gen Tech Enhancement', tags: ['AI Production', 'VFX Pipeline', 'Gen AI'], icon: Sparkles },
-  { id: '04', title: 'AD-TECH PLATFORM', subtitle: 'Targeted IP Distribution', tags: ['Programmatic', 'DMP Analytics', 'Performance'], icon: Cpu },
-  { id: '05', title: 'GLOBAL NETWORK', subtitle: 'Global Scale-Up', tags: ['Localization', 'Global Media Buying', 'IP Expansion'], icon: Globe },
-];
-
-const TEAMS = [
-  { name: 'AE', role: 'Account Executive', desc: '클라이언트 커뮤니케이션 및 미디어 디지털 컨텐츠 전략을 총괄합니다.', items: ['클라이언트 커뮤니케이션', '미디어 & 디지털컨텐츠', '이슈 매니지먼트'] },
-  { name: 'CREATIVE', role: 'Creative Planning', desc: 'TVC/Brand/기업PR/Viral/SNS & Mobile 등 다양한 영상을 기획하는 크리에이터.', items: ['TVC / Brand / 기업PR', 'Viral / SNS & Mobile', '컨셉 & 아이디어 개발'] },
-  { name: 'PRODUCING', role: 'Content Producing', desc: '촬영, 편집, CG, 녹음 등 컨텐츠 제작 진행 및 퀄리티 컨트롤.', items: ['영상 제작 전문', '컬러 그레이딩', 'ATL / BTL 전 과정'] },
-  { name: 'DESIGN', role: 'Visual Design', desc: '온오프라인 광고 전반의 디자인 — 임팩트 있는 비주얼을 만들어냅니다.', items: ['온라인 배너 / 옥외광고', '키비주얼 / SNS컨텐츠', '디지털 캠페인'] },
+  { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',       tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
+  { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',       tags: ['TVC Production', 'Brand Film', '3D Motion'],               icon: Zap       },
+  { id: '03', title: 'AI INNOVATION LAB',   subtitle: 'Next-Gen Tech Enhancement',    tags: ['AI Production', 'VFX Pipeline', 'Gen AI'],                 icon: Sparkles  },
+  { id: '04', title: 'AD-TECH PLATFORM',    subtitle: 'Targeted IP Distribution',     tags: ['Programmatic', 'DMP Analytics', 'Performance'],            icon: Cpu       },
+  { id: '05', title: 'GLOBAL NETWORK',      subtitle: 'Global Scale-Up',              tags: ['Localization', 'Global Media Buying', 'IP Expansion'],      icon: Globe     },
 ];
 
 const PROCESS = [
   { num: '01', title: '제작의뢰', desc: 'OT를 통해 영상 제작에 대한 고객의 니즈를 파악합니다.' },
-  { num: '02', title: '기획', desc: '고객의 니즈를 바탕으로 아이디어를 구상하고 컨셉을 도출합니다.' },
+  { num: '02', title: '기획',     desc: '고객의 니즈를 바탕으로 아이디어를 구상하고 컨셉을 도출합니다.' },
   { num: '03', title: 'PPM / 촬영', desc: '사전 미팅으로 세부 의견을 조율한 후 전문 촬영진이 진행합니다.' },
   { num: '04', title: '후반작업', desc: '전문 영상 편집자들이 고객의 요청에 맞추어 편집을 진행합니다.' },
   { num: '05', title: '시사 및 수정', desc: '고객과 함께 시사를 통해 피드백을 받은 후 수정사항을 반영합니다.' },
-  { num: '06', title: 'On-Air', desc: '최종 확인 후 완성된 제작물을 매체로 On-Air합니다.' },
+  { num: '06', title: 'On-Air',   desc: '최종 확인 후 완성된 제작물을 매체로 On-Air합니다.' },
 ];
 
 const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -45,41 +38,16 @@ const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
-// Word that enters from right, stays, then exits left
-const SlideWord: React.FC<{
-  p: MotionValue<number>;
-  enter: [number, number];
-  exit: [number, number];
-  text: string;
-  color?: string;
-}> = ({ p, enter, exit, text, color = '#ffffff' }) => {
-  const op = useTransform(p, [enter[0], enter[1], exit[0], exit[1]], [0, 1, 1, 0]);
-  const x  = useTransform(p, [enter[0], enter[1], exit[0], exit[1]], ['80vw', '0vw', '0vw', '-80vw']);
-  return (
-    <motion.h1
-      style={{ opacity: op, x, color, position: 'absolute', willChange: 'transform' }}
-      className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
-      // font-size set via inline style so it's not overridden
-    >
-      <span style={{ fontSize: 'clamp(5.5rem, 20vw, 17rem)', display: 'block' }}>{text}</span>
-    </motion.h1>
-  );
-};
-
 // ── Ch1 — word-by-word horizontal slide ──────────────────────────────────────
 const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
 
-  // Word 1: visible from p=0 (no enter), exits left
   const w1Op = useTransform(p, [0.28, 0.42], [1, 0]);
   const w1X  = useTransform(p, [0.28, 0.42], ['0vw', '-80vw']);
-  // Word 2: enters from right, exits left
   const w2Op = useTransform(p, [0.28, 0.44, 0.58, 0.68], [0, 1, 1, 0]);
   const w2X  = useTransform(p, [0.28, 0.44, 0.58, 0.68], ['80vw', '0vw', '0vw', '-80vw']);
-  // Word 3: enters from right, stays
   const w3Op = useTransform(p, [0.58, 0.72, 0.92, 1.00], [0, 1, 1, 0]);
   const w3X  = useTransform(p, [0.58, 0.72], ['80vw', '0vw']);
-
   const subOp = useTransform(p, [0.68, 0.80], [0, 1]);
   const subX  = useTransform(p, [0.68, 0.80], ['4%', '0%']);
 
@@ -94,22 +62,18 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold">
           Business Overview
         </p>
-
         <motion.h1 style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', color: '#ffffff', willChange: 'transform' }}
           className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
           <span style={FS}>WE BUILD</span>
         </motion.h1>
-
         <motion.h1 style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
           className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
           <span style={FS}>THE NEXT</span>
         </motion.h1>
-
         <motion.h1 style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', color: '#FFB800', willChange: 'transform' }}
           className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
           <span style={FS}>LEVEL.</span>
         </motion.h1>
-
         <motion.p
           style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%', left: '2rem' }}
           className="text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
@@ -122,8 +86,13 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   );
 };
 
-// ── Ch2 ───────────────────────────────────────────────────────────────────────
-const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onIntegratedClick?: () => void }> = ({ g, onAiLabClick, onIntegratedClick }) => {
+// ── Ch2 — domain list (clickable) ────────────────────────────────────────────
+const Ch2: React.FC<{
+  g: MotionValue<number>;
+  onAiLabClick?: () => void;
+  onIntegratedClick?: () => void;
+  onCreativeClick?: () => void;
+}> = ({ g, onAiLabClick, onIntegratedClick, onCreativeClick }) => {
   const p = useTransform(g, [C2S, C2E], [0, 1]);
 
   const titleOp = useTransform(p, [0.00, 0.10], [0, 1]);
@@ -155,15 +124,16 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
                 <motion.div
                   key={d.id}
                   style={{ opacity: dOps[i], x: dXs[i] }}
-                  className="group border-t border-white/10 py-5 md:py-6 flex items-center gap-5 md:gap-8 cursor-default"
+                  className="group border-t border-white/10 py-5 md:py-6 flex items-center gap-5 md:gap-8 cursor-pointer hover:bg-white/[0.02] -mx-4 px-4 rounded transition-colors"
                   onClick={() => {
-                    if (d.id === '03' && onAiLabClick) onAiLabClick();
                     if (d.id === '01' && onIntegratedClick) onIntegratedClick();
+                    if (d.id === '02' && onCreativeClick) onCreativeClick();
+                    if (d.id === '03' && onAiLabClick) onAiLabClick();
                   }}
                 >
                   <span className="font-mono text-sm text-white/25 shrink-0 w-6">{d.id}</span>
                   <Icon className="w-5 h-5 text-white/30 group-hover:text-[#FFB800] transition-colors shrink-0" />
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h3 className="font-black tracking-[-0.02em] text-white/80 group-hover:text-white transition-colors leading-none"
                       style={{ fontSize: 'clamp(1.6rem, 4vw, 3.5rem)' }}>
                       {d.title}
@@ -179,125 +149,139 @@ const Ch2: React.FC<{ g: MotionValue<number>; onAiLabClick?: () => void; onInteg
                       </span>
                     ))}
                   </div>
+                  <span className="text-white/20 group-hover:text-[#FFB800] transition-colors text-sm ml-4">→</span>
                 </motion.div>
               );
             })}
             <div className="border-t border-white/10" />
           </div>
+          <motion.p style={{ opacity: d4Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-widest uppercase">
+            02 · IMMERSIVE CREATIVE 클릭하여 상세 확인
+          </motion.p>
         </motion.div>
       </StickyPanel>
     </div>
   );
 };
 
-// ── Ch3 ───────────────────────────────────────────────────────────────────────
+// ── Process Slide — full-screen dissolve for each production step ─────────────
+const ProcessSlide: React.FC<{
+  step: { num: string; title: string; desc: string };
+  index: number;
+  total: number;
+  p: MotionValue<number>;
+}> = ({ step, index, total, p }) => {
+  const seg = 1 / total;
+  const start = index * seg;
+  const end = (index + 1) * seg;
+  const fadeLen = seg * 0.09;
+
+  const op = useTransform(
+    p,
+    index === total - 1
+      ? [Math.max(0, start - fadeLen * 0.5), start + fadeLen, 1, 1]
+      : [Math.max(0, start - fadeLen * 0.5), start + fadeLen, end - fadeLen, Math.min(1, end + fadeLen * 0.5)],
+    index === total - 1 ? [0, 1, 1, 1] : [0, 1, 1, 0],
+  );
+
+  // Number appears first
+  const numOp = useTransform(p, [start + fadeLen, start + fadeLen * 2.5], [0, 1]);
+  const numY  = useTransform(p, [start + fadeLen, start + fadeLen * 2.5], ['40px', '0px']);
+
+  // Title appears after number
+  const titleOp = useTransform(p, [start + seg * 0.22, start + seg * 0.32], [0, 1]);
+  const titleY  = useTransform(p, [start + seg * 0.22, start + seg * 0.32], ['30px', '0px']);
+
+  // Desc appears last
+  const descOp  = useTransform(p, [start + seg * 0.40, start + seg * 0.52], [0, 1]);
+
+  return (
+    <motion.div
+      style={{ opacity: op, position: 'absolute', inset: 0 }}
+      className="flex flex-col justify-center px-8 md:px-16 lg:px-24"
+    >
+      <p className="text-[11px] tracking-[0.45em] uppercase text-[#FFB800]/60 font-bold mb-6">
+        IMMERSIVE CREATIVE · PRODUCTION PROCESS
+      </p>
+      <motion.div style={{ opacity: numOp, y: numY }}>
+        <span
+          className="block font-black leading-none tabular-nums"
+          style={{
+            fontSize: 'clamp(6rem, 22vw, 18rem)',
+            color: 'rgba(255,255,255,0.06)',
+            letterSpacing: '-0.04em',
+            fontFamily: 'Manrope, sans-serif',
+          }}
+        >{step.num}</span>
+      </motion.div>
+      <motion.h2
+        style={{
+          opacity: titleOp, y: titleY,
+          fontSize: 'clamp(3rem, 10vw, 9rem)',
+          color: 'white',
+          marginTop: '-0.15em',
+        }}
+        className="font-black tracking-[-0.03em] leading-none block"
+      >{step.title}</motion.h2>
+      <motion.p style={{ opacity: descOp }} className="mt-8 text-white/55 text-base md:text-xl font-light leading-relaxed max-w-lg">
+        {step.desc}
+      </motion.p>
+    </motion.div>
+  );
+};
+
+// ── Ch3 — IMMERSIVE CREATIVE: production steps one-by-one ────────────────────
 const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
+  const exitOp = useTransform(p, [0.88, 0.98], [1, 0]);
 
-  const titleOp = useTransform(p, [0.00, 0.12], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.12], ['12px', '0px']);
-
-  const t0Op = useTransform(p, [0.08, 0.22], [0, 1]); const t0Y = useTransform(p, [0.08, 0.22], ['28px', '0px']);
-  const t1Op = useTransform(p, [0.18, 0.32], [0, 1]); const t1Y = useTransform(p, [0.18, 0.32], ['28px', '0px']);
-  const t2Op = useTransform(p, [0.28, 0.42], [0, 1]); const t2Y = useTransform(p, [0.28, 0.42], ['28px', '0px']);
-  const t3Op = useTransform(p, [0.38, 0.52], [0, 1]); const t3Y = useTransform(p, [0.38, 0.52], ['28px', '0px']);
-
-  const exitOp = useTransform(p, [0.80, 0.96], [1, 0]);
-  const exitY  = useTransform(p, [0.80, 0.96], ['0px', '-16px']);
-
-  const tOps = [t0Op, t1Op, t2Op, t3Op];
-  const tYs  = [t0Y, t1Y, t2Y, t3Y];
+  // Step indicator — slides along like the year rail
+  const seg = 1 / PROCESS.length;
+  const indicatorPct = useTransform(p, [0, 1 - seg], ['0%', `${100 * (1 - seg)}%`]);
 
   return (
     <div style={{ height: `${H3}vh` }}>
-      <StickyPanel>
-        <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <motion.p style={{ opacity: titleOp, y: titleY }}
-            className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] mb-8 font-bold"
-          >CONTENT PRODUCTION — TEAM</motion.p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-0">
-            {TEAMS.map((team, i) => (
+      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }} className="relative overflow-hidden">
+        <motion.div style={{ opacity: exitOp }} className="absolute inset-0">
+
+          {/* Step rail at top */}
+          <div className="absolute top-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 z-10">
+            <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold mb-4">
+              02 · IMMERSIVE CREATIVE — PRODUCTION PROCESS
+            </p>
+            <div className="relative">
+              <div className="absolute top-[10px] left-0 right-0 h-[1px] bg-white/10" />
+              <div className="relative flex justify-between">
+                {PROCESS.map((step) => (
+                  <div key={step.num} className="flex flex-col items-center gap-2">
+                    <div className="w-[5px] h-[5px] rounded-full bg-white/15" />
+                    <span className="text-[9px] font-mono text-white/25">{step.num}</span>
+                  </div>
+                ))}
+              </div>
               <motion.div
-                key={team.name}
-                style={{ opacity: tOps[i], y: tYs[i] }}
-                className="pr-6 lg:pr-8 border-r border-white/10 last:border-r-0 first:pl-0 pl-6 lg:pl-8"
+                className="absolute top-[7px] flex flex-col items-center"
+                style={{ left: indicatorPct, translateX: '-50%' }}
               >
-                <div className="pb-3 border-b border-white/15 mb-4">
-                  <span
-                    className="block font-black tracking-tight leading-none text-white"
-                    style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)' }}
-                  >
-                    {team.name}
-                  </span>
-                </div>
-                <p className="text-[10px] tracking-[0.3em] uppercase text-[#FFB800]/80 font-semibold mb-3">{team.role}</p>
-                <p className="text-[11px] text-white/50 leading-relaxed mb-4">{team.desc}</p>
-                <ul className="flex flex-col gap-1.5">
-                  {team.items.map(item => (
-                    <li key={item} className="flex items-start gap-2 text-[10px] text-white/35 leading-relaxed">
-                      <span className="mt-1.5 w-[3px] h-[3px] rounded-full bg-[#FFB800]/40 shrink-0" />{item}
-                    </li>
-                  ))}
-                </ul>
+                <div className="w-[12px] h-[12px] rounded-full bg-[#FFB800] shadow-[0_0_10px_rgba(255,184,0,0.8)]" />
               </motion.div>
+            </div>
+          </div>
+
+          {/* Dissolving process slides */}
+          <div className="absolute inset-0 pt-24">
+            {PROCESS.map((step, i) => (
+              <ProcessSlide key={step.num} step={step} index={i} total={PROCESS.length} p={p} />
             ))}
           </div>
+
+          {/* Footer */}
+          <div className="absolute bottom-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 flex items-center justify-between">
+            <p className="text-white/18 text-[10px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
+            <p className="text-[#FFB800] text-[10px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
+          </div>
         </motion.div>
-      </StickyPanel>
-    </div>
-  );
-};
-
-// ── Ch4 ───────────────────────────────────────────────────────────────────────
-const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
-  const p = useTransform(g, [C4S, C4E], [0, 1]);
-
-  const titleOp = useTransform(p, [0.00, 0.12], [0, 1]);
-  const titleY  = useTransform(p, [0.00, 0.12], ['12px', '0px']);
-
-  const p0Op = useTransform(p, [0.08, 0.22], [0, 1]); const p0Y = useTransform(p, [0.08, 0.22], ['32px', '0px']);
-  const p1Op = useTransform(p, [0.16, 0.30], [0, 1]); const p1Y = useTransform(p, [0.16, 0.30], ['32px', '0px']);
-  const p2Op = useTransform(p, [0.24, 0.38], [0, 1]); const p2Y = useTransform(p, [0.24, 0.38], ['32px', '0px']);
-  const p3Op = useTransform(p, [0.38, 0.52], [0, 1]); const p3Y = useTransform(p, [0.38, 0.52], ['32px', '0px']);
-  const p4Op = useTransform(p, [0.46, 0.60], [0, 1]); const p4Y = useTransform(p, [0.46, 0.60], ['32px', '0px']);
-  const p5Op = useTransform(p, [0.54, 0.70], [0, 1]); const p5Y = useTransform(p, [0.54, 0.70], ['32px', '0px']);
-  const pOps = [p0Op, p1Op, p2Op, p3Op, p4Op, p5Op];
-  const pYs  = [p0Y, p1Y, p2Y, p3Y, p4Y, p5Y];
-
-  return (
-    <div style={{ height: `${H4}vh` }}>
-      <StickyPanel>
-        <motion.p style={{ opacity: titleOp, y: titleY }}
-          className="text-[10px] tracking-[0.5em] uppercase text-[#FFB800] mb-8 font-bold"
-        >PRODUCTION PROCESS</motion.p>
-        <div className="grid grid-cols-3 gap-0">
-          {PROCESS.map((step, i) => (
-            <motion.div
-              key={step.num}
-              style={{ opacity: pOps[i], y: pYs[i] }}
-              className="pr-6 lg:pr-10 border-r border-white/10 last:border-r-0 pl-0 [&:nth-child(3n+2)]:pl-6 lg:[&:nth-child(3n+2)]:pl-10 [&:nth-child(3n)]:pl-6 lg:[&:nth-child(3n)]:pl-10"
-            >
-              <div className="pb-3 border-b border-white/12 mb-4">
-                <span
-                  className="block font-black leading-none text-white/85 tabular-nums"
-                  style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(3.5rem, 9vw, 7.5rem)' }}
-                >
-                  {step.num}
-                </span>
-              </div>
-              <p className="text-[9px] tracking-[0.4em] uppercase text-white/30 font-medium mb-2">STEP {step.num}</p>
-              <h4 className="font-bold text-white mb-2" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1rem)' }}>{step.title}</h4>
-              <p className="text-[11px] text-white/45 leading-relaxed">{step.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-        <motion.div style={{ opacity: p5Op }}
-          className="mt-10 pt-5 border-t border-white/10 flex items-center justify-between"
-        >
-          <p className="text-white/25 text-[10px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
-          <p className="text-[#FFB800] text-[10px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
-        </motion.div>
-      </StickyPanel>
+      </div>
     </div>
   );
 };
@@ -314,6 +298,7 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
   const scrollRef = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  const [inCh3, setInCh3] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -321,9 +306,14 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
     if (!el) return;
     progress.set(0);
     el.scrollTop = 0;
+    setInCh3(false);
     const onScroll = () => {
       const max = el.scrollHeight - el.clientHeight;
-      if (max > 0) progress.set(el.scrollTop / max);
+      if (max > 0) {
+        const v = el.scrollTop / max;
+        progress.set(v);
+        setInCh3(v > C3S - 0.04);
+      }
     };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
@@ -335,6 +325,15 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]);
+
+  const scrollToProgress = (target: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ top: target * (el.scrollHeight - el.clientHeight), behavior: 'smooth' });
+  };
+
+  const handleBack = () => scrollToProgress(C2S + 0.01);
+  const handleCreativeClick = () => scrollToProgress(C3S + 0.01);
 
   return (
     <AnimatePresence>
@@ -355,11 +354,26 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
             style={{ height: HEADER_H }}
           >
             <span className="text-xs font-bold tracking-[0.3em] text-[#FFB800] uppercase">Business</span>
-            <button onClick={onClose}
-              className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-3">
+              <AnimatePresence>
+                {inCh3 && (
+                  <motion.button
+                    key="back"
+                    initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={handleBack}
+                    className="text-[11px] font-bold tracking-[0.2em] uppercase text-white/50 hover:text-white flex items-center gap-1.5 transition-colors"
+                  >
+                    ← BACK
+                  </motion.button>
+                )}
+              </AnimatePresence>
+              <button onClick={onClose}
+                className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <div
             ref={scrollRef}
@@ -367,9 +381,8 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
             style={{ scrollbarWidth: 'none' }}
           >
             <Ch1 g={progress} />
-            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} />
+            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} onCreativeClick={handleCreativeClick} />
             <Ch3 g={progress} />
-            <Ch4 g={progress} />
           </div>
         </motion.div>
       )}

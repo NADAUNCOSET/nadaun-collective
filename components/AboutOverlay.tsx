@@ -4,8 +4,8 @@ import { X } from 'lucide-react';
 
 const HEADER_H = 57;
 
-// Chapter heights (vh) — H3/H4/H5 increased for better pacing
-const H1 = 250, H2 = 270, H3 = 420, H4 = 600, H5 = 900;
+// Chapter heights (vh) — H3/H5 increased for word-by-word dwell time
+const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 1200;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 const C1S = 0,               C1E = H1 / TOTAL;
@@ -42,45 +42,61 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
   </div>
 );
 
-// ── Chapter 1 ─────────────────────────────────────────────────────────────────
+// ── Chapter 1 — horizontal word slides (same pattern as BusinessOverlay Ch1) ──
 const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
 
-  const h1Op = useTransform(p, [0.00, 0.16], [0, 1]);
-  const h1Y  = useTransform(p, [0.00, 0.16], ['6%', '0%']);
-  const h2Op = useTransform(p, [0.18, 0.34], [0, 1]);
-  const h2Y  = useTransform(p, [0.18, 0.34], ['6%', '0%']);
-  const h3Op = useTransform(p, [0.36, 0.52], [0, 1]);
-  const h3Y  = useTransform(p, [0.36, 0.52], ['6%', '0%']);
-  const tagOp = useTransform(p, [0.54, 0.70], [0, 1]);
-  const tagY  = useTransform(p, [0.54, 0.70], ['3%', '0%']);
-  const exitOp = useTransform(p, [0.80, 0.96], [1, 0]);
-  const exitY  = useTransform(p, [0.80, 0.96], ['0%', '-5%']);
+  // HIGH-END: visible from start, exits left
+  const w1Op = useTransform(p, [0.26, 0.40], [1, 0]);
+  const w1X  = useTransform(p, [0.26, 0.40], ['0vw', '-80vw']);
+
+  // CONTENT: slides in from right, exits left
+  const w2Op = useTransform(p, [0.26, 0.42, 0.56, 0.66], [0, 1, 1, 0]);
+  const w2X  = useTransform(p, [0.26, 0.42, 0.56, 0.66], ['80vw', '0vw', '0vw', '-80vw']);
+
+  // SOLUTION: slides in, stays (gold)
+  const w3Op = useTransform(p, [0.56, 0.70, 0.90, 1.00], [0, 1, 1, 0]);
+  const w3X  = useTransform(p, [0.56, 0.70], ['80vw', '0vw']);
+
+  // Sub text fades in after SOLUTION
+  const subOp = useTransform(p, [0.66, 0.78], [0, 1]);
+  const subX  = useTransform(p, [0.66, 0.78], ['4%', '0%']);
+
+  const FS = { fontSize: 'clamp(5rem, 18vw, 15rem)' } as const;
 
   return (
     <div style={{ height: `${H1}vh` }}>
-      <StickyPanel>
-        <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold">
-            NADAUN COLLECTIVE — Since 2020, Seoul
-          </p>
-          <motion.h1 style={{ opacity: h1Op, y: h1Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string }}
-            className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-          >HIGH-END</motion.h1>
-          <motion.h1 style={{ opacity: h2Op, y: h2Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string, color: '#FFB800' }}
-            className="font-black tracking-[-0.03em] leading-[0.85] block"
-          >CONTENT</motion.h1>
-          <motion.h1 style={{ opacity: h3Op, y: h3Y, fontSize: 'clamp(5rem, 19vw, 15rem)' as string }}
-            className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-          >SOLUTION</motion.h1>
-          <motion.p style={{ opacity: tagOp, y: tagY }}
-            className="mt-10 text-white/75 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
-          >
-            최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
-            하이엔드 콘텐츠 솔루션 그룹
-          </motion.p>
-        </motion.div>
-      </StickyPanel>
+      <div
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        className="relative overflow-hidden flex items-center"
+      >
+        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
+          NADAUN COLLECTIVE — Since 2020, Seoul
+        </p>
+
+        <motion.h1
+          style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', color: 'white', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+        ><span style={FS}>HIGH-END</span></motion.h1>
+
+        <motion.h1
+          style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+        ><span style={FS}>CONTENT</span></motion.h1>
+
+        <motion.h1
+          style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', color: '#FFB800', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+        ><span style={FS}>SOLUTION.</span></motion.h1>
+
+        <motion.p
+          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%', left: '2rem' }}
+          className="text-white/65 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
+        >
+          최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
+          하이엔드 콘텐츠 솔루션 그룹
+        </motion.p>
+      </div>
     </div>
   );
 };
@@ -144,74 +160,113 @@ const TimelineSlide: React.FC<{
   const seg = 1 / total;
   const start = index * seg;
   const end = (index + 1) * seg;
-  const ov = seg * 0.28; // overlap for soft cross-dissolve
+  const fadeLen = seg * 0.09; // fast fade in/out — gives wide stable plateau
 
-  // Last slide stays visible; others dissolve out
-  const opStops = index === total - 1
-    ? [0, 1, 1, 1]
-    : [0, 1, 1, 0];
+  // Container cross-dissolve (wide plateau between fadeLen and end-fadeLen)
   const op = useTransform(
     p,
-    [Math.max(0, start - ov * 0.4), start + ov, Math.max(start + ov + 0.001, end - ov), Math.min(1, end + ov * 0.4)],
-    opStops,
+    index === total - 1
+      ? [Math.max(0, start - fadeLen * 0.5), start + fadeLen, 1, 1]
+      : [Math.max(0, start - fadeLen * 0.5), start + fadeLen, end - fadeLen, Math.min(1, end + fadeLen * 0.5)],
+    index === total - 1 ? [0, 1, 1, 1] : [0, 1, 1, 0],
   );
-  const yVal = useTransform(p, [Math.max(0, start - ov * 0.4), start + ov], ['32px', '0px']);
 
-  const titleLines = item.title.split('\n');
+  // Line 1 — appears as soon as slide is visible
+  const l1Op = useTransform(p, [start + fadeLen, start + fadeLen * 2.2], [0, 1]);
+  const l1Y  = useTransform(p, [start + fadeLen, start + fadeLen * 2.2], ['32px', '0px']);
+
+  // Line 2 — appears seg*0.24 after line 1 (sequential stagger)
+  const l2S   = start + seg * 0.24;
+  const l2Op  = useTransform(p, [l2S, l2S + fadeLen * 1.4], [0, 1]);
+  const l2Y   = useTransform(p, [l2S, l2S + fadeLen * 1.4], ['32px', '0px']);
+
+  const lines = item.title.split('\n');
 
   return (
     <motion.div
-      style={{ opacity: op, y: yVal, position: 'absolute', inset: 0 }}
+      style={{ opacity: op, position: 'absolute', inset: 0 }}
       className="flex flex-col justify-center px-8 md:px-16 lg:px-24"
     >
-      <span className="text-[11px] tracking-[0.45em] uppercase font-bold mb-5 block"
-        style={{ color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.35)' }}>
+      <span
+        className="text-[11px] tracking-[0.45em] uppercase font-bold mb-6 block"
+        style={{ color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.35)' }}
+      >
         {String(index + 1).padStart(2, '0')} · {item.year}
       </span>
-      <h2
-        className="font-black tracking-[-0.03em] leading-[0.88]"
-        style={{
-          fontSize: 'clamp(4rem, 13.5vw, 11.5rem)',
-          color: item.highlight ? '#FFB800' : 'white',
-        }}
-      >
-        {titleLines.map((line, i) => (
-          <span key={i} className="block">{line}</span>
-        ))}
-      </h2>
+      {/* Two lines reveal sequentially with vertical gap */}
+      <div className="flex flex-col gap-4 md:gap-5">
+        <motion.h2
+          style={{
+            opacity: l1Op, y: l1Y,
+            fontSize: 'clamp(4.2rem, 14vw, 12rem)',
+            color: item.highlight ? '#FFB800' : 'white',
+          }}
+          className="font-black tracking-[-0.03em] leading-[0.88] block"
+        >{lines[0]}</motion.h2>
+        {lines[1] && (
+          <motion.h2
+            style={{
+              opacity: l2Op, y: l2Y,
+              fontSize: 'clamp(4.2rem, 14vw, 12rem)',
+              color: item.highlight ? '#FFB800' : 'white',
+            }}
+            className="font-black tracking-[-0.03em] leading-[0.88] block"
+          >{lines[1]}</motion.h2>
+        )}
+      </div>
     </motion.div>
   );
 };
 
-// ── Chapter 3 — One-by-one dissolve timeline ───────────────────────────────────
+// ── Chapter 3 — One-by-one dissolve timeline with year rail ───────────────────
 const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
-  const exitOp     = useTransform(p, [0.88, 0.98], [1, 0]);
-  const lineScaleX = useTransform(p, [0, 1], [0, 1]);
+  // exitOp delayed so ALL IN ONE 솔루션 (last slide) is fully visible before fade
+  const exitOp = useTransform(p, [0.94, 1.00], [1, 0]);
+
+  // Year indicator slides along the rail (from 0% to ~86% then anchors at last)
+  const seg = 1 / TIMELINE.length;
+  const indicatorPct = useTransform(p, [0, 1 - seg], ['0%', `${100 * (1 - seg)}%`]);
 
   return (
     <div style={{ height: `${H3}vh` }}>
       <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }} className="relative overflow-hidden">
         <motion.div style={{ opacity: exitOp }} className="absolute inset-0">
 
-          {/* Section label */}
-          <div className="absolute top-8 left-8 md:left-16 lg:left-24 z-10">
-            <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
-              OUR STORY · 2020–2026
-            </p>
-          </div>
-
-          {/* Progress bar at bottom */}
-          <div className="absolute bottom-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 z-10">
-            <div className="h-[1px] w-full bg-white/10 relative">
-              <motion.div className="absolute inset-0 bg-[#FFB800] origin-left" style={{ scaleX: lineScaleX }} />
+          {/* ── Year rail at top ── */}
+          <div className="absolute top-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 z-10">
+            <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold mb-4">OUR STORY</p>
+            <div className="relative">
+              {/* Track line */}
+              <div className="absolute top-[10px] left-0 right-0 h-[1px] bg-white/10" />
+              {/* Year label dots */}
+              <div className="relative flex justify-between">
+                {TIMELINE.map((item, i) => {
+                  const dotPct = i / (TIMELINE.length - 1);
+                  return (
+                    <div key={item.year} className="flex flex-col items-center gap-2">
+                      <div className="w-[6px] h-[6px] rounded-full bg-white/15" />
+                      <span className="text-[10px] font-mono text-white/28 tracking-wider">{item.year}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Sliding indicator */}
+              <motion.div
+                className="absolute top-[7px] flex flex-col items-center"
+                style={{ left: indicatorPct, translateX: '-50%' }}
+              >
+                <div className="w-[12px] h-[12px] rounded-full bg-[#FFB800] shadow-[0_0_10px_rgba(255,184,0,0.8)]" />
+              </motion.div>
             </div>
           </div>
 
-          {/* Dissolving slides — all stacked absolute */}
-          {TIMELINE.map((item, i) => (
-            <TimelineSlide key={item.year} item={item} index={i} total={TIMELINE.length} p={p} />
-          ))}
+          {/* Dissolving slides — stacked absolute, centered vertically */}
+          <div className="absolute inset-0 pt-28">
+            {TIMELINE.map((item, i) => (
+              <TimelineSlide key={item.year} item={item} index={i} total={TIMELINE.length} p={p} />
+            ))}
+          </div>
         </motion.div>
       </div>
     </div>
@@ -291,7 +346,8 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
   useMotionValueEvent(p, 'change', (v) => { progressRef.current = v; });
 
-  const textOp = useTransform(p, [0.00, 0.10, 0.22, 0.50], [0, 1, 1, 0]);
+  // Korea map lingers p=0.10→0.30 before globe zoom; text fades out as globe establishes
+  const textOp = useTransform(p, [0.00, 0.10, 0.38, 0.68], [0, 1, 1, 0]);
   const exitOp = useTransform(p, [0.84, 0.97], [1, 0]);
 
   useEffect(() => {
@@ -335,7 +391,8 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
       const pv = progressRef.current;
 
       // zoomPhase: 1 = Korea zoomed in, 0 = full globe
-      const zoomRaw = Math.max(0, Math.min(1, 1 - (pv - 0.10) / 0.44));
+      // Korea plateaus 0.10→0.30, then zooms out 0.30→0.66
+      const zoomRaw = Math.max(0, Math.min(1, 1 - (pv - 0.30) / 0.36));
       const zoomPhase = zoomRaw < 0.5
         ? 2 * zoomRaw * zoomRaw
         : 1 - Math.pow(-2 * zoomRaw + 2, 2) / 2;
@@ -368,6 +425,19 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
         ctx.fillStyle = sphGrad;
         ctx.fill();
+
+        // Rim light — makes sphere edge visible against dark background
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255,184,0,${globeAlpha * 0.14})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        // Inner atmosphere ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseRadius * 0.98, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(180,160,255,${globeAlpha * 0.06})`;
+        ctx.lineWidth = 3;
+        ctx.stroke();
 
         const glowGrad = ctx.createRadialGradient(cx, cy, baseRadius * 0.82, cx, cy, baseRadius * 1.18);
         glowGrad.addColorStop(0,   'rgba(255,184,0,0)');
@@ -615,155 +685,184 @@ const FANCLUB_ITEMS = [
   { label: '해외 광고',          spec: '일본·중국·동남아·미국·유럽 집행' },
 ];
 
-// ── Chapter 5 — Full scroll-scrubbing TTL showcase ────────────────────────────
+// ── Chapter 5 — Word-by-word cinematic slide: TVC → 제작부터 → 전국 → 송출까지. ──
 const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
   const p = useTransform(g, [C5S, C5E], [0, 1]);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const labelOp    = useTransform(p, [0.00, 0.08], [0, 1]);
-  const h1Op       = useTransform(p, [0.04, 0.16], [0, 1]);
-  const h1Y        = useTransform(p, [0.04, 0.16], ['7%', '0%']);
-  const h2Op       = useTransform(p, [0.11, 0.23], [0, 1]);
-  const h2Y        = useTransform(p, [0.11, 0.23], ['7%', '0%']);
-  const bodyOp     = useTransform(p, [0.23, 0.35], [0, 1]);
-  const bodyY      = useTransform(p, [0.23, 0.35], ['4%', '0%']);
-  const videoOp    = useTransform(p, [0.32, 0.42], [0, 1]);
-  const videoScale = useTransform(p, [0.32, 0.62], [0.22, 1.0]);
-  const tvOp       = useTransform(p, [0.50, 0.60], [0, 1]);
-  const iptvOp     = useTransform(p, [0.56, 0.66], [0, 1]);
-  const btlOp      = useTransform(p, [0.63, 0.73], [0, 1]);
-  const btlY       = useTransform(p, [0.63, 0.73], ['4%', '0%']);
-  const fanOp      = useTransform(p, [0.72, 0.81], [0, 1]);
-  const fanY       = useTransform(p, [0.72, 0.81], ['4%', '0%']);
-  const ctaOp      = useTransform(p, [0.86, 0.95], [0, 1]);
-  const ctaY       = useTransform(p, [0.86, 0.95], ['4%', '0%']);
+  // ── 4 word slides ── each: slide-in from right, plateau, slide-out to left, gap
+  // W1 "TVC"      p=[0.00→0.24]
+  const w1Op = useTransform(p, [0.00, 0.07, 0.17, 0.24], [0, 1, 1, 0]);
+  const w1X  = useTransform(p, [0.00, 0.07, 0.17, 0.24], ['80vw', '0vw', '0vw', '-80vw']);
+
+  // W2 "제작부터" p=[0.25→0.50]
+  const w2Op = useTransform(p, [0.25, 0.33, 0.43, 0.50], [0, 1, 1, 0]);
+  const w2X  = useTransform(p, [0.25, 0.33, 0.43, 0.50], ['80vw', '0vw', '0vw', '-80vw']);
+
+  // W3 "전국" (gold) p=[0.51→0.74]
+  const w3Op = useTransform(p, [0.51, 0.58, 0.67, 0.74], [0, 1, 1, 0]);
+  const w3X  = useTransform(p, [0.51, 0.58, 0.67, 0.74], ['80vw', '0vw', '0vw', '-80vw']);
+
+  // W4 "송출까지." (gold) p=[0.75→0.92] — exits into detail
+  const w4Op = useTransform(p, [0.75, 0.83, 0.88, 0.93], [0, 1, 1, 0]);
+  const w4X  = useTransform(p, [0.75, 0.83], ['80vw', '0vw']);
+
+  // ── Detail layout ── fades in as W4 exits
+  const detailOp = useTransform(p, [0.87, 0.95], [0, 1]);
+  const detailY  = useTransform(p, [0.87, 0.95], ['3%', '0%']);
+  const labelOp  = useTransform(p, [0.87, 0.93], [0, 1]);
+  const videoOp  = useTransform(p, [0.89, 0.95], [0, 1]);
+  const tvOp     = useTransform(p, [0.91, 0.96], [0, 1]);
+  const iptvOp   = useTransform(p, [0.92, 0.97], [0, 1]);
+  const btlOp    = useTransform(p, [0.93, 0.97], [0, 1]);
+  const btlY     = useTransform(p, [0.93, 0.97], ['4%', '0%']);
+  const fanOp    = useTransform(p, [0.94, 0.98], [0, 1]);
+  const fanY     = useTransform(p, [0.94, 0.98], ['4%', '0%']);
+  const ctaOp    = useTransform(p, [0.95, 1.00], [0, 1]);
+  const ctaY     = useTransform(p, [0.95, 1.00], ['4%', '0%']);
+
+  const FS_SHORT = { fontSize: 'clamp(9rem, 32vw, 28rem)' } as const;
+  const FS_LONG  = { fontSize: 'clamp(6rem, 22vw, 19rem)' } as const;
 
   return (
     <div style={{ height: `${H5}vh` }}>
-      <StickyPanel>
-        {/* Section label */}
-        <motion.p style={{ opacity: labelOp }} className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800] mb-5 font-bold">
-          THROUGH THE LINE — TTL CAMPAIGN
-        </motion.p>
+      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+           className="relative overflow-hidden">
 
-        {/* Giant headline — two lines dissolve in */}
-        <div className="mb-5">
-          <div className="overflow-hidden">
-            <motion.h2
-              style={{ opacity: h1Op, y: h1Y, fontSize: 'clamp(3rem, 10vw, 8.5rem)' }}
-              className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-            >TVC 제작부터</motion.h2>
-          </div>
-          <div className="overflow-hidden">
-            <motion.h2
-              style={{ opacity: h2Op, y: h2Y, fontSize: 'clamp(3rem, 10vw, 8.5rem)', color: '#FFB800' }}
-              className="font-black tracking-[-0.03em] leading-[0.85] block"
-            >전국 송출까지.</motion.h2>
-          </div>
+        {/* Fixed label top-left — shows throughout word slides */}
+        <div className="absolute top-8 left-8 md:left-16 lg:left-24 z-10 pointer-events-none">
+          <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold">
+            THROUGH THE LINE — TTL CAMPAIGN
+          </p>
         </div>
 
-        {/* Body text */}
-        <motion.p style={{ opacity: bodyOp, y: bodyY }}
-          className="text-white/60 text-sm md:text-base leading-relaxed max-w-xl mb-6 font-light"
-        >
-          공영·케이블·IPTV부터 지하철·옥외·택시·버스까지 —<br className="hidden md:block" />
-          모든 매체를 단 하나의 파트너로 완성합니다.
-        </motion.p>
+        {/* ── Word 1: TVC ── */}
+        <motion.div style={{ opacity: w1Op, x: w1X }}
+          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
+          <h2 style={{ ...FS_SHORT, color: 'white', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1 }}>
+            TVC
+          </h2>
+        </motion.div>
 
-        {/* Video + channels row */}
-        <div className="flex gap-5 items-start mb-5">
-          {/* Video — grows from small to large via scale */}
-          <motion.div style={{ opacity: videoOp, scale: videoScale }} className="shrink-0 origin-top-left">
-            <div
-              className="relative bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden shadow-2xl"
-              style={{ width: 'clamp(160px, 26vw, 280px)', aspectRatio: '16/9' }}
-            >
-              <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 bg-black/75 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-bold text-white">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
-                JTBC ON-AIR
+        {/* ── Word 2: 제작부터 ── */}
+        <motion.div style={{ opacity: w2Op, x: w2X }}
+          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
+          <h2 style={{ ...FS_LONG, color: 'white', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>
+            제작부터
+          </h2>
+        </motion.div>
+
+        {/* ── Word 3: 전국 (gold) ── */}
+        <motion.div style={{ opacity: w3Op, x: w3X }}
+          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
+          <h2 style={{ ...FS_SHORT, color: '#FFB800', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1 }}>
+            전국
+          </h2>
+        </motion.div>
+
+        {/* ── Word 4: 송출까지. (gold) ── */}
+        <motion.div style={{ opacity: w4Op, x: w4X }}
+          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
+          <h2 style={{ ...FS_LONG, color: '#FFB800', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>
+            송출까지.
+          </h2>
+        </motion.div>
+
+        {/* ── Detail layout — appears after words finish ── */}
+        <motion.div style={{ opacity: detailOp, y: detailY }}
+          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
+
+          <motion.p style={{ opacity: labelOp }} className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800] mb-4 font-bold">
+            THROUGH THE LINE — TTL CAMPAIGN
+          </motion.p>
+          <p className="text-white/60 text-base md:text-lg leading-relaxed max-w-xl mb-5 font-light">
+            공영·케이블·IPTV부터 지하철·옥외·택시·버스까지 —<br className="hidden md:block" />
+            모든 매체를 단 하나의 파트너로 완성합니다.
+          </p>
+
+          {/* Video + channels row */}
+          <div className="flex gap-5 items-start mb-5">
+            <motion.div style={{ opacity: videoOp }} className="shrink-0">
+              <div className="relative bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden shadow-2xl"
+                   style={{ width: 'clamp(220px, 34vw, 380px)', aspectRatio: '16/9' }}>
+                <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 bg-black/75 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-bold text-white">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
+                  JTBC ON-AIR
+                </div>
+                <div className="absolute bottom-1.5 right-2 z-10 text-[8px] font-black text-white/40 tracking-wider">LIVERNOVO</div>
+                <video ref={videoRef} className="w-full h-full object-cover"
+                  src="/livernovo-jtbc.mp4" muted loop playsInline autoPlay
+                  onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 29; }} />
               </div>
-              <div className="absolute bottom-1.5 right-2 z-10 text-[8px] font-black text-white/40 tracking-wider">LIVERNOVO</div>
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                src="/livernovo-jtbc.mp4"
-                muted loop playsInline autoPlay
-                onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 29; }}
-              />
+              <p className="text-[9px] text-white/22 mt-1.5 font-light">실제 방영 모니터링 영상 · 2025.11</p>
+            </motion.div>
+
+            {/* Channel badges */}
+            <div className="flex-1 min-w-0 space-y-3">
+              <motion.div style={{ opacity: tvOp }}>
+                <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-1.5">공영 · 케이블 · 종편</p>
+                <div className="flex flex-wrap gap-1">
+                  {BROADCAST_CHANNELS.tv.map(ch => (
+                    <span key={ch} className="text-[9px] font-bold border border-white/10 px-2 py-0.5 rounded text-white/50 hover:border-[#FFB800]/40 hover:text-[#FFB800]/80 transition-colors cursor-default">{ch}</span>
+                  ))}
+                </div>
+              </motion.div>
+              <motion.div style={{ opacity: iptvOp }}>
+                <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-1.5">IPTV</p>
+                <div className="flex flex-wrap gap-1">
+                  {BROADCAST_CHANNELS.iptv.map(ch => (
+                    <span key={ch} className="text-[9px] font-bold border border-white/10 px-2 py-0.5 rounded text-white/50">{ch}</span>
+                  ))}
+                </div>
+              </motion.div>
             </div>
-            <p className="text-[9px] text-white/22 mt-1.5 font-light">실제 방영 모니터링 영상 · 2025.11</p>
+          </div>
+
+          {/* BTL Offline */}
+          <motion.div style={{ opacity: btlOp, y: btlY }} className="mb-4">
+            <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-2">오프라인 BTL 광고</p>
+            <div className="flex flex-wrap gap-2">
+              {BTL_ITEMS.map(item => (
+                <div key={item.label} className="flex flex-col border border-[#FFB800]/18 rounded px-3 py-2 bg-[#FFB800]/[0.04]">
+                  <span className="text-[10px] font-bold text-[#FFB800]/75">{item.label}</span>
+                  <span className="text-[8px] text-white/30 mt-0.5">{item.spec}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
-          {/* Channel badges */}
-          <div className="flex-1 min-w-0 space-y-3">
-            <motion.div style={{ opacity: tvOp }}>
-              <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-1.5">공영 · 케이블 · 종편</p>
-              <div className="flex flex-wrap gap-1">
-                {BROADCAST_CHANNELS.tv.map(ch => (
-                  <span key={ch} className="text-[9px] font-bold border border-white/10 px-2 py-0.5 rounded text-white/50 hover:border-[#FFB800]/40 hover:text-[#FFB800]/80 transition-colors cursor-default">
-                    {ch}
-                  </span>
-                ))}
+          {/* Fanclub + Overseas */}
+          <motion.div style={{ opacity: fanOp, y: fanY }} className="mb-5">
+            <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-2">팬클럽 광고 · 해외 광고</p>
+            <div className="flex flex-wrap gap-2">
+              {FANCLUB_ITEMS.map(item => (
+                <div key={item.label} className="flex flex-col border border-white/10 rounded px-3 py-2">
+                  <span className="text-[10px] font-bold text-white/60">{item.label}</span>
+                  <span className="text-[8px] text-white/25 mt-0.5">{item.spec}</span>
+                </div>
+              ))}
+              <div className="flex flex-col justify-center border border-white/8 rounded px-3 py-2">
+                <span className="text-[8px] text-white/20 font-light">협력사 · NEWAD.KR</span>
               </div>
-            </motion.div>
-            <motion.div style={{ opacity: iptvOp }}>
-              <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-1.5">IPTV</p>
-              <div className="flex flex-wrap gap-1">
-                {BROADCAST_CHANNELS.iptv.map(ch => (
-                  <span key={ch} className="text-[9px] font-bold border border-white/10 px-2 py-0.5 rounded text-white/50">
-                    {ch}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* BTL Offline — 4 items with specs */}
-        <motion.div style={{ opacity: btlOp, y: btlY }} className="mb-4">
-          <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-2">오프라인 BTL 광고</p>
-          <div className="flex flex-wrap gap-2">
-            {BTL_ITEMS.map(item => (
-              <div key={item.label} className="flex flex-col border border-[#FFB800]/18 rounded px-3 py-2 bg-[#FFB800]/[0.04]">
-                <span className="text-[10px] font-bold text-[#FFB800]/75">{item.label}</span>
-                <span className="text-[8px] text-white/30 mt-0.5">{item.spec}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Fanclub + Overseas — partnership with newad.kr */}
-        <motion.div style={{ opacity: fanOp, y: fanY }} className="mb-5">
-          <p className="text-[9px] text-white/28 tracking-[0.2em] uppercase mb-2">팬클럽 광고 · 해외 광고</p>
-          <div className="flex flex-wrap gap-2">
-            {FANCLUB_ITEMS.map(item => (
-              <div key={item.label} className="flex flex-col border border-white/10 rounded px-3 py-2">
-                <span className="text-[10px] font-bold text-white/60">{item.label}</span>
-                <span className="text-[8px] text-white/25 mt-0.5">{item.spec}</span>
-              </div>
-            ))}
-            <div className="flex flex-col justify-center border border-white/8 rounded px-3 py-2">
-              <span className="text-[8px] text-white/20 font-light">협력사 · NEWAD.KR</span>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* CTA */}
-        <motion.div style={{ opacity: ctaOp, y: ctaY }} className="flex items-center justify-between border-t border-white/8 pt-5">
-          <div>
-            <p className="text-white/30 text-xs font-light mb-1 tracking-widest uppercase">ALL IN ONE 솔루션</p>
-            <p className="text-white font-bold leading-tight" style={{ fontSize: 'clamp(1.1rem, 3vw, 2.2rem)', letterSpacing: '-0.02em' }}>
-              프로젝트 문의하기
-            </p>
-          </div>
-          <button
-            onClick={onContactClick}
-            className="shrink-0 ml-6 flex items-center gap-2 border border-white/20 rounded-full px-6 py-3 text-sm font-bold text-white hover:bg-white hover:text-black transition-all duration-300"
-          >
-            문의하기 <span className="text-base leading-none">→</span>
-          </button>
-        </motion.div>
-      </StickyPanel>
+          {/* CTA */}
+          <motion.div style={{ opacity: ctaOp, y: ctaY }} className="flex items-center justify-between border-t border-white/8 pt-5">
+            <div>
+              <p className="text-white/30 text-xs font-light mb-1 tracking-widest uppercase">ALL IN ONE 솔루션</p>
+              <p className="text-white font-bold leading-tight" style={{ fontSize: 'clamp(1.1rem, 3vw, 2.2rem)', letterSpacing: '-0.02em' }}>
+                프로젝트 문의하기
+              </p>
+            </div>
+            <button onClick={onContactClick}
+              className="shrink-0 ml-6 flex items-center gap-2 border border-white/20 rounded-full px-6 py-3 text-sm font-bold text-white hover:bg-white hover:text-black transition-all duration-300">
+              문의하기 <span className="text-base leading-none">→</span>
+            </button>
+          </motion.div>
+
+        </motion.div>{/* END detail layout */}
+      </div>{/* END sticky */}
     </div>
   );
 };
