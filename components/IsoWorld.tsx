@@ -3,6 +3,8 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
+type LinkItem = { label: string; url: string };
+
 type BuildingData = {
   id: string;
   title: string;
@@ -11,7 +13,8 @@ type BuildingData = {
   url?: string;
   b2b?: string;
   b2c?: string;
-  btnLabels?: { b2b: string; b2c: string };  // custom button labels
+  btnLabels?: { b2b: string; b2c: string };
+  links?: LinkItem[];  // multi-link grid (e.g. 4 links for SPACE)
   color: string;
   position: [number, number, number];
   height: number;
@@ -23,7 +26,12 @@ const UNIVERSE_DATA: BuildingData[] = [
     title: 'NADAUN SPACE',
     subtitle: 'INFRA SOLUTION',
     desc: '모든 창작의 시작,\n압도적 기술력의 인프라',
-    url: 'https://www.rainbowbene.com/',
+    links: [
+      { label: '자사몰',    url: 'https://www.rainbowbene.com/' },
+      { label: '스토어',    url: 'https://smartstore.naver.com/rainbowbene' },
+      { label: '블로그',    url: 'https://blog.naver.com/nadaunstudio' },
+      { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
+    ],
     color: '#00C2FF',
     position: [-7, 0, 1.5],
     height: 3.5,
@@ -87,7 +95,8 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
   });
 
   const isMoment = data.id === 'moment';
-  const hasTwoLinks = isMoment || data.id === 'starlogin';
+  const hasLinks = !!data.links && data.links.length > 0;
+  const hasTwoLinks = (isMoment || data.id === 'starlogin') && !hasLinks;
 
   return (
     <group position={data.position}>
@@ -110,7 +119,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
           distanceFactor={15}
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="flex flex-col items-center text-center select-none" style={{ width: hasTwoLinks ? 200 : 170 }}>
+          <div className="flex flex-col items-center text-center select-none" style={{ width: hasLinks ? 200 : hasTwoLinks ? 200 : 170 }}>
             <div className="bg-black/90 backdrop-blur-md border border-white/10 p-3 rounded-lg shadow-xl w-full">
               <h3 className="text-sm font-bold tracking-tight mb-0.5" style={{ color: data.color }}>
                 {data.title}
@@ -123,8 +132,21 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
                 {data.desc}
               </p>
 
-              {/* Two-link buttons (MOMENT, STARLOGIN) */}
-              {hasTwoLinks ? (
+              {/* 4-link grid (SPACE) */}
+              {hasLinks ? (
+                <div className="grid grid-cols-2 gap-1 mt-1">
+                  {data.links!.map(link => (
+                    <button
+                      key={link.label}
+                      className="text-[8px] font-bold uppercase tracking-wider py-1 px-1.5 rounded border transition-colors cursor-pointer"
+                      style={{ borderColor: data.color + '50', color: data.color }}
+                      onClick={() => window.open(link.url, '_blank')}
+                    >
+                      {link.label} →
+                    </button>
+                  ))}
+                </div>
+              ) : hasTwoLinks ? (
                 <div className="flex gap-1.5 mt-1">
                   <button
                     className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors cursor-pointer"
@@ -235,8 +257,19 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                   {item.desc}
                 </p>
 
-                {/* MOMENT — two link buttons */}
-                {item.id === 'moment' ? (
+                {/* Multi-link grid (SPACE) */}
+                {item.links ? (
+                  <div className="grid grid-cols-2 gap-1 mt-3">
+                    {item.links.map(link => (
+                      <button
+                        key={link.label}
+                        className="text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform"
+                        style={{ borderColor: item.color + '50', color: item.color }}
+                        onClick={() => window.open(link.url, '_blank')}
+                      >{link.label} →</button>
+                    ))}
+                  </div>
+                ) : item.id === 'moment' ? (
                   <div className="flex gap-1.5 mt-3">
                     <button
                       className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform"
