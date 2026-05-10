@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 1500;
+const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 800;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 const C1S = 0,               C1E = H1 / TOTAL;
@@ -405,10 +405,18 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
       const ll = (lat: number, lon: number) => latLonToXY(lat, lon, cx, cy, scale, cLat, cLon);
 
+      // ── Ocean background ─────────────────────────────────────────────────────
+      const oceanGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.7);
+      oceanGrad.addColorStop(0,   'rgba(8, 22, 52, 0.55)');
+      oceanGrad.addColorStop(0.6, 'rgba(4, 12, 32, 0.40)');
+      oceanGrad.addColorStop(1,   'rgba(2,  6, 18, 0.20)');
+      ctx.fillStyle = oceanGrad;
+      ctx.fillRect(0, 0, w, h);
+
       // ── Grid ────────────────────────────────────────────────────────────────
-      ctx.globalAlpha = 0.05;
+      ctx.globalAlpha = 0.09;
       ctx.lineWidth = 0.5;
-      ctx.strokeStyle = 'rgba(255,255,255,1)';
+      ctx.strokeStyle = 'rgba(60,140,255,1)';
       for (let lat = -60; lat <= 90; lat += 30) {
         ctx.beginPath();
         for (let lon = -180; lon <= 180; lon += 3) {
@@ -435,10 +443,10 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         });
         ctx.closePath();
-        ctx.fillStyle = 'rgba(255,255,255,0.025)';
+        ctx.fillStyle = 'rgba(18, 50, 30, 0.70)';
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.10)';
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = 'rgba(35, 180, 110, 0.28)';
+        ctx.lineWidth = 0.9;
         ctx.stroke();
       });
 
