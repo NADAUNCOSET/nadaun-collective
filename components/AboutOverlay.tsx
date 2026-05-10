@@ -681,7 +681,7 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
           {/* Full-screen background video */}
           <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover"
             src="/livernovo-jtbc.mp4" muted loop playsInline autoPlay
-            onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 29; }} />
+            onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 0; }} />
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
