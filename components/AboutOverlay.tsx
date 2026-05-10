@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 800;
+const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 1100;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 const C1S = 0,               C1E = H1 / TOTAL;
@@ -443,9 +443,9 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         });
         ctx.closePath();
-        ctx.fillStyle = 'rgba(18, 50, 30, 0.70)';
+        ctx.fillStyle = 'rgba(45, 50, 68, 0.72)';
         ctx.fill();
-        ctx.strokeStyle = 'rgba(35, 180, 110, 0.28)';
+        ctx.strokeStyle = 'rgba(100, 120, 180, 0.22)';
         ctx.lineWidth = 0.9;
         ctx.stroke();
       });
@@ -593,10 +593,10 @@ const BROADCAST_CHANNELS = {
 };
 
 const BTL_ITEMS = [
-  { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역', color: '#FFB800' },
-  { label: '옥외 전광판',      spec: 'Full HD/4K · 가로·세로형',    color: '#FFB800' },
-  { label: '택시 미디어',      spec: '후면 LED · 측면 랩핑 · 전국', color: '#FFB800' },
-  { label: '버스 외부광고',    spec: '슈퍼사이드·풀백·측면랩 · 1M+', color: '#FFB800' },
+  { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역',  img: 'http://www.newad.kr/upload_board_files/code_5/20210222092921-6b25109b040389ce5b4d35fc426d17e4.jpg' },
+  { label: '옥외 전광판',      spec: 'Full HD / 4K · 가로·세로형',   img: 'http://www.newad.kr/upload_board_files/code_10/20210222095353-6b25109b040389ce5b4d35fc426d17e4.jpg' },
+  { label: '택시 미디어',      spec: '후면 LED · 측면 랩핑 · 전국',  img: 'http://www.newad.kr/upload_board_files/code_11/20210222101310-6b25109b040389ce5b4d35fc426d17e4.jpg' },
+  { label: '버스 외부광고',    spec: '슈퍼사이드 · 풀백 · 측면랩',   img: 'http://www.newad.kr/upload_board_files/code_7/20210222093425-6b25109b040389ce5b4d35fc426d17e4.jpg' },
 ];
 
 const FANCLUB_ITEMS = [
@@ -604,40 +604,44 @@ const FANCLUB_ITEMS = [
   { label: '해외 광고',          spec: '일본·중국·동남아·미국·유럽 집행' },
 ];
 
-// ── Chapter 5 — 4 word slides + 3 full-screen content sections ───────────────
+// ── Chapter 5 — word slides → channels → 4 BTL image slides → CTA ────────────
 const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
   const p = useTransform(g, [C5S, C5E], [0, 1]);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // ── 4 word slides — each takes ~15% with 10% plateau ──
-  // W1 "TVC" (white)
-  const w1Op = useTransform(p, [0.00, 0.06, 0.14, 0.18], [0, 1, 1, 0]);
-  const w1X  = useTransform(p, [0.00, 0.06, 0.14, 0.18], ['80vw', '0vw', '0vw', '-80vw']);
-  // W2 "제작부터" (white)
-  const w2Op = useTransform(p, [0.20, 0.26, 0.34, 0.38], [0, 1, 1, 0]);
-  const w2X  = useTransform(p, [0.20, 0.26, 0.34, 0.38], ['80vw', '0vw', '0vw', '-80vw']);
-  // W3 "전국" (gold)
-  const w3Op = useTransform(p, [0.40, 0.46, 0.54, 0.58], [0, 1, 1, 0]);
-  const w3X  = useTransform(p, [0.40, 0.46, 0.54, 0.58], ['80vw', '0vw', '0vw', '-80vw']);
-  // W4 "송출까지." (gold)
-  const w4Op = useTransform(p, [0.60, 0.66, 0.70, 0.74], [0, 1, 1, 0]);
-  const w4X  = useTransform(p, [0.60, 0.66], ['80vw', '0vw']);
+  // ── 4 word slides (fast) — each ~16% ──
+  const w1Op = useTransform(p, [0.00, 0.06, 0.12, 0.16], [0, 1, 1, 0]);
+  const w1X  = useTransform(p, [0.00, 0.06, 0.12, 0.16], ['80vw', '0vw', '0vw', '-80vw']);
+  const w2Op = useTransform(p, [0.17, 0.22, 0.28, 0.32], [0, 1, 1, 0]);
+  const w2X  = useTransform(p, [0.17, 0.22, 0.28, 0.32], ['80vw', '0vw', '0vw', '-80vw']);
+  const w3Op = useTransform(p, [0.33, 0.38, 0.44, 0.48], [0, 1, 1, 0]);
+  const w3X  = useTransform(p, [0.33, 0.38, 0.44, 0.48], ['80vw', '0vw', '0vw', '-80vw']);
+  const w4Op = useTransform(p, [0.49, 0.54, 0.59, 0.63], [0, 1, 1, 0]);
+  const w4X  = useTransform(p, [0.49, 0.54, 0.59, 0.63], ['80vw', '0vw', '0vw', '-80vw']);
 
-  // ── S1: Channels (공영·케이블·IPTV) — big text, full screen ──
-  const s1Op  = useTransform(p, [0.72, 0.78, 0.86, 0.90], [0, 1, 1, 0]);
-  const s1Y   = useTransform(p, [0.72, 0.78], ['4%', '0%']);
-  const tvL   = useTransform(p, [0.74, 0.80], [0, 1]);
-  const iptvL = useTransform(p, [0.80, 0.86], [0, 1]);
+  // ── S1: Channels ──
+  const s1Op  = useTransform(p, [0.61, 0.66, 0.72, 0.76], [0, 1, 1, 0]);
+  const s1Y   = useTransform(p, [0.61, 0.66], ['4%', '0%']);
+  const tvL   = useTransform(p, [0.62, 0.68], [0, 1]);
+  const iptvL = useTransform(p, [0.67, 0.73], [0, 1]);
 
-  // ── S2: BTL 오프라인 광고 — big text, full screen ──
-  const s2Op   = useTransform(p, [0.88, 0.93, 0.96, 1.00], [0, 1, 1, 0]);
-  const s2Y    = useTransform(p, [0.88, 0.93], ['4%', '0%']);
-  const btlL1  = useTransform(p, [0.89, 0.94], [0, 1]);
-  const btlL2  = useTransform(p, [0.92, 0.97], [0, 1]);
+  // ── S2: BTL 4 image slides — declared individually (no useTransform in .map) ──
+  // Slide 1: 지하철 스크린도어
+  const btl1Op = useTransform(p, [0.74, 0.78, 0.82, 0.85], [0, 1, 1, 0]);
+  const btl1LabelOp = useTransform(p, [0.76, 0.80], [0, 1]);
+  // Slide 2: 옥외 전광판
+  const btl2Op = useTransform(p, [0.83, 0.86, 0.89, 0.92], [0, 1, 1, 0]);
+  const btl2LabelOp = useTransform(p, [0.84, 0.88], [0, 1]);
+  // Slide 3: 택시 미디어
+  const btl3Op = useTransform(p, [0.90, 0.93, 0.95, 0.97], [0, 1, 1, 0]);
+  const btl3LabelOp = useTransform(p, [0.91, 0.94], [0, 1]);
+  // Slide 4: 버스 외부광고 (stays as background for S3)
+  const btl4Op = useTransform(p, [0.95, 0.98, 1.00, 1.00], [0, 1, 1, 1]);
+  const btl4LabelOp = useTransform(p, [0.96, 0.99], [0, 1]);
 
-  // ── S3: 팬클럽·해외 + CTA — stays visible ──
-  const s3Op  = useTransform(p, [0.96, 1.00, 1, 1], [0, 1, 1, 1]);
-  const s3Y   = useTransform(p, [0.96, 1.00], ['4%', '0%']);
+  // ── S3: CTA — fades in over slide 4 ──
+  const s3Op = useTransform(p, [0.97, 1.00, 1, 1], [0, 1, 1, 1]);
+  const s3Y  = useTransform(p, [0.97, 1.00], ['4%', '0%']);
 
   const FS_SHORT = { fontSize: 'clamp(9rem, 32vw, 28rem)' } as const;
   const FS_LONG  = { fontSize: 'clamp(6rem, 21vw, 18rem)' } as const;
@@ -659,86 +663,131 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
           className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
           <h2 style={{ ...FS_SHORT, color: 'white', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1 }}>TVC</h2>
         </motion.div>
-
         <motion.div style={{ opacity: w2Op, x: w2X }}
           className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
           <h2 style={{ ...FS_LONG, color: 'white', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>제작부터</h2>
         </motion.div>
-
         <motion.div style={{ opacity: w3Op, x: w3X }}
           className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
           <h2 style={{ ...FS_SHORT, color: '#FFB800', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1 }}>전국</h2>
         </motion.div>
-
         <motion.div style={{ opacity: w4Op, x: w4X }}
           className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
           <h2 style={{ ...FS_LONG, color: '#FFB800', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>송출까지.</h2>
         </motion.div>
 
-        {/* ── S1: CHANNELS — big editorial text ── */}
-        <motion.div style={{ opacity: s1Op, y: s1Y }}
-          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-8">공영 · 케이블 · 종편</p>
-          <motion.p style={{ opacity: tvL, fontSize: 'clamp(2.2rem, 6vw, 6.5rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}
-            className="font-black leading-tight text-white/90 mb-10">
-            {BROADCAST_CHANNELS.tv.join(' · ')}
-          </motion.p>
-          <motion.div style={{ opacity: iptvL }}>
-            <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-5">IPTV</p>
-            <p className="font-black leading-tight text-white/90"
-              style={{ fontSize: 'clamp(2rem, 5.5vw, 6rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-              {BROADCAST_CHANNELS.iptv.join(' · ')}
+        {/* ── S1: CHANNELS — video background + channel list text ── */}
+        <motion.div style={{ opacity: s1Op, y: s1Y }} className="absolute inset-0">
+          {/* Full-screen background video */}
+          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover"
+            src="/livernovo-jtbc.mp4" muted loop playsInline autoPlay
+            onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 29; }} />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
+
+          {/* ON-AIR badge */}
+          <div className="absolute top-8 right-8 md:right-16 lg:right-24 flex items-center gap-2 bg-black/70 border border-white/10 px-3 py-1.5 rounded-full">
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
+            <span className="text-[9px] font-bold text-white tracking-wider">JTBC ON-AIR</span>
+          </div>
+
+          {/* Channel text */}
+          <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
+            <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-8">공영 · 케이블 · 종편</p>
+            <motion.p style={{ opacity: tvL, fontSize: 'clamp(2.2rem, 6vw, 6.5rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}
+              className="font-black leading-tight text-white/90 mb-10">
+              {BROADCAST_CHANNELS.tv.join(' · ')}
+            </motion.p>
+            <motion.div style={{ opacity: iptvL }}>
+              <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-5">IPTV</p>
+              <p className="font-black leading-tight text-white/90"
+                style={{ fontSize: 'clamp(2rem, 5.5vw, 6rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+                {BROADCAST_CHANNELS.iptv.join(' · ')}
+              </p>
+            </motion.div>
+          </div>
+          <p className="absolute bottom-5 right-8 md:right-16 lg:right-24 text-[8px] text-white/20 font-light">
+            실제 방영 모니터링 영상 · 2025.11
+          </p>
+        </motion.div>
+
+        {/* ── S2: BTL IMAGE SLIDES (4 sequential full-screen) ── */}
+
+        {/* Slide 1 — 지하철 스크린도어 */}
+        <motion.div style={{ opacity: btl1Op }} className="absolute inset-0 will-change-transform">
+          <img src={BTL_ITEMS[0].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
+          <motion.div style={{ opacity: btl1LabelOp }}
+            className="absolute bottom-14 left-8 md:left-16 lg:left-24">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 01</p>
+            <p className="font-black text-white leading-none mb-3"
+              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
+              {BTL_ITEMS[0].label}
+            </p>
+            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
+              {BTL_ITEMS[0].spec}
             </p>
           </motion.div>
-          {/* video badge bottom-right */}
-          <div className="absolute bottom-10 right-8 md:right-16 lg:right-24 opacity-50 hover:opacity-90 transition-opacity">
-            <div className="relative rounded-lg overflow-hidden border border-white/10 bg-black/60"
-                 style={{ width: 'clamp(140px, 18vw, 220px)', aspectRatio: '16/9' }}>
-              <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-1 bg-black/70 px-1.5 py-0.5 rounded text-[8px] font-bold text-white">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
-                JTBC ON-AIR
-              </div>
-              <video ref={videoRef} className="w-full h-full object-cover"
-                src="/livernovo-jtbc.mp4" muted loop playsInline autoPlay
-                onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 29; }} />
-            </div>
-            <p className="text-[8px] text-white/20 mt-1 font-light text-right">실제 방영 모니터링 영상 · 2025.11</p>
-          </div>
         </motion.div>
 
-        {/* ── S2: BTL 오프라인 광고 ── */}
-        <motion.div style={{ opacity: s2Op, y: s2Y }}
-          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-6">오프라인 BTL 광고</p>
-          <motion.div style={{ opacity: btlL1 }} className="grid grid-cols-2 gap-x-12 gap-y-8 mb-10">
-            {BTL_ITEMS.map(item => (
-              <div key={item.label}>
-                <p className="font-black text-[#FFB800] leading-tight" style={{ fontSize: 'clamp(1.8rem, 4vw, 4.5rem)', letterSpacing: '-0.02em' }}>
-                  {item.label}
-                </p>
-                <p className="text-white/40 font-light mt-1.5" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>{item.spec}</p>
-              </div>
-            ))}
-          </motion.div>
-          <motion.div style={{ opacity: btlL2 }}>
-            <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800]/60 font-bold mb-4">팬클럽 광고 · 해외 광고</p>
-            <div className="flex flex-wrap gap-6">
-              {FANCLUB_ITEMS.map(item => (
-                <div key={item.label}>
-                  <p className="font-black text-white/80 leading-tight" style={{ fontSize: 'clamp(1.5rem, 3.5vw, 4rem)', letterSpacing: '-0.02em' }}>
-                    {item.label}
-                  </p>
-                  <p className="text-white/35 font-light mt-1" style={{ fontSize: 'clamp(0.8rem, 1.4vw, 1.1rem)' }}>{item.spec}</p>
-                </div>
-              ))}
-            </div>
+        {/* Slide 2 — 옥외 전광판 */}
+        <motion.div style={{ opacity: btl2Op }} className="absolute inset-0 will-change-transform">
+          <img src={BTL_ITEMS[1].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
+          <motion.div style={{ opacity: btl2LabelOp }}
+            className="absolute bottom-14 left-8 md:left-16 lg:left-24">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 02</p>
+            <p className="font-black text-white leading-none mb-3"
+              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
+              {BTL_ITEMS[1].label}
+            </p>
+            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
+              {BTL_ITEMS[1].spec}
+            </p>
           </motion.div>
         </motion.div>
 
-        {/* ── S3: CTA — final screen ── */}
+        {/* Slide 3 — 택시 미디어 */}
+        <motion.div style={{ opacity: btl3Op }} className="absolute inset-0 will-change-transform">
+          <img src={BTL_ITEMS[2].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
+          <motion.div style={{ opacity: btl3LabelOp }}
+            className="absolute bottom-14 left-8 md:left-16 lg:left-24">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 03</p>
+            <p className="font-black text-white leading-none mb-3"
+              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
+              {BTL_ITEMS[2].label}
+            </p>
+            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
+              {BTL_ITEMS[2].spec}
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* Slide 4 — 버스 외부광고 (stays as bg for S3) */}
+        <motion.div style={{ opacity: btl4Op }} className="absolute inset-0 will-change-transform">
+          <img src={BTL_ITEMS[3].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/40" />
+          <motion.div style={{ opacity: btl4LabelOp }}
+            className="absolute top-24 right-8 md:right-16 lg:right-24 text-right">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 04</p>
+            <p className="font-black text-white leading-none mb-3"
+              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
+              {BTL_ITEMS[3].label}
+            </p>
+            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
+              {BTL_ITEMS[3].spec}
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* ── S3: CTA — fades in over slide 4 background ── */}
         <motion.div style={{ opacity: s3Op, y: s3Y }}
-          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-8">ALL IN ONE 솔루션</p>
+          className="absolute inset-0 flex flex-col justify-end px-8 md:px-16 lg:px-24 pb-16">
+          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">
+            팬클럽 광고 · 해외 광고 · 공항 · 일본 · 동남아 · 미국 · 유럽
+          </p>
           <h2 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 10vw, 9rem)', letterSpacing: '-0.04em' }}>
             프로젝트<br />문의하기
           </h2>

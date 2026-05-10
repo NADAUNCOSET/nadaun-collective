@@ -170,7 +170,7 @@ const Ch2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     setInsight('');
     setLoading(true);
     const result = await generateMarketingInsight(ind);
-    setInsight(result);
+    setInsight(result.text);
     setLoading(false);
   };
 
