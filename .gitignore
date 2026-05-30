@@ -1,25 +1,42 @@
+# NADAUN 사이트 .gitignore — 공통 baseline (BACKUP_RULE.md 참조)
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Dependencies
+node_modules/
+
 # Logs
-logs
 *.log
+logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Vercel
 .vercel
+
+# 작업 백업 (BACKUP_RULE.md — git 이력 + 로컬 backups/ 2중 보호)
+backups/*
+!backups/.gitkeep
+_archive/
+
+# ─── 사이트별 (Vite/React 빌드 산출물) ───
+dist/
+dist-ssr/
+*.local
