@@ -113,7 +113,8 @@ const Clients: React.FC = () => {
 
     // spread converges 0.06 → 0.48 (빠르게 모이고 지나감)
     const sp = Math.max(0, Math.min(1, (v - 0.06) / 0.42));
-    const eased = sp < 0.5 ? 2 * sp * sp : 1 - Math.pow(-2 * sp + 2, 2) / 2;
+    // easeOutExpo — "슈우웅" 확 들어와서 부드럽게 감속 (리니어/약한 S곡선 제거, NADAUN out-expo 룰)
+    const eased = sp >= 1 ? 1 : 1 - Math.pow(2, -10 * sp);
     setSpread(2.6 - eased * 1.6);
   });
 

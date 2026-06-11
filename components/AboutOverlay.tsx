@@ -45,56 +45,52 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
   </div>
 );
 
-// ── Chapter 1 — horizontal word slides (same pattern as BusinessOverlay Ch1) ──
+// ── Chapter 1 — 차례대로 한 화면에 (세로 스택 순차 등장, 모두 머무름) 대표 룰 2026-06-11 ──
 const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
 
-  // HIGH-END: visible from start, exits left
-  const w1Op = useTransform(p, [0.26, 0.40], [1, 0]);
-  const w1X  = useTransform(p, [0.26, 0.40], ['0vw', '-80vw']);
-
-  // CONTENT: slides in from right, exits left
-  const w2Op = useTransform(p, [0.26, 0.42, 0.56, 0.66], [0, 1, 1, 0]);
-  const w2X  = useTransform(p, [0.26, 0.42, 0.56, 0.66], ['80vw', '0vw', '0vw', '-80vw']);
-
-  // SOLUTION: slides in, stays (gold)
-  const w3Op = useTransform(p, [0.56, 0.70, 0.90, 1.00], [0, 1, 1, 0]);
-  const w3X  = useTransform(p, [0.56, 0.70], ['80vw', '0vw']);
+  // 세 단어가 순서대로 나타나 한 화면에 모두 남음 (이전: 가로로 지나가며 사라짐)
+  const w1Op = useTransform(p, [0.04, 0.16], [0, 1]);
+  const w1Y  = useTransform(p, [0.04, 0.16], ['40px', '0px']);
+  const w2Op = useTransform(p, [0.20, 0.32], [0, 1]);
+  const w2Y  = useTransform(p, [0.20, 0.32], ['40px', '0px']);
+  const w3Op = useTransform(p, [0.36, 0.48], [0, 1]);
+  const w3Y  = useTransform(p, [0.36, 0.48], ['40px', '0px']);
 
   // Sub text fades in after SOLUTION
-  const subOp = useTransform(p, [0.66, 0.78], [0, 1]);
-  const subX  = useTransform(p, [0.66, 0.78], ['4%', '0%']);
+  const subOp = useTransform(p, [0.54, 0.68], [0, 1]);
+  const subY  = useTransform(p, [0.54, 0.68], ['20px', '0px']);
 
-  const FS = { fontSize: 'clamp(5rem, 18vw, 15rem)' } as const;
+  const FS = { fontSize: 'clamp(3rem, 11vw, 9rem)' } as const;
 
   return (
     <div style={{ height: `${H1}vh` }}>
       <div
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
-        className="relative overflow-hidden flex items-center"
+        className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
         <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
           NADAUN COLLECTIVE — Since 2020, Seoul
         </p>
 
         <motion.h1
-          style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', color: 'white', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+          style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
         ><span style={FS}>HIGH-END</span></motion.h1>
 
         <motion.h1
-          style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+          style={{ opacity: w2Op, y: w2Y, color: 'white', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
         ><span style={FS}>CONTENT</span></motion.h1>
 
         <motion.h1
-          style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', color: '#FFB800', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
+          style={{ opacity: w3Op, y: w3Y, color: '#FFB800', willChange: 'transform' }}
+          className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
         ><span style={FS}>SOLUTION.</span></motion.h1>
 
         <motion.p
-          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%', left: '2rem' }}
-          className="text-white/65 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
+          style={{ opacity: subOp, y: subY }}
+          className="mt-10 text-white/70 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
         >
           최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
           하이엔드 콘텐츠 솔루션 그룹
