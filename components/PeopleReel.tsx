@@ -33,7 +33,7 @@ const PeopleReel: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.4, ease: 'easeInOut' }}
+          transition={{ duration: 0.77, ease: 'easeInOut' }}
         >
           <img
             src={PHOTOS[current].src}

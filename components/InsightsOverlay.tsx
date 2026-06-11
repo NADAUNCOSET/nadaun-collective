@@ -253,7 +253,7 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.495, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10" style={{ scaleX }} />
           <div className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md" style={{ height: HEADER_H }}>

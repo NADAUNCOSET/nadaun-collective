@@ -11,7 +11,7 @@ const About: React.FC = () => {
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.44 }}
               className="text-sm font-bold tracking-[0.2em] text-[#FFB800] mb-6 uppercase"
             >
               Who We Are
@@ -23,7 +23,7 @@ const About: React.FC = () => {
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.44 }}
             >
               <h3 className="text-3xl md:text-5xl font-medium leading-tight mb-12">
                 We are a <span className="text-white border-b-2 border-[#FFB800]">Digital Intelligence</span> group that redefines the relationship between brands and consumers through data and creativity.
@@ -35,7 +35,7 @@ const About: React.FC = () => {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.8 }}
+                transition={{ delay: 0.08, duration: 0.44 }}
               >
                 <h4 className="text-xl font-bold mb-4 text-white">Data Driven</h4>
                 <p className="text-gray-400 leading-relaxed">
@@ -48,7 +48,7 @@ const About: React.FC = () => {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.4, duration: 0.8 }}
+                transition={{ delay: 0.16, duration: 0.44 }}
               >
                 <h4 className="text-xl font-bold mb-4 text-white">Creative Tech</h4>
                 <p className="text-gray-400 leading-relaxed">

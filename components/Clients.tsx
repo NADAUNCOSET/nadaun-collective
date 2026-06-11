@@ -225,7 +225,7 @@ const Clients: React.FC = () => {
                     ? { opacity: 1, scale: 1, y: 0 }
                     : { opacity: 0, scale: 0.7, y: 8 }
                   }
-                  transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.275, delay, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div
                     className="rounded-full mb-1.5"

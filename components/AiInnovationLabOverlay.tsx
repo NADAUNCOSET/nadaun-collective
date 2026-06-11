@@ -43,7 +43,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.44, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[100] bg-black text-white overflow-y-auto"
         >
           {/* Close Button */}
@@ -61,7 +61,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
+                transition={{ delay: 0.08, duration: 0.44 }}
                 className="flex items-center gap-3 text-[#FFB800] mb-6"
               >
                 <Sparkles className="w-6 h-6" />
@@ -71,7 +71,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
               <motion.h2 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
+                transition={{ delay: 0.12, duration: 0.44 }}
                 className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 leading-[0.9]"
               >
                 EXPLORE <br/>
@@ -81,7 +81,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
+                transition={{ delay: 0.16, duration: 0.44 }}
                 className="text-gray-400 text-lg md:text-xl max-w-2xl font-light leading-relaxed"
               >
                 NADAUN AI LAB에서 엄선한 글로벌 AI 솔루션들을 만나보세요. 
@@ -93,7 +93,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
+              transition={{ delay: 0.2, duration: 0.44 }}
               className="flex flex-wrap gap-2 mb-16"
             >
               {CATEGORIES.map((category) => (
@@ -126,7 +126,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.275 }}
                     className="space-y-8"
                   >
                     <div className="flex items-center gap-4 border-b border-white/10 pb-4">
@@ -150,7 +150,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.4 }}
+                            transition={{ duration: 0.22 }}
                             className="group relative bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 hover:border-[#FFB800]/30 transition-all duration-500 flex flex-col h-full overflow-hidden"
                           >
                             {/* Hover Background Glow */}

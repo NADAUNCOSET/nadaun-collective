@@ -71,7 +71,7 @@ const itemVariants = {
     opacity: 1, 
     x: 0, 
     transition: { 
-      duration: 1.2, 
+      duration: 0.66, 
       ease: [0.16, 1, 0.3, 1] 
     } 
   }
@@ -94,7 +94,7 @@ const Work: React.FC<WorkProps> = ({ isOverlay = false }) => {
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 0.4, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 1.0 }} // Slower crossfade
+                transition={{ duration: 0.55 }} // Slower crossfade
                 className="absolute inset-0"
               >
                 <img 
@@ -116,7 +116,7 @@ const Work: React.FC<WorkProps> = ({ isOverlay = false }) => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1.0 }}
+          transition={{ duration: 0.55 }}
         >
           <h2 className="text-sm font-bold tracking-[0.2em] text-[#FFB800] uppercase">
             Selected Works

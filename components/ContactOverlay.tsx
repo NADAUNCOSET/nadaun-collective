@@ -14,7 +14,7 @@ const SectionReveal: React.FC<{ children: React.ReactNode; delay?: number }> = (
     initial={{ opacity: 0, y: 40 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: '-10% 0px' }}
-    transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+    transition={{ duration: 0.44, delay, ease: [0.16, 1, 0.3, 1] }}
   >
     {children}
   </motion.div>
@@ -99,7 +99,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.468, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Header */}
           <div className="sticky top-0 left-0 right-0 h-[57px] flex items-center justify-between px-8 md:px-16 border-b border-white/8 bg-black/95 backdrop-blur-md z-10">

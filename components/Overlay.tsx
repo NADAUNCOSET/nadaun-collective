@@ -17,7 +17,7 @@ const Overlay: React.FC<OverlayProps> = ({ isOpen, onClose, children }) => {
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
-          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[100] bg-[#111] text-white overflow-y-auto custom-scrollbar"
         >
             {/* Close Button - Fixed position for seamless look */}

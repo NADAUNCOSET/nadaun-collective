@@ -8,8 +8,8 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.3
+      staggerChildren: 0.06,
+      delayChildren: 0.1
     }
   }
 };
@@ -20,7 +20,7 @@ const itemVariants = {
     opacity: 1, 
     y: 0, 
     transition: { 
-      duration: 1.2, 
+      duration: 0.66, 
       ease: [0.16, 1, 0.3, 1] 
     } 
   }
@@ -110,7 +110,7 @@ const Insights: React.FC<InsightsProps> = ({ onAiLabClick }) => {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.66, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="bg-white/5 border border-white/10 rounded-2xl p-8 md:p-12 min-h-[400px] flex flex-col justify-center relative backdrop-blur-sm"
           >
             {!result && !loading && (
@@ -133,7 +133,7 @@ const Insights: React.FC<InsightsProps> = ({ onAiLabClick }) => {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.44 }}
               >
                 <div className="mb-8">
                   <h4 className="text-xs font-bold text-[#FFB800] uppercase tracking-widest mb-3">Strategic Insight</h4>

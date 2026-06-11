@@ -64,7 +64,7 @@ const VideoReel: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          transition={{ duration: 0.33, ease: 'easeInOut' }}
         />
       </AnimatePresence>
 
@@ -97,7 +97,7 @@ const VideoReel: React.FC = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.22 }}
             className="text-white font-bold text-xl md:text-3xl tracking-tight mb-5"
           >
             {current.title}
@@ -113,7 +113,7 @@ const VideoReel: React.FC = () => {
                 width: i === index ? 28 : 6,
                 backgroundColor: i === index ? '#FFB800' : 'rgba(255,255,255,0.3)',
               }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.165 }}
               className="h-[3px] rounded-full"
             />
           ))}

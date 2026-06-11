@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
             className="flex items-center gap-2 z-50 relative cursor-pointer select-none"
             initial={{ y: 100 }}
             animate={introFinished ? { y: 0 } : { y: 100 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            transition={{ duration: 0.33, ease: [0.22, 1, 0.36, 1], delay: 0.04 }}
           >
             <div className="flex items-center gap-2">
               <span className="text-2xl md:text-3xl font-extrabold text-white leading-none tracking-tight">
@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
               className="flex items-center space-x-12"
               initial={{ opacity: 0 }}
               animate={introFinished ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.275, delay: 0.12 }}
             >
               {navItems.map((item) => (
                 <button 
@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
               onClick={(e) => handleItemClick('contact', e)}
               initial={{ y: 100 }}
               animate={introFinished ? { y: 0 } : { y: 100 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+              transition={{ duration: 0.33, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
               className="group relative z-[60] cursor-pointer flex items-center justify-center overflow-hidden bg-white hover:bg-[#FFB800] transition-colors duration-300 px-6 py-2 rounded-full"
             >
               <span className="text-sm font-bold tracking-widest text-black transition-colors">
@@ -113,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
             initial={{ opacity: 0, y: '-100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '-100%' }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.275, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 bg-black z-40 flex flex-col justify-center items-center"
           >
             <div className="flex flex-col space-y-8 text-center">

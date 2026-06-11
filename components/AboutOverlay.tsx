@@ -175,8 +175,8 @@ const TimelineSlide: React.FC<{
   const l1Op = useTransform(p, [start + fadeLen, start + fadeLen * 2.2], [0, 1]);
   const l1Y  = useTransform(p, [start + fadeLen, start + fadeLen * 2.2], ['32px', '0px']);
 
-  // Line 2 — appears seg*0.24 after line 1 (sequential stagger)
-  const l2S   = start + seg * 0.24;
+  // Line 2 — seg*0.12 (빠른 stagger: 2~3문장 거의 동시, 대표 룰 2026-06-11)
+  const l2S   = start + seg * 0.12;
   const l2Op  = useTransform(p, [l2S, l2S + fadeLen * 1.4], [0, 1]);
   const l2Y   = useTransform(p, [l2S, l2S + fadeLen * 1.4], ['32px', '0px']);
 
@@ -379,7 +379,7 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     ro.observe(canvas);
 
     const SEOUL_LAT = 37.5665, SEOUL_LON = 126.978;
-    const LINE_START = 0.48, LINE_GAP = 0.038, LINE_DUR = 0.075;
+    const LINE_START = 0.42, LINE_GAP = 0.018, LINE_DUR = 0.05;
     const eio = (t: number) => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
 
     const draw = () => {
@@ -847,7 +847,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.495, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
             className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"

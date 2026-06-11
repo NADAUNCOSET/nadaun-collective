@@ -52,7 +52,7 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: React.React
     initial={{ opacity: 0, y: 60, filter: 'blur(15px)' }}
     whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
     viewport={{ once: false, margin: "-15%" }}
-    transition={{ duration: 1.2, delay, ease: [0.16, 1, 0.3, 1] }}
+    transition={{ duration: 0.66, delay, ease: [0.16, 1, 0.3, 1] }}
     className={className}
   >
     {children}
@@ -67,7 +67,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.44 }}
           className="fixed inset-0 z-[100] bg-[#050505] text-white overflow-y-auto overflow-x-hidden scroll-smooth"
         >
           {/* Close Button */}
@@ -96,7 +96,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
 
             <motion.div
               animate={{ y: [0, 15, 0], opacity: [0.3, 1, 0.3] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
               className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
             >
               <span className="text-xs tracking-[0.4em] text-gray-500 uppercase font-bold">Scroll to Explore</span>
@@ -134,7 +134,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
 
                   {/* Right: Content */}
                   <div className="w-full md:w-2/3 md:pt-48">
-                    <FadeIn delay={0.2}>
+                    <FadeIn delay={0.08}>
                       <p className="text-3xl md:text-5xl text-gray-200 font-light leading-[1.5] tracking-tight mb-16 break-keep">
                         {service.desc}
                       </p>
@@ -142,7 +142,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {service.features.map((feature, idx) => (
-                        <FadeIn key={feature} delay={0.3 + (idx * 0.1)}>
+                        <FadeIn key={feature} delay={0.1 + (idx * 0.04)}>
                           <div className="flex items-center gap-5 p-6 md:p-8 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-white/10 transition-all duration-500 backdrop-blur-sm group">
                             <div className="w-3 h-3 rounded-full bg-[#FFB800] group-hover:scale-150 transition-transform duration-500" />
                             <span className="text-lg md:text-xl font-medium text-gray-300 group-hover:text-white transition-colors">{feature}</span>
