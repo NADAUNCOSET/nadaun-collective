@@ -1,8 +1,40 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const HEADER_H = 57;
+
+// ── 송출영상 풀스크린 배경 (LIVERNOVO 송출분) — R2 website/video, 무음 순환, 어둡게 ──
+const VideoBg: React.FC = () => {
+  const [vids, setVids] = useState<{ src: string; channel: string }[]>([]);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    fetch('/livernovo-videos.json')
+      .then(r => r.json())
+      .then((m: any[]) => {
+        const list = (Array.isArray(m) ? m : [])
+          .filter(x => x && x.src && String(x.project || '').includes('livernovo'));
+        if (list.length) setVids(list);
+      })
+      .catch(() => {});
+  }, []);
+  if (!vids.length) return null;
+  const cur = vids[idx % vids.length];
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <video
+        key={cur.src}
+        src={cur.src}
+        autoPlay muted playsInline preload="auto"
+        onEnded={() => setIdx(i => (i + 1) % vids.length)}
+        onError={() => setIdx(i => (i + 1) % vids.length)}
+        className="w-full h-full object-cover"
+        style={{ opacity: 0.22 }}
+      />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(7,7,7,0.82) 0%, rgba(7,7,7,0.6) 45%, rgba(7,7,7,0.92) 100%)' }} />
+    </div>
+  );
+};
 
 const H_W = 1000, H2 = 320, H3 = 700;
 const TOTAL = H_W + H2 + H3; // 2020
@@ -255,14 +287,15 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
           exit={{ y: '100%' }}
           transition={{ duration: 0.421, ease: [0.22, 1, 0.36, 1] }}
         >
-          <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10" style={{ scaleX }} />
-          <div className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md" style={{ height: HEADER_H }}>
+          <VideoBg />
+          <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-20" style={{ scaleX }} />
+          <div className="relative z-10 shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md" style={{ height: HEADER_H }}>
             <span className="text-xs font-bold tracking-[0.3em] text-[#FFB800] uppercase">Campaign Results</span>
             <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all">
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div ref={scrollRef} className="flex-1 overflow-y-scroll" style={{ scrollbarWidth: 'none' }}>
+          <div ref={scrollRef} className="relative z-10 flex-1 overflow-y-scroll" style={{ scrollbarWidth: 'none' }}>
             <ChW g={progress} />
             <Ch2 g={progress} />
             <Ch3 g={progress} />
