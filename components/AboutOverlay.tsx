@@ -59,8 +59,12 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const w3Y  = useTransform(p, [0.36, 0.48], ['40px', '0px']);
 
   // Sub text fades in after SOLUTION
-  const subOp = useTransform(p, [0.54, 0.68], [0, 1]);
-  const subY  = useTransform(p, [0.54, 0.68], ['20px', '0px']);
+  const subOp = useTransform(p, [0.50, 0.62], [0, 1]);
+  const subY  = useTransform(p, [0.50, 0.62], ['20px', '0px']);
+
+  // ★ 다음 섹션으로 빠르고 부드럽게 연결 — Ch1 끝에서 위로 디졸브 아웃 (Ch2 페이드인과 크로스) 대표 룰 2026-06-12
+  const exitOp = useTransform(p, [0.74, 0.98], [1, 0]);
+  const exitY  = useTransform(p, [0.74, 0.98], ['0px', '-60px']);
 
   const FS = { fontSize: 'clamp(3rem, 11vw, 9rem)' } as const;
 
@@ -74,28 +78,30 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           NADAUN COLLECTIVE — Since 2020, Seoul
         </p>
 
-        <motion.h1
-          style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
-        ><span style={FS}>HIGH-END</span></motion.h1>
+        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
+          <motion.h1
+            style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
+          ><span style={FS}>HIGH-END</span></motion.h1>
 
-        <motion.h1
-          style={{ opacity: w2Op, y: w2Y, color: 'white', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
-        ><span style={FS}>CONTENT</span></motion.h1>
+          <motion.h1
+            style={{ opacity: w2Op, y: w2Y, color: 'white', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
+          ><span style={FS}>CONTENT</span></motion.h1>
 
-        <motion.h1
-          style={{ opacity: w3Op, y: w3Y, color: '#FFB800', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
-        ><span style={FS}>SOLUTION.</span></motion.h1>
+          <motion.h1
+            style={{ opacity: w3Op, y: w3Y, color: '#FFB800', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
+          ><span style={FS}>SOLUTION.</span></motion.h1>
 
-        <motion.p
-          style={{ opacity: subOp, y: subY }}
-          className="mt-10 text-white/70 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
-        >
-          최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
-          하이엔드 콘텐츠 솔루션 그룹
-        </motion.p>
+          <motion.p
+            style={{ opacity: subOp, y: subY }}
+            className="mt-10 text-white/70 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
+          >
+            최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
+            하이엔드 콘텐츠 솔루션 그룹
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );
