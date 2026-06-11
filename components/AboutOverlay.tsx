@@ -8,7 +8,8 @@ import { WORLD_LAND } from './worldGeo';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 1100;
+// 스크롤 총량 단축 (2720→~1430vh): 챕터별 "차례대로 한 화면" 느낌, 내부 연출은 정규화라 유지 (대표 룰 2026-06-11)
+const H1 = 170, H2 = 180, H3 = 340, H4 = 380, H5 = 360;
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 const C1S = 0,               C1E = H1 / TOTAL;
