@@ -32,7 +32,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
       setStage(4);
 
       animate(maskRadius, 150, {
-        duration: 0.275,
+        duration: 0.234,
         ease: [0.645, 0.045, 0.355, 1.0],
         onComplete: () => { if (!cancelled) onComplete(); },
       });
@@ -58,7 +58,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 3, opacity: 0 }}
-                transition={{ duration: 0.22, type: 'spring', stiffness: 300, damping: 20 }}
+                transition={{ duration: 0.187, type: 'spring', stiffness: 300, damping: 20 }}
                 style={{ width: 16, height: 16 }}
               />
             )}
@@ -68,7 +68,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
             className="z-10 relative"
             initial={{ opacity: 0, scale: 0.88 }}
             animate={stage >= 2 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.88 }}
-            transition={{ duration: 0.275, ease: 'easeOut' }}
+            transition={{ duration: 0.234, ease: 'easeOut' }}
           >
             <img
               src="/symbol-white.webp"
@@ -85,7 +85,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
           className="absolute inset-0 bg-[#FFB800] flex items-center justify-center overflow-hidden z-20"
           initial={{ clipPath: 'circle(0% at 50% 50%)' }}
           animate={stage >= 3 ? { clipPath: 'circle(150% at 50% 50%)' } : { clipPath: 'circle(0% at 50% 50%)' }}
-          transition={{ duration: 0.385, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 0.327, ease: [0.76, 0, 0.24, 1] }}
         >
           <img
             src="/symbol-black.webp"

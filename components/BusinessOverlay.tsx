@@ -343,7 +343,7 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.495, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.421, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
             className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
@@ -360,7 +360,7 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
                   <motion.button
                     key="back"
                     initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }}
-                    transition={{ duration: 0.165 }}
+                    transition={{ duration: 0.14 }}
                     onClick={handleBack}
                     className="text-[11px] font-bold tracking-[0.2em] uppercase text-white/50 hover:text-white flex items-center gap-1.5 transition-colors"
                   >

@@ -17,7 +17,7 @@ const ManifestoLine: React.FC<{ text: string; delay: number }> = ({ text, delay 
       initial={{ y: '100%', opacity: 0 }}
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: true, amount: 0.6 }}
-      transition={{ duration: 0.495, ease: [0.16, 1, 0.3, 1], delay }}
+      transition={{ duration: 0.421, ease: [0.16, 1, 0.3, 1], delay }}
     >
       {text}
     </motion.p>
@@ -82,7 +82,7 @@ const Manifesto: React.FC = () => {
           initial={{ opacity: 0, scaleX: 0 }}
           whileInView={{ opacity: 1, scaleX: 1 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.66, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+          transition={{ duration: 0.561, ease: [0.16, 1, 0.3, 1], delay: 0.096 }}
           style={{ originX: 0 }}
         >
           <div className="h-[1px] flex-1 bg-gradient-to-r from-[#FFB800]/60 to-transparent" />
@@ -105,9 +105,9 @@ const Manifesto: React.FC = () => {
                 whileInView={{ y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{
-                  duration: 0.468,
+                  duration: 0.398,
                   ease: [0.16, 1, 0.3, 1],
-                  delay: 0.04 + i * 0.08,
+                  delay: 0.032 + i * 0.08,
                 }}
               >
                 {word}
@@ -122,7 +122,7 @@ const Manifesto: React.FC = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.55, delay: 0.24 }}
+          transition={{ duration: 0.468, delay: 0.192 }}
         >
           Since 2020 — Seoul, Korea
         </motion.p>

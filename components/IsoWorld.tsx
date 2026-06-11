@@ -50,8 +50,9 @@ const UNIVERSE_DATA: BuildingData[] = [
     title: 'NADAUN MOMENT',
     subtitle: 'CORPORATE VISUAL ARCHIVE',
     desc: '기업의 순간을 정제된\n감각으로 영원히 기록',
-    b2b: 'https://nadaun-portfolio.vercel.app/nadaun-portfolio.html',
-    b2c: 'https://nadaun.framer.website/',
+    b2b: 'https://photo.nadaun.co',
+    b2c: 'https://video.nadaun.co',
+    btnLabels: { b2b: 'PHOTO →', b2c: 'VIDEO →' },
     color: '#FF8C00',
     position: [3, 0, -2],
     height: 4.0,
@@ -275,12 +276,12 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                       className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform"
                       style={{ borderColor: item.color + '60', color: item.color }}
                       onClick={() => item.b2b && window.open(item.b2b, '_blank')}
-                    >B2B</button>
+                    >PHOTO</button>
                     <button
                       className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border"
                       style={item.b2c ? { borderColor: item.color + '60', color: item.color } : { borderColor: '#333', color: '#555' }}
                       onClick={() => item.b2c && window.open(item.b2c, '_blank')}
-                    >{item.b2c ? 'B2C' : 'Soon'}</button>
+                    >{item.b2c ? 'VIDEO' : 'Soon'}</button>
                   </div>
                 ) : (
                   <button

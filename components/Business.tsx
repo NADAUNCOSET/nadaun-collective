@@ -91,7 +91,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.495, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.421, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="block text-[#FFB800] font-bold tracking-[0.25em] text-[11px] uppercase mb-7">
             IP PIPELINE — 5 STAGES
@@ -152,7 +152,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.66, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.561, delay: 0.096, ease: [0.16, 1, 0.3, 1] }}
         >
           {businessAreas.map((area) => (
             <motion.div
@@ -182,7 +182,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 0.22 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.495 }}
+                    transition={{ duration: 0.421 }}
                     className="absolute inset-0 z-0"
                   >
                     <img src={area.image} alt="" className="w-full h-full object-cover grayscale" />
@@ -228,7 +228,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
                     <motion.div
                       initial={{ opacity: 0, y: 18 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1, duration: 0.413, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ delay: 0.08, duration: 0.351, ease: [0.16, 1, 0.3, 1] }}
                     >
                       {/* Subtitle */}
                       <p className="text-[11px] tracking-[0.25em] uppercase text-[#FFB800]/70 font-bold mb-3">
@@ -275,7 +275,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.55, delay: 0.16 }}
+          transition={{ duration: 0.468, delay: 0.128 }}
         >
           <p className="text-white/22 text-xs tracking-[0.3em] uppercase font-medium">
             NADAUN COLLECTIVE — All-in-One IP Engine

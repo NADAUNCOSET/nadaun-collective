@@ -14,7 +14,7 @@ const SectionReveal: React.FC<{ children: React.ReactNode; delay?: number }> = (
     initial={{ opacity: 0, y: 40 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: '-10% 0px' }}
-    transition={{ duration: 0.44, delay, ease: [0.16, 1, 0.3, 1] }}
+    transition={{ duration: 0.374, delay, ease: [0.16, 1, 0.3, 1] }}
   >
     {children}
   </motion.div>
@@ -46,7 +46,7 @@ const SectionNum: React.FC<{ n: string; label: string }> = ({ n, label }) => (
 
 const BigQ: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <p
-    className="text-white font-black leading-[0.88] tracking-tight mb-14"
+    className="text-white font-black leading-[1.08] tracking-tight mb-14 break-keep pb-1"
     style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}
   >
     {children}
@@ -99,7 +99,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.468, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.398, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Header */}
           <div className="sticky top-0 left-0 right-0 h-[57px] flex items-center justify-between px-8 md:px-16 border-b border-white/8 bg-black/95 backdrop-blur-md z-10">

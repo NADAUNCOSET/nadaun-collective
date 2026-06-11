@@ -106,12 +106,13 @@ const Clients: React.FC = () => {
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     // tier gates
-    if (v >= 0.06)  setLgVisible(true);
-    if (v >= 0.28)  setMdVisible(true);
-    if (v >= 0.52)  setSmVisible(true);
+    // 한 번 스크롤에 쫙 모이게 — 게이트·수렴 앞당김 (대표 룰 2026-06-11)
+    if (v >= 0.04)  setLgVisible(true);
+    if (v >= 0.16)  setMdVisible(true);
+    if (v >= 0.30)  setSmVisible(true);
 
-    // spread converges 0.15 → 0.80
-    const sp = Math.max(0, Math.min(1, (v - 0.15) / 0.65));
+    // spread converges 0.06 → 0.48 (빠르게 모이고 지나감)
+    const sp = Math.max(0, Math.min(1, (v - 0.06) / 0.42));
     const eased = sp < 0.5 ? 2 * sp * sp : 1 - Math.pow(-2 * sp + 2, 2) / 2;
     setSpread(2.6 - eased * 1.6);
   });
@@ -148,7 +149,7 @@ const Clients: React.FC = () => {
 
   return (
     // Tall outer — provides scroll distance
-    <div ref={sectionRef} style={{ height: '300vh' }} className="relative">
+    <div ref={sectionRef} style={{ height: '150vh' }} className="relative">
 
       <div className="sticky top-0 w-full h-screen bg-black overflow-hidden">
 
@@ -225,7 +226,7 @@ const Clients: React.FC = () => {
                     ? { opacity: 1, scale: 1, y: 0 }
                     : { opacity: 0, scale: 0.7, y: 8 }
                   }
-                  transition={{ duration: 0.275, delay, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.234, delay, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div
                     className="rounded-full mb-1.5"

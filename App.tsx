@@ -73,7 +73,7 @@ const App: React.FC = () => {
             style={{ scaleX }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.275 }}
+            transition={{ duration: 0.234 }}
           />
         )}
 

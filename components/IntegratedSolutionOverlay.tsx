@@ -52,7 +52,7 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: React.React
     initial={{ opacity: 0, y: 60, filter: 'blur(15px)' }}
     whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
     viewport={{ once: false, margin: "-15%" }}
-    transition={{ duration: 0.66, delay, ease: [0.16, 1, 0.3, 1] }}
+    transition={{ duration: 0.561, delay, ease: [0.16, 1, 0.3, 1] }}
     className={className}
   >
     {children}
@@ -67,7 +67,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.44 }}
+          transition={{ duration: 0.374 }}
           className="fixed inset-0 z-[100] bg-[#050505] text-white overflow-y-auto overflow-x-hidden scroll-smooth"
         >
           {/* Close Button */}
@@ -96,7 +96,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
 
             <motion.div
               animate={{ y: [0, 15, 0], opacity: [0.3, 1, 0.3] }}
-              transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
+              transition={{ repeat: Infinity, duration: 0.935, ease: "easeInOut" }}
               className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
             >
               <span className="text-xs tracking-[0.4em] text-gray-500 uppercase font-bold">Scroll to Explore</span>

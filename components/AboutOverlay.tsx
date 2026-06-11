@@ -949,7 +949,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ duration: 0.495, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.421, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
             className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
