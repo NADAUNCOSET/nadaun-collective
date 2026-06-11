@@ -171,6 +171,15 @@ const TimelineSlide: React.FC<{
     index === total - 1 ? [0, 1, 1, 1] : [0, 1, 1, 0],
   );
 
+  // ★ 2026-06-11 대표 룰: 년도별 텍스트가 오른쪽에서 슬라이드되며 안착 + 디졸브로 넘어감
+  const x = useTransform(
+    p,
+    index === total - 1
+      ? [Math.max(0, start - fadeLen * 0.5), start + fadeLen, 1, 1]
+      : [Math.max(0, start - fadeLen * 0.5), start + fadeLen, end - fadeLen, Math.min(1, end + fadeLen * 0.5)],
+    index === total - 1 ? ['7%', '0%', '0%', '0%'] : ['7%', '0%', '0%', '-7%'],
+  );
+
   // Line 1 — appears as soon as slide is visible
   const l1Op = useTransform(p, [start + fadeLen, start + fadeLen * 2.2], [0, 1]);
   const l1Y  = useTransform(p, [start + fadeLen, start + fadeLen * 2.2], ['32px', '0px']);
@@ -184,7 +193,7 @@ const TimelineSlide: React.FC<{
 
   return (
     <motion.div
-      style={{ opacity: op, position: 'absolute', inset: 0 }}
+      style={{ opacity: op, x, position: 'absolute', inset: 0, willChange: 'transform, opacity' }}
       className="flex flex-col justify-center px-8 md:px-16 lg:px-24"
     >
       <span
