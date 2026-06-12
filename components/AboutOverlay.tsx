@@ -49,56 +49,50 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
 const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
 
-  // HIGH-END: visible from start, exits left
-  const w1Op = useTransform(p, [0.26, 0.40], [1, 0]);
-  const w1X  = useTransform(p, [0.26, 0.40], ['0vw', '-80vw']);
+  // 세 단어가 끊김 없이 부드럽게 이어져 한 화면에 모두 남음 (stagger 겹침, 모두 머무름) 대표 룰 2026-06-13
+  const w1Op = useTransform(p, [0.04, 0.12], [0, 1]);
+  const w1Y  = useTransform(p, [0.04, 0.12], ['30px', '0px']);
+  const w2Op = useTransform(p, [0.10, 0.18], [0, 1]);
+  const w2Y  = useTransform(p, [0.10, 0.18], ['30px', '0px']);
+  const w3Op = useTransform(p, [0.16, 0.24], [0, 1]);
+  const w3Y  = useTransform(p, [0.16, 0.24], ['30px', '0px']);
 
-  // CONTENT: slides in from right, exits left
-  const w2Op = useTransform(p, [0.26, 0.42, 0.56, 0.66], [0, 1, 1, 0]);
-  const w2X  = useTransform(p, [0.26, 0.42, 0.56, 0.66], ['80vw', '0vw', '0vw', '-80vw']);
+  const subOp = useTransform(p, [0.24, 0.34], [0, 1]);
+  const subY  = useTransform(p, [0.24, 0.34], ['20px', '0px']);
 
-  // SOLUTION: slides in, stays (gold)
-  const w3Op = useTransform(p, [0.56, 0.70, 0.90, 1.00], [0, 1, 1, 0]);
-  const w3X  = useTransform(p, [0.56, 0.70], ['80vw', '0vw']);
+  // 다음 섹션으로 부드럽게 — 끝에서 위로 디졸브 아웃
+  const exitOp = useTransform(p, [0.78, 0.98], [1, 0]);
+  const exitY  = useTransform(p, [0.78, 0.98], ['0px', '-50px']);
 
-  // Sub text fades in after SOLUTION
-  const subOp = useTransform(p, [0.66, 0.78], [0, 1]);
-  const subX  = useTransform(p, [0.66, 0.78], ['4%', '0%']);
-
-  const FS = { fontSize: 'clamp(5rem, 18vw, 15rem)' } as const;
+  const FS = { fontSize: 'clamp(3rem, 11vw, 9rem)' } as const;
 
   return (
     <div style={{ height: `${H1}vh` }}>
       <div
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
-        className="relative overflow-hidden flex items-center"
+        className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
         <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
           NADAUN COLLECTIVE — Since 2020, Seoul
         </p>
 
-        <motion.h1
-          style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', color: 'white', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
-        ><span style={FS}>HIGH-END</span></motion.h1>
-
-        <motion.h1
-          style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
-        ><span style={FS}>CONTENT</span></motion.h1>
-
-        <motion.h1
-          style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', color: '#FFB800', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24"
-        ><span style={FS}>SOLUTION.</span></motion.h1>
-
-        <motion.p
-          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%', left: '2rem' }}
-          className="text-white/65 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
-        >
-          최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
-          하이엔드 콘텐츠 솔루션 그룹
-        </motion.p>
+        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
+          <motion.h1 style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
+          ><span style={FS}>HIGH-END</span></motion.h1>
+          <motion.h1 style={{ opacity: w2Op, y: w2Y, color: 'white', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
+          ><span style={FS}>CONTENT</span></motion.h1>
+          <motion.h1 style={{ opacity: w3Op, y: w3Y, color: '#FFB800', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
+          ><span style={FS}>SOLUTION.</span></motion.h1>
+          <motion.p style={{ opacity: subOp, y: subY }}
+            className="mt-10 text-white/70 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
+          >
+            최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
+            하이엔드 콘텐츠 솔루션 그룹
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );
@@ -728,26 +722,16 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
   const aOp   = useTransform(p, [0.62, 0.68], [0, 1]);
   const bOp   = useTransform(p, [0.67, 0.73], [0, 1]);
 
-  // ── S2: BTL 4 image slides — declared individually (no useTransform in .map) ──
-  // Slide 1: 지하철 스크린도어
-  const btl1Op = useTransform(p, [0.74, 0.78, 0.82, 0.85], [0, 1, 1, 0]);
-  const btl1LabelOp = useTransform(p, [0.76, 0.80], [0, 1]);
-  // Slide 2: 옥외 전광판
-  const btl2Op = useTransform(p, [0.83, 0.86, 0.89, 0.92], [0, 1, 1, 0]);
-  const btl2LabelOp = useTransform(p, [0.84, 0.88], [0, 1]);
-  // Slide 3: 택시 미디어
-  const btl3Op = useTransform(p, [0.90, 0.93, 0.95, 0.97], [0, 1, 1, 0]);
-  const btl3LabelOp = useTransform(p, [0.91, 0.94], [0, 1]);
-  // Slide 4: 버스 외부광고 (stays as background for S3)
-  const btl4Op = useTransform(p, [0.95, 0.98, 1.00, 1.00], [0, 1, 1, 1]);
-  const btl4LabelOp = useTransform(p, [0.96, 0.99], [0, 1]);
+  // ── S2: BTL — 4개 매체 한 화면 그리드 (순차 등장, 모두 머무름) 대표 룰 2026-06-13 ──
+  const btlSecOp = useTransform(p, [0.76, 0.82, 0.91, 0.95], [0, 1, 1, 0]);
+  const b1Op = useTransform(p, [0.77, 0.83], [0, 1]); const b1Y = useTransform(p, [0.77, 0.83], ['30px', '0px']);
+  const b2Op = useTransform(p, [0.79, 0.85], [0, 1]); const b2Y = useTransform(p, [0.79, 0.85], ['30px', '0px']);
+  const b3Op = useTransform(p, [0.81, 0.87], [0, 1]); const b3Y = useTransform(p, [0.81, 0.87], ['30px', '0px']);
+  const b4Op = useTransform(p, [0.83, 0.89], [0, 1]); const b4Y = useTransform(p, [0.83, 0.89], ['30px', '0px']);
 
-  // ── S3: CTA — fades in over slide 4 ──
-  const s3Op = useTransform(p, [0.97, 1.00, 1, 1], [0, 1, 1, 1]);
-  const s3Y  = useTransform(p, [0.97, 1.00], ['4%', '0%']);
-
-  const FS_SHORT = { fontSize: 'clamp(9rem, 32vw, 28rem)' } as const;
-  const FS_LONG  = { fontSize: 'clamp(6rem, 21vw, 18rem)' } as const;
+  // ── S3: CTA — 중앙 정렬, BTL 후 등장 ──
+  const s3Op = useTransform(p, [0.93, 0.98], [0, 1]);
+  const s3Y  = useTransform(p, [0.93, 0.98], ['4%', '0%']);
 
   return (
     <div style={{ height: `${H5}vh` }}>
@@ -814,79 +798,40 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
           </p>
         </motion.div>
 
-        {/* ── S2: BTL IMAGE SLIDES (4 sequential full-screen) ── */}
-
-        {/* Slide 1 — 지하철 스크린도어 */}
-        <motion.div style={{ opacity: btl1Op }} className="absolute inset-0 will-change-transform">
-          <img src={BTL_ITEMS[0].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
-          <motion.div style={{ opacity: btl1LabelOp }}
-            className="absolute bottom-14 left-8 md:left-16 lg:left-24">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 01</p>
-            <p className="font-black text-white leading-none mb-3"
-              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
-              {BTL_ITEMS[0].label}
-            </p>
-            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
-              {BTL_ITEMS[0].spec}
-            </p>
-          </motion.div>
+        {/* ── S2: BTL — 4개 매체 한 화면 그리드 (지하철·옥외·택시·버스) ── */}
+        <motion.div style={{ opacity: btlSecOp }}
+          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
+          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">오프라인 BTL — 전국 매체</p>
+          <p className="text-white/45 text-xs md:text-sm font-light mb-6 md:mb-8">지하철 · 옥외 전광판 · 택시 · 버스 — 어디든 닿습니다</p>
+          <div className="grid grid-cols-2 gap-3 md:gap-5 max-w-5xl w-full">
+            {[
+              { op: b1Op, y: b1Y, item: BTL_ITEMS[0], n: '01' },
+              { op: b2Op, y: b2Y, item: BTL_ITEMS[1], n: '02' },
+              { op: b3Op, y: b3Y, item: BTL_ITEMS[2], n: '03' },
+              { op: b4Op, y: b4Y, item: BTL_ITEMS[3], n: '04' },
+            ].map(({ op, y, item, n }) => (
+              <motion.div key={n} style={{ opacity: op, y, willChange: 'transform, opacity' }}
+                className="relative rounded-xl overflow-hidden aspect-[16/10]">
+                <img src={item.img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-4 md:p-6">
+                  <p className="text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">오프라인 BTL · {n}</p>
+                  <p className="font-black text-white leading-none mb-1.5"
+                    style={{ fontSize: 'clamp(1.4rem, 3.2vw, 2.8rem)', letterSpacing: '-0.03em' }}>
+                    {item.label}
+                  </p>
+                  <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.72rem, 1.1vw, 1rem)' }}>
+                    {item.spec}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
 
-        {/* Slide 2 — 옥외 전광판 */}
-        <motion.div style={{ opacity: btl2Op }} className="absolute inset-0 will-change-transform">
-          <img src={BTL_ITEMS[1].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
-          <motion.div style={{ opacity: btl2LabelOp }}
-            className="absolute bottom-14 left-8 md:left-16 lg:left-24">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 02</p>
-            <p className="font-black text-white leading-none mb-3"
-              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
-              {BTL_ITEMS[1].label}
-            </p>
-            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
-              {BTL_ITEMS[1].spec}
-            </p>
-          </motion.div>
-        </motion.div>
-
-        {/* Slide 3 — 택시 미디어 */}
-        <motion.div style={{ opacity: btl3Op }} className="absolute inset-0 will-change-transform">
-          <img src={BTL_ITEMS[2].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
-          <motion.div style={{ opacity: btl3LabelOp }}
-            className="absolute bottom-14 left-8 md:left-16 lg:left-24">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 03</p>
-            <p className="font-black text-white leading-none mb-3"
-              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
-              {BTL_ITEMS[2].label}
-            </p>
-            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
-              {BTL_ITEMS[2].spec}
-            </p>
-          </motion.div>
-        </motion.div>
-
-        {/* Slide 4 — 버스 외부광고 (stays as bg for S3) */}
-        <motion.div style={{ opacity: btl4Op }} className="absolute inset-0 will-change-transform">
-          <img src={BTL_ITEMS[3].img} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/40" />
-          <motion.div style={{ opacity: btl4LabelOp }}
-            className="absolute top-24 right-8 md:right-16 lg:right-24 text-right">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">오프라인 BTL · 04</p>
-            <p className="font-black text-white leading-none mb-3"
-              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '-0.04em' }}>
-              {BTL_ITEMS[3].label}
-            </p>
-            <p className="text-white/50 font-light" style={{ fontSize: 'clamp(0.85rem, 1.5vw, 1.2rem)' }}>
-              {BTL_ITEMS[3].spec}
-            </p>
-          </motion.div>
-        </motion.div>
-
-        {/* ── S3: CTA — fades in over slide 4 background ── */}
+        {/* ── S3: CTA — 중앙 정렬 ── */}
         <motion.div style={{ opacity: s3Op, y: s3Y }}
-          className="absolute inset-0 flex flex-col justify-end px-8 md:px-16 lg:px-24 pb-16">
+          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
           <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">
             팬클럽 광고 · 해외 광고 · 공항 · 일본 · 동남아 · 미국 · 유럽
           </p>
