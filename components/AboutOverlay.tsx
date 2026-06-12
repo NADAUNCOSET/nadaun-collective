@@ -664,7 +664,7 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         </motion.div>
 
         {/* DOM overlay text */}
-        <div className="absolute inset-0 flex flex-col justify-between px-8 md:px-16 lg:px-24 py-10 pointer-events-none">
+        <div className="absolute inset-0 flex flex-col justify-start px-8 md:px-16 lg:px-24 pt-[14vh] pb-10 pointer-events-none">
           <motion.p style={{ opacity: headOp }}
             className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
             IP CONNECT — GLOBAL
