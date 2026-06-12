@@ -694,10 +694,10 @@ const BROADCAST_CHANNELS = [
 ];
 
 const BTL_ITEMS = [
-  { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역',  img: 'http://www.newad.kr/upload_board_files/code_5/20210222092921-6b25109b040389ce5b4d35fc426d17e4.jpg' },
-  { label: '옥외 전광판',      spec: 'Full HD / 4K · 가로·세로형',   img: 'http://www.newad.kr/upload_board_files/code_10/20210222095353-6b25109b040389ce5b4d35fc426d17e4.jpg' },
-  { label: '택시 미디어',      spec: '후면 LED · 측면 랩핑 · 전국',  img: 'http://www.newad.kr/upload_board_files/code_11/20210222101310-6b25109b040389ce5b4d35fc426d17e4.jpg' },
-  { label: '버스 외부광고',    spec: '슈퍼사이드 · 풀백 · 측면랩',   img: 'http://www.newad.kr/upload_board_files/code_7/20210222093425-6b25109b040389ce5b4d35fc426d17e4.jpg' },
+  { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역',  img: 'https://media.nadaun.co/collective/btl/01-subway.webp' },
+  { label: '옥외 전광판',      spec: 'Full HD / 4K · 가로·세로형',   img: 'https://media.nadaun.co/collective/btl/02-outdoor.webp' },
+  { label: '택시 미디어',      spec: '후면 LED · 측면 랩핑 · 전국',  img: 'https://media.nadaun.co/collective/btl/03-taxi.webp' },
+  { label: '버스 외부광고',    spec: '슈퍼사이드 · 풀백 · 측면랩',   img: 'https://media.nadaun.co/collective/btl/04-bus.webp' },
 ];
 
 const FANCLUB_ITEMS = [

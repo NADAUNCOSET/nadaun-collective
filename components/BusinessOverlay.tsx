@@ -5,7 +5,7 @@ import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 const HEADER_H = 57;
 
 // Ch1 intro + Ch2 domain list + Ch3 production scroll-scrub
-const H1 = 300, H2 = 420, H3 = 700;
+const H1 = 120, H2 = 200, H3 = 280; // 스크러빙 단축 1420→600vh — 빨리 지나가게 (대표 룰 2026-06-13)
 const TOTAL = H1 + H2 + H3;
 
 const C1S = 0,   C1E = H1 / TOTAL;

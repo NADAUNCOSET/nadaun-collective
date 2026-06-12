@@ -36,7 +36,7 @@ const VideoBg: React.FC = () => {
   );
 };
 
-const H_W = 450, H2 = 320, H3 = 420; // 세로 스택 전환으로 스크롤 단축 (대표 룰 2026-06-12)
+const H_W = 320, H2 = 240, H3 = 320; // 스크러빙 더 단축 — 빨리 지나가게 (대표 룰 2026-06-13)
 const TOTAL = H_W + H2 + H3;
 
 const CWS = 0,    CWE = H_W / TOTAL;
