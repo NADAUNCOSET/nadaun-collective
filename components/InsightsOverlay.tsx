@@ -36,8 +36,8 @@ const VideoBg: React.FC = () => {
   );
 };
 
-const H_W = 1000, H2 = 320, H3 = 700;
-const TOTAL = H_W + H2 + H3; // 2020
+const H_W = 450, H2 = 320, H3 = 420; // 세로 스택 전환으로 스크롤 단축 (대표 룰 2026-06-12)
+const TOTAL = H_W + H2 + H3;
 
 const CWS = 0,    CWE = H_W / TOTAL;
 const C2S = CWE,  C2E = (H_W + H2) / TOTAL;
@@ -66,19 +66,17 @@ const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 const ChW: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [CWS, CWE], [0, 1]);
 
-  const w1Op = useTransform(p, [0.00, 0.06, 0.14, 0.18], [0, 1, 1, 0]);
-  const w1X  = useTransform(p, [0.00, 0.06, 0.14, 0.18], ['80vw', '0vw', '0vw', '-80vw']);
-  const w2Op = useTransform(p, [0.20, 0.26, 0.34, 0.38], [0, 1, 1, 0]);
-  const w2X  = useTransform(p, [0.20, 0.26, 0.34, 0.38], ['80vw', '0vw', '0vw', '-80vw']);
-  const w3Op = useTransform(p, [0.40, 0.46, 0.54, 0.58], [0, 1, 1, 0]);
-  const w3X  = useTransform(p, [0.40, 0.46, 0.54, 0.58], ['80vw', '0vw', '0vw', '-80vw']);
-  const w4Op = useTransform(p, [0.60, 0.66, 0.74, 0.78], [0, 1, 1, 0]);
-  const w4X  = useTransform(p, [0.60, 0.66, 0.74, 0.78], ['80vw', '0vw', '0vw', '-80vw']);
-  const w5Op = useTransform(p, [0.80, 0.86, 0.96, 1.00], [0, 1, 1, 0]);
-  const w5X  = useTransform(p, [0.80, 0.86], ['80vw', '0vw']);
+  // 세로 스택 — 차례대로 나타나 한 화면에 모두 남음 (대표 룰, About Ch1 패턴 통일 2026-06-12)
+  const l1Op = useTransform(p, [0.06, 0.18], [0, 1]);
+  const l1Y  = useTransform(p, [0.06, 0.18], ['40px', '0px']);
+  const l2Op = useTransform(p, [0.24, 0.36], [0, 1]);
+  const l2Y  = useTransform(p, [0.24, 0.36], ['40px', '0px']);
+  const l3Op = useTransform(p, [0.42, 0.54], [0, 1]);
+  const l3Y  = useTransform(p, [0.42, 0.54], ['40px', '0px']);
+  const exitOp = useTransform(p, [0.84, 0.96], [1, 0]);
+  const exitY  = useTransform(p, [0.84, 0.96], ['0px', '-50px']);
 
-  const FS_N = { fontSize: 'clamp(6rem, 24vw, 22rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 } as const;
-  const FS_W = { fontSize: 'clamp(5rem, 18vw, 16rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 } as const;
+  const FS_L = { fontSize: 'clamp(2.6rem, 9vw, 7.5rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.05 } as const;
 
   return (
     <div style={{ height: `${H_W}vh` }}>
@@ -88,29 +86,18 @@ const ChW: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           LIVERNOVO · 2025.10~11 캠페인 결과
         </p>
 
-        {/* 4,190만+ */}
-        <motion.div style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <span style={{ ...FS_N, color: 'white', display: 'block' }}>4,190만+</span>
-        </motion.div>
-
-        {/* 도달. */}
-        <motion.div style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <span style={{ ...FS_W, color: '#FFB800', display: 'block' }}>도달.</span>
-        </motion.div>
-
-        {/* 1,296회 */}
-        <motion.div style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <span style={{ ...FS_N, color: 'white', display: 'block' }}>1,296회</span>
-        </motion.div>
-
-        {/* 송출. */}
-        <motion.div style={{ opacity: w4Op, x: w4X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <span style={{ ...FS_W, color: '#FFB800', display: 'block' }}>송출.</span>
-        </motion.div>
-
-        {/* 초과달성. */}
-        <motion.div style={{ opacity: w5Op, x: w5X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <span style={{ ...FS_W, color: 'white', display: 'block' }}>초과달성.</span>
+        {/* 캠페인 임팩트 — 세로 스택, 차례대로 나타나 한 화면에 모두 남음 */}
+        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }}
+          className="absolute inset-0 flex flex-col justify-center gap-1 px-8 md:px-16 lg:px-24">
+          <motion.div style={{ opacity: l1Op, y: l1Y, ...FS_L, willChange: 'transform' }} className="whitespace-nowrap">
+            <span style={{ color: 'white' }}>4,190만+</span> <span style={{ color: '#FFB800' }}>도달.</span>
+          </motion.div>
+          <motion.div style={{ opacity: l2Op, y: l2Y, ...FS_L, willChange: 'transform' }} className="whitespace-nowrap">
+            <span style={{ color: 'white' }}>1,296회</span> <span style={{ color: '#FFB800' }}>송출.</span>
+          </motion.div>
+          <motion.div style={{ opacity: l3Op, y: l3Y, ...FS_L, color: 'white', willChange: 'transform' }} className="whitespace-nowrap">
+            초과달성.
+          </motion.div>
         </motion.div>
       </div>
     </div>
@@ -179,60 +166,66 @@ const Ch2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
 
-  // Slide 1: PP
-  const s1Op = useTransform(p, [0.00, 0.07, 0.16, 0.22], [0, 1, 1, 0]);
-  const s1X  = useTransform(p, [0.00, 0.07, 0.16, 0.22], ['80vw', '0vw', '0vw', '-80vw']);
-  // Slide 2: IPTV
-  const s2Op = useTransform(p, [0.23, 0.30, 0.39, 0.45], [0, 1, 1, 0]);
-  const s2X  = useTransform(p, [0.23, 0.30, 0.39, 0.45], ['80vw', '0vw', '0vw', '-80vw']);
-  // Slide 3: 케이블
-  const s3Op = useTransform(p, [0.46, 0.53, 0.62, 0.68], [0, 1, 1, 0]);
-  const s3X  = useTransform(p, [0.46, 0.53, 0.62, 0.68], ['80vw', '0vw', '0vw', '-80vw']);
-  // Slide 4: 총합
-  const s4Op = useTransform(p, [0.69, 0.76, 0.88, 0.94], [0, 1, 1, 0]);
-  const s4X  = useTransform(p, [0.69, 0.76], ['80vw', '0vw']);
+  // 4개 스탯 세로 스택 — 차례대로 나타나 한 화면에 모두 남음 (대표 룰, About Ch1 패턴 통일 2026-06-12)
+  const titleOp = useTransform(p, [0.00, 0.08], [0, 1]);
+  const r1Op = useTransform(p, [0.06, 0.16], [0, 1]); const r1Y = useTransform(p, [0.06, 0.16], ['40px', '0px']);
+  const r2Op = useTransform(p, [0.18, 0.28], [0, 1]); const r2Y = useTransform(p, [0.18, 0.28], ['40px', '0px']);
+  const r3Op = useTransform(p, [0.30, 0.40], [0, 1]); const r3Y = useTransform(p, [0.30, 0.40], ['40px', '0px']);
+  const r4Op = useTransform(p, [0.42, 0.52], [0, 1]); const r4Y = useTransform(p, [0.42, 0.52], ['40px', '0px']);
 
-  const footerOp = useTransform(p, [0.88, 1.00], [0, 1]);
+  const footerOp = useTransform(p, [0.80, 0.94], [0, 1]);
 
-  const NUM = { fontSize: 'clamp(5rem, 20vw, 18rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 } as const;
-  const LBL = { fontSize: 'clamp(2.5rem, 9vw, 8rem)', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.1 } as const;
+  const NUM = { fontSize: 'clamp(2.4rem, 7vw, 5rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 } as const;
+  const LBL = { fontSize: 'clamp(1.6rem, 4.5vw, 3rem)', fontWeight: 900, letterSpacing: '-0.03em' } as const;
 
   return (
     <div style={{ height: `${H3}vh` }}>
       <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
-           className="relative overflow-hidden flex items-center">
+           className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24">
 
-        {/* Slide 1: PP 송출 */}
-        <motion.div style={{ opacity: s1Op, x: s1X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800]/70 font-bold mb-3">PP · JTBC · tvN · OCN · JTBC4</p>
-          <span style={{ ...NUM, color: 'white', display: 'block' }}>1,296회</span>
-          <span style={{ ...LBL, color: '#FFB800', display: 'block', marginTop: '0.2em' }}>송출.</span>
-          <p className="text-white/35 mt-4" style={{ fontSize: 'clamp(0.9rem, 1.8vw, 1.3rem)' }}>계약 311회 대비 <strong className="text-[#FFB800]">416%</strong> 달성</p>
-        </motion.div>
+        <motion.p style={{ opacity: titleOp }}
+          className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800]/70 font-bold mb-8 md:mb-10">
+          CAMPAIGN RESULTS — 전 매체 합산
+        </motion.p>
 
-        {/* Slide 2: IPTV */}
-        <motion.div style={{ opacity: s2Op, x: s2X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800]/70 font-bold mb-3">IPTV · KT LiveAD · LG ART · SK SBA</p>
-          <span style={{ ...NUM, color: '#FFB800', display: 'block' }}>1,206만</span>
-          <span style={{ ...LBL, color: 'white', display: 'block', marginTop: '0.2em' }}>노출.</span>
-          <p className="text-white/35 mt-4" style={{ fontSize: 'clamp(0.9rem, 1.8vw, 1.3rem)' }}>IPTV 3사 통합 광고 노출 수</p>
-        </motion.div>
-
-        {/* Slide 3: 케이블/재핑 */}
-        <motion.div style={{ opacity: s3Op, x: s3X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800]/70 font-bold mb-3">CABLE · 딜라이브 재핑 · 전국</p>
-          <span style={{ ...NUM, color: 'white', display: 'block' }}>2,983만</span>
-          <span style={{ ...LBL, color: '#FFB800', display: 'block', marginTop: '0.2em' }}>가구.</span>
-          <p className="text-white/35 mt-4" style={{ fontSize: 'clamp(0.9rem, 1.8vw, 1.3rem)' }}>케이블 재핑 전국 가구 도달</p>
-        </motion.div>
-
-        {/* Slide 4: 총합 */}
-        <motion.div style={{ opacity: s4Op, x: s4X, y: '-50%', top: '50%', position: 'absolute', left: '2rem', willChange: 'transform' }}>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-[#FFB800]/70 font-bold mb-3">TOTAL CAMPAIGN IMPRESSION</p>
-          <span style={{ ...NUM, color: '#FFB800', display: 'block' }}>4,190만+</span>
-          <span style={{ ...LBL, color: 'white', display: 'block', marginTop: '0.2em' }}>도달.</span>
-          <p className="text-white/35 mt-4" style={{ fontSize: 'clamp(0.9rem, 1.8vw, 1.3rem)' }}>PP + IPTV + 케이블 전 매체 합산</p>
-        </motion.div>
+        <div className="flex flex-col gap-5 md:gap-7 max-w-5xl">
+          {/* PP */}
+          <motion.div style={{ opacity: r1Op, y: r1Y, willChange: 'transform' }} className="border-t border-white/10 pt-4 md:pt-5">
+            <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800]/70 font-bold mb-2">PP · JTBC · tvN · OCN · JTBC4</p>
+            <div className="flex items-baseline gap-x-4 gap-y-1 flex-wrap">
+              <span style={{ ...NUM, color: 'white' }}>1,296회</span>
+              <span style={{ ...LBL, color: '#FFB800' }}>송출.</span>
+              <span className="text-white/35 ml-auto" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.2rem)' }}>계약 311회 대비 <strong className="text-[#FFB800]">416%</strong> 달성</span>
+            </div>
+          </motion.div>
+          {/* IPTV */}
+          <motion.div style={{ opacity: r2Op, y: r2Y, willChange: 'transform' }} className="border-t border-white/10 pt-4 md:pt-5">
+            <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800]/70 font-bold mb-2">IPTV · KT LiveAD · LG ART · SK SBA</p>
+            <div className="flex items-baseline gap-x-4 gap-y-1 flex-wrap">
+              <span style={{ ...NUM, color: '#FFB800' }}>1,206만</span>
+              <span style={{ ...LBL, color: 'white' }}>노출.</span>
+              <span className="text-white/35 ml-auto" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.2rem)' }}>IPTV 3사 통합 광고 노출 수</span>
+            </div>
+          </motion.div>
+          {/* CABLE */}
+          <motion.div style={{ opacity: r3Op, y: r3Y, willChange: 'transform' }} className="border-t border-white/10 pt-4 md:pt-5">
+            <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800]/70 font-bold mb-2">CABLE · 딜라이브 재핑 · 전국</p>
+            <div className="flex items-baseline gap-x-4 gap-y-1 flex-wrap">
+              <span style={{ ...NUM, color: 'white' }}>2,983만</span>
+              <span style={{ ...LBL, color: '#FFB800' }}>가구.</span>
+              <span className="text-white/35 ml-auto" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.2rem)' }}>케이블 재핑 전국 가구 도달</span>
+            </div>
+          </motion.div>
+          {/* TOTAL */}
+          <motion.div style={{ opacity: r4Op, y: r4Y, willChange: 'transform' }} className="border-t border-[#FFB800]/30 pt-4 md:pt-5">
+            <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-2">TOTAL CAMPAIGN IMPRESSION</p>
+            <div className="flex items-baseline gap-x-4 gap-y-1 flex-wrap">
+              <span style={{ ...NUM, color: '#FFB800' }}>4,190만+</span>
+              <span style={{ ...LBL, color: 'white' }}>도달.</span>
+              <span className="text-white/35 ml-auto" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.2rem)' }}>PP + IPTV + 케이블 전 매체 합산</span>
+            </div>
+          </motion.div>
+        </div>
 
         {/* Footer */}
         <motion.div style={{ opacity: footerOp }}

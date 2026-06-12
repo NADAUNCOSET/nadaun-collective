@@ -42,45 +42,50 @@ const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C1S, C1E], [0, 1]);
 
-  const w1Op = useTransform(p, [0.28, 0.42], [1, 0]);
-  const w1X  = useTransform(p, [0.28, 0.42], ['0vw', '-80vw']);
-  const w2Op = useTransform(p, [0.28, 0.44, 0.58, 0.68], [0, 1, 1, 0]);
-  const w2X  = useTransform(p, [0.28, 0.44, 0.58, 0.68], ['80vw', '0vw', '0vw', '-80vw']);
-  const w3Op = useTransform(p, [0.58, 0.72, 0.92, 1.00], [0, 1, 1, 0]);
-  const w3X  = useTransform(p, [0.58, 0.72], ['80vw', '0vw']);
-  const subOp = useTransform(p, [0.68, 0.80], [0, 1]);
-  const subX  = useTransform(p, [0.68, 0.80], ['4%', '0%']);
+  // 세 단어가 순서대로 나타나 한 화면에 모두 남음 (대표 룰: 차례대로 한 화면에, About Ch1 패턴 통일 2026-06-12)
+  const w1Op = useTransform(p, [0.04, 0.16], [0, 1]);
+  const w1Y  = useTransform(p, [0.04, 0.16], ['40px', '0px']);
+  const w2Op = useTransform(p, [0.20, 0.32], [0, 1]);
+  const w2Y  = useTransform(p, [0.20, 0.32], ['40px', '0px']);
+  const w3Op = useTransform(p, [0.36, 0.48], [0, 1]);
+  const w3Y  = useTransform(p, [0.36, 0.48], ['40px', '0px']);
+  const subOp = useTransform(p, [0.50, 0.62], [0, 1]);
+  const subY  = useTransform(p, [0.50, 0.62], ['20px', '0px']);
+  const exitOp = useTransform(p, [0.74, 0.98], [1, 0]);
+  const exitY  = useTransform(p, [0.74, 0.98], ['0px', '-60px']);
 
-  const FS = { fontSize: 'clamp(5.5rem, 20vw, 17rem)' } as const;
+  const FS = { fontSize: 'clamp(3rem, 11vw, 9rem)' } as const;
 
   return (
     <div style={{ height: `${H1}vh` }}>
       <div
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
-        className="relative overflow-hidden flex items-center"
+        className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
         <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold">
           Business Overview
         </p>
-        <motion.h1 style={{ opacity: w1Op, x: w1X, y: '-50%', top: '50%', position: 'absolute', color: '#ffffff', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
-          <span style={FS}>WE BUILD</span>
-        </motion.h1>
-        <motion.h1 style={{ opacity: w2Op, x: w2X, y: '-50%', top: '50%', position: 'absolute', color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
-          <span style={FS}>THE NEXT</span>
-        </motion.h1>
-        <motion.h1 style={{ opacity: w3Op, x: w3X, y: '-50%', top: '50%', position: 'absolute', color: '#FFB800', willChange: 'transform' }}
-          className="font-black tracking-[-0.04em] leading-none whitespace-nowrap left-8 md:left-16 lg:left-24">
-          <span style={FS}>LEVEL.</span>
-        </motion.h1>
-        <motion.p
-          style={{ opacity: subOp, x: subX, position: 'absolute', bottom: '18%', left: '2rem' }}
-          className="text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
-        >
-          커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
-          단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
-        </motion.p>
+        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
+          <motion.h1 style={{ opacity: w1Op, y: w1Y, color: '#ffffff', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap">
+            <span style={FS}>WE BUILD</span>
+          </motion.h1>
+          <motion.h1 style={{ opacity: w2Op, y: w2Y, color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap">
+            <span style={FS}>THE NEXT</span>
+          </motion.h1>
+          <motion.h1 style={{ opacity: w3Op, y: w3Y, color: '#FFB800', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap">
+            <span style={FS}>LEVEL.</span>
+          </motion.h1>
+          <motion.p
+            style={{ opacity: subOp, y: subY }}
+            className="mt-10 text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
+          >
+            커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
+            단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );
