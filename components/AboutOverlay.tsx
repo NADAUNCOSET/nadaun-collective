@@ -1,6 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo, Suspense } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
+import * as THREE from 'three';
+import { WORLD_LAND } from './worldGeo';
 
 const HEADER_H = 57;
 
@@ -273,54 +276,29 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   );
 };
 
-// ── Globe helpers ─────────────────────────────────────────────────────────────
-// ── 2D flat-map projection ────────────────────────────────────────────────────
-function latLonToXY(
-  lat: number, lon: number,
-  cx: number, cy: number,
-  scale: number, cLat: number, cLon: number,
-): [number, number] {
-  return [cx + (lon - cLon) * scale, cy - (lat - cLat) * scale];
+// ── Chapter 4 — 3D Gold Dot Globe · Descent to Seoul → IP CONNECT ─────────────
+const DEG = Math.PI / 180;
+const SEOUL = { lat: 37.5665, lon: 126.978 };
+
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+// Matches THREE.SphereGeometry UV so markers/arcs land on the real texture geography
+function latLonToVec3(lat: number, lon: number, r = 1): THREE.Vector3 {
+  const u = (lon + 180) / 360;
+  const v = (90 - lat) / 180;
+  const phi = u * Math.PI * 2;
+  const theta = v * Math.PI;
+  return new THREE.Vector3(
+    -r * Math.cos(phi) * Math.sin(theta),
+    r * Math.cos(theta),
+    r * Math.sin(phi) * Math.sin(theta),
+  );
 }
 
-// Simplified continent coastlines [lat, lon][]
-const CONTINENTS: [number, number][][] = [
-  // North America
-  [[71,-165],[71,-140],[60,-140],[58,-137],[55,-130],[50,-125],[46,-124],
-   [40,-124],[36,-122],[32,-117],[30,-110],[22,-105],[16,-92],[16,-88],
-   [22,-80],[30,-80],[35,-76],[40,-74],[45,-67],[47,-53],[50,-56],[60,-65],
-   [65,-64],[70,-78],[72,-80],[72,-100],[70,-117],[71,-128],[71,-155],[71,-165]],
-  // South America
-  [[12,-71],[11,-63],[8,-60],[5,-52],[0,-50],[-5,-35],[-10,-37],[-15,-39],
-   [-20,-40],[-25,-48],[-30,-51],[-35,-57],[-40,-62],[-45,-65],[-53,-69],
-   [-55,-69],[-55,-63],[-50,-58],[-45,-58],[-40,-58],[-35,-58],[-30,-55],
-   [-25,-50],[-18,-46],[-10,-48],[-5,-48],[0,-48],[5,-52],[8,-60],[12,-71]],
-  // Eurasia
-  [[71,28],[65,14],[58,5],[51,2],[48,-5],[44,-9],[36,-9],[36,-5],[38,0],
-   [36,5],[37,10],[38,15],[38,22],[42,28],[42,35],[38,40],[36,36],[32,35],
-   [30,34],[22,38],[12,45],[12,51],[22,60],[27,57],[25,62],[25,68],[8,77],
-   [8,78],[14,80],[22,88],[24,90],[22,92],[22,93],[16,100],[10,100],
-   [4,104],[4,107],[14,108],[14,110],[20,110],[22,114],[22,120],
-   [24,122],[30,122],[37,122],[41,121],[41,130],[45,135],[48,135],
-   [52,141],[55,135],[60,140],[65,141],[68,160],[70,170],[71,180],
-   [71,175],[68,170],[65,170],[62,165],[60,165],[60,155],[62,140],
-   [60,128],[57,120],[55,110],[55,100],[57,90],[55,80],[55,68],[57,60],
-   [55,50],[50,46],[48,38],[45,38],[46,35],[43,33],[42,30],[42,28]],
-  // Africa
-  [[37,10],[37,12],[31,32],[22,37],[12,44],[11,42],[4,42],[0,42],
-   [-5,40],[-11,40],[-26,34],[-34,26],[-34,18],[-30,17],[-26,15],
-   [-22,14],[-18,12],[-14,12],[-4,9],[4,2],[4,7],[6,2],[5,-4],
-   [4,-9],[6,-14],[10,-15],[14,-17],[20,-17],[26,-15],[30,-10],[37,-6],
-   [37,0],[37,5],[37,10]],
-  // Australia
-  [[-14,129],[-13,136],[-12,137],[-14,140],[-16,145],[-20,149],
-   [-24,154],[-28,154],[-32,152],[-38,147],[-40,148],[-43,147],
-   [-39,146],[-38,142],[-36,140],[-38,140],[-35,137],[-32,134],
-   [-34,122],[-32,116],[-28,115],[-22,114],[-20,119],[-18,122],
-   [-16,122],[-14,127],[-14,129]],
-];
-
-// 11 cities covering all continents — all arcs complete before Ch4 exits
+// 11 global cities — IP CONNECT network endpoints
 const GLOBE_CITIES = [
   { name: 'TOKYO',     lat: 35.6762,  lon: 139.6503  },
   { name: 'BEIJING',   lat: 39.9042,  lon: 116.4074  },
@@ -332,252 +310,375 @@ const GLOBE_CITIES = [
   { name: 'PARIS',     lat: 48.8566,  lon:  2.3522   },
   { name: 'NEW YORK',  lat: 40.7128,  lon: -74.006   },
   { name: 'L.A.',      lat: 34.0522,  lon: -118.2437 },
-  { name: 'SÃO PAULO', lat: -23.5558, lon: -46.6396  },
+  { name: 'SAO PAULO', lat: -23.5558, lon: -46.6396  },
 ];
 
+// Korea peninsula outline — drawn as a glowing loop so the descent target reads unmistakably as KOREA
 const KOREA_OUTLINE: [number, number][] = [
-  [34.39, 126.22], [34.48, 126.80], [34.58, 127.44], [34.72, 128.04],
-  [34.88, 128.59], [35.10, 129.10], [35.42, 129.30], [35.60, 129.40],
-  [36.10, 129.43], [36.55, 129.46], [36.82, 129.49], [37.15, 129.30],
-  [37.46, 129.38], [37.74, 129.08], [38.00, 128.60], [38.31, 128.50],
-  [38.25, 128.00], [38.30, 127.50], [38.25, 127.00], [38.30, 126.50],
-  [38.10, 126.35], [37.88, 126.20], [37.68, 125.69],
-  [37.50, 126.62], [37.26, 126.50], [37.00, 126.55], [36.70, 126.40],
-  [36.50, 126.27], [36.20, 126.51], [35.90, 126.55], [35.70, 126.48],
-  [35.40, 126.50], [35.20, 126.55], [34.85, 126.45], [34.60, 126.00],
+  [34.39, 126.22], [34.48, 126.80], [34.58, 127.44], [34.72, 128.04], [34.88, 128.59],
+  [35.10, 129.10], [35.42, 129.30], [35.60, 129.40], [36.10, 129.43], [36.55, 129.46],
+  [36.82, 129.49], [37.15, 129.30], [37.46, 129.38], [37.74, 129.08], [38.00, 128.60],
+  [38.31, 128.50], [38.25, 128.00], [38.30, 127.50], [38.25, 127.00], [38.30, 126.50],
+  [38.10, 126.35], [37.88, 126.20], [37.68, 125.69], [37.50, 126.62], [37.26, 126.50],
+  [37.00, 126.55], [36.70, 126.40], [36.50, 126.27], [36.20, 126.51], [35.90, 126.55],
+  [35.70, 126.48], [35.40, 126.50], [35.20, 126.55], [34.85, 126.45], [34.60, 126.00],
   [34.39, 126.22],
 ];
+function buildKoreaLine(r = 1.005): Float32Array {
+  const out = new Float32Array(KOREA_OUTLINE.length * 3);
+  KOREA_OUTLINE.forEach(([lat, lon], i) => {
+    const v = latLonToVec3(lat, lon, r);
+    out[i * 3] = v.x; out[i * 3 + 1] = v.y; out[i * 3 + 2] = v.z;
+  });
+  return out;
+}
+// Fine WHITE dot fill over the Korean peninsula — pops against the gold world dots
+function buildKoreaDots(step = 0.3): Float32Array {
+  const inKorea = (lon: number, lat: number) => {
+    let inside = false;
+    for (let i = 0, j = KOREA_OUTLINE.length - 1; i < KOREA_OUTLINE.length; j = i++) {
+      const yi = KOREA_OUTLINE[i][0], xi = KOREA_OUTLINE[i][1];
+      const yj = KOREA_OUTLINE[j][0], xj = KOREA_OUTLINE[j][1];
+      if (((yi > lat) !== (yj > lat)) && (lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  };
+  const pos: number[] = [];
+  for (let lat = 34; lat <= 38.4; lat += step) {
+    for (let lon = 125.6; lon <= 129.6; lon += step) {
+      if (inKorea(lon, lat)) {
+        const v = latLonToVec3(lat, lon, 1.006);
+        pos.push(v.x, v.y, v.z);
+      }
+    }
+  }
+  return new Float32Array(pos);
+}
 
-// ── Chapter 4 — Korea → 2D Flat World Map ────────────────────────────────────
+// ── Land dot matrix: lat/lon grid filtered by point-in-land (computed once) ────
+let _landCache: Float32Array | null = null;
+function buildLandPositions(step = 1.4): Float32Array {
+  if (_landCache) return _landCache;
+  // ring bounding boxes for fast rejection
+  const bboxes = WORLD_LAND.map(ring => {
+    let mnx = 1e9, mny = 1e9, mxx = -1e9, mxy = -1e9;
+    for (const [x, y] of ring) {
+      if (x < mnx) mnx = x; if (x > mxx) mxx = x;
+      if (y < mny) mny = y; if (y > mxy) mxy = y;
+    }
+    return [mnx, mny, mxx, mxy];
+  });
+  const inRing = (lon: number, lat: number, ring: [number, number][]) => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+      if (((yi > lat) !== (yj > lat)) && (lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  };
+  const onLand = (lon: number, lat: number) => {
+    for (let k = 0; k < WORLD_LAND.length; k++) {
+      const b = bboxes[k];
+      if (lon < b[0] || lon > b[2] || lat < b[1] || lat > b[3]) continue;
+      if (inRing(lon, lat, WORLD_LAND[k])) return true;
+    }
+    return false;
+  };
+  const pos: number[] = [];
+  for (let lat = -82; lat <= 82; lat += step) {
+    const lonStep = step / Math.max(0.18, Math.cos(lat * DEG)); // even spacing
+    for (let lon = -180; lon <= 180; lon += lonStep) {
+      if (onLand(lon, lat)) {
+        const v = latLonToVec3(lat, lon, 1.0);
+        pos.push(v.x, v.y, v.z);
+      }
+    }
+  }
+  _landCache = new Float32Array(pos);
+  return _landCache;
+}
+
+// star field (fixed in space)
+function buildStars(n = 900): Float32Array {
+  const a = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    // deterministic scatter (no Math.random — keeps it stable)
+    const t = i * 2.399963; // golden angle
+    const y = 1 - (i / (n - 1)) * 2;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const rad = 14 + ((i * 53) % 11);
+    a[i * 3]     = Math.cos(t) * r * rad;
+    a[i * 3 + 1] = y * rad;
+    a[i * 3 + 2] = Math.sin(t) * r * rad;
+  }
+  return a;
+}
+
+// great-circle arc points Seoul → city, lifted into an over-the-horizon curve
+function buildArc(from: THREE.Vector3, to: THREE.Vector3, segments = 56): Float32Array {
+  const a = from.clone().normalize();
+  const b = to.clone().normalize();
+  const dot = Math.max(-1, Math.min(1, a.dot(b)));
+  const omega = Math.acos(dot);
+  const sinO = Math.sin(omega) || 1e-6;
+  const out = new Float32Array((segments + 1) * 3);
+  const dist = omega / Math.PI;                 // 0..1 angular distance
+  const lift = 0.14 + dist * 0.42;              // farther city → higher arc
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const s1 = Math.sin((1 - t) * omega) / sinO;
+    const s2 = Math.sin(t * omega) / sinO;
+    const x = a.x * s1 + b.x * s2;
+    const y = a.y * s1 + b.y * s2;
+    const z = a.z * s1 + b.z * s2;
+    const v = new THREE.Vector3(x, y, z).normalize();
+    const r = 1 + Math.sin(Math.PI * t) * lift;
+    v.multiplyScalar(r);
+    out[i * 3] = v.x; out[i * 3 + 1] = v.y; out[i * 3 + 2] = v.z;
+  }
+  return out;
+}
+
+// Atmosphere — fresnel rim glow (gold/blue) for the "from space" look
+const AtmosphereGlow: React.FC = () => {
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    side: THREE.BackSide,
+    depthWrite: false,
+    uniforms: {
+      uInner: { value: new THREE.Color('#4a86e8') },
+      uOuter: { value: new THREE.Color('#bcd8ff') },
+    },
+    vertexShader: `
+      varying vec3 vN; varying vec3 vP;
+      void main(){ vN = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position,1.0); vP = mv.xyz;
+        gl_Position = projectionMatrix * mv; }
+    `,
+    fragmentShader: `
+      varying vec3 vN; varying vec3 vP;
+      uniform vec3 uInner; uniform vec3 uOuter;
+      void main(){
+        vec3 V = normalize(-vP);
+        float f = pow(1.0 - max(dot(vN, V), 0.0), 3.4);
+        vec3 c = mix(uInner, uOuter, clamp(f, 0.0, 1.0));
+        gl_FragColor = vec4(c, f * 0.9);
+      }
+    `,
+  }), []);
+  return (
+    <mesh scale={1.11}>
+      <sphereGeometry args={[1, 48, 48]} />
+      <primitive object={mat} attach="material" />
+    </mesh>
+  );
+};
+
+const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ progressRef }) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const cloudRef = useRef<THREE.Mesh>(null);
+  const cloudMatRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const pulseRef = useRef<THREE.Mesh>(null);
+  const arcRefs = useRef<(THREE.BufferGeometry | null)[]>([]);
+  const arcMatRefs = useRef<(THREE.LineBasicMaterial | null)[]>([]);
+  const { camera } = useThree();
+
+  const [dayMap, cloudMap] = useLoader(THREE.TextureLoader, [
+    '/earth_day_8k.jpg', '/earth_clouds.png',
+  ]);
+  dayMap.colorSpace = THREE.SRGBColorSpace;
+  dayMap.anisotropy = 8;
+
+  const stars = useMemo(() => buildStars(), []);
+  const seoulVec = useMemo(() => latLonToVec3(SEOUL.lat, SEOUL.lon, 1), []);
+  const seoulDir = useMemo(() => seoulVec.clone().normalize(), [seoulVec]);
+
+  // bring Seoul to the camera (+Z) AND keep north up (+Y) — familiar "Korea from above" view
+  const qSeoul = useMemo(() => {
+    const fwd = seoulDir.clone();
+    const up0 = new THREE.Vector3(0, 1, 0);
+    const up = up0.clone().sub(fwd.clone().multiplyScalar(up0.dot(fwd))).normalize();
+    const right = new THREE.Vector3().crossVectors(up, fwd).normalize();
+    const m = new THREE.Matrix4().makeBasis(right, up, fwd);
+    return new THREE.Quaternion().setFromRotationMatrix(m).invert();
+  }, [seoulDir]);
+  const qStart = useMemo(() => {
+    const off = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.30, 1.05, 0.06));
+    return qSeoul.clone().premultiply(off);
+  }, [qSeoul]);
+
+  const arcs = useMemo(
+    () => GLOBE_CITIES.map(c => buildArc(seoulVec, latLonToVec3(c.lat, c.lon, 1))),
+    [seoulVec],
+  );
+  const markerQuat = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), seoulDir),
+    [seoulDir],
+  );
+
+  useFrame((state) => {
+    const p = progressRef.current;
+    const g = groupRef.current;
+    if (!g) return;
+
+    const de = easeOutExpo(clamp01(p / 0.45));
+    g.quaternion.slerpQuaternions(qStart, qSeoul, de);
+
+    let camZ: number, camY: number;
+    if (p < 0.45) {
+      camZ = lerp(5.2, 2.25, de);
+      camY = lerp(1.25, 0.02, de);
+    } else if (p < 0.62) {
+      const t = easeInOut(clamp01((p - 0.45) / 0.17));
+      camZ = lerp(2.25, 2.15, t);
+      camY = 0.02;
+    } else {
+      const t = easeInOut(clamp01((p - 0.62) / 0.38));
+      camZ = lerp(2.15, 3.7, t);
+      camY = lerp(0.02, 0.3, t);
+    }
+    camera.position.set(0, camY, camZ);
+    camera.lookAt(0, 0, 0);
+
+    // clouds part as we descend toward Korea
+    if (cloudRef.current) cloudRef.current.rotation.y += 0.0003;
+    if (cloudMatRef.current) cloudMatRef.current.opacity = 0.34 * (1 - de);
+
+    if (pulseRef.current) {
+      const beat = 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 2.2);
+      const sc = 1 + beat * 1.8;
+      pulseRef.current.scale.set(sc, sc, sc);
+      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - beat) * 0.6 * clamp01((p - 0.2) / 0.12);
+    }
+
+    arcs.forEach((_, i) => {
+      const geo = arcRefs.current[i];
+      const mat = arcMatRefs.current[i];
+      if (!geo || !mat) return;
+      const start = 0.64 + i * 0.018;
+      const prog = clamp01((p - start) / 0.12);
+      const total = arcs[i].length / 3;
+      geo.setDrawRange(0, Math.max(0, Math.floor(total * prog)));
+      mat.opacity = 0.9 * clamp01((p - start) / 0.05);
+    });
+  });
+
+  return (
+    <>
+      {/* stars */}
+      <points>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[stars, 3]} />
+        </bufferGeometry>
+        <pointsMaterial size={0.06} color="#9fb4e0" sizeAttenuation transparent opacity={0.5} depthWrite={false} />
+      </points>
+
+      {/* even daylight on the camera-facing hemisphere */}
+      <directionalLight position={[0.2, 0.35, 1.5]} intensity={1.5} color="#fff6e8" />
+      <ambientLight intensity={1.15} />
+
+      <AtmosphereGlow />
+
+      {/* globe */}
+      <group ref={groupRef}>
+        <mesh>
+          <sphereGeometry args={[1, 96, 96]} />
+          <meshStandardMaterial map={dayMap} roughness={1} metalness={0} />
+        </mesh>
+
+        {/* clouds — thin, clear away on descent */}
+        <mesh ref={cloudRef} scale={1.01}>
+          <sphereGeometry args={[1, 64, 64]} />
+          <meshStandardMaterial ref={cloudMatRef} color="#ffffff" alphaMap={cloudMap} transparent opacity={0.34} depthWrite={false} roughness={1} metalness={0} />
+        </mesh>
+
+        {/* Seoul marker + pulse */}
+        <group position={seoulDir.clone().multiplyScalar(1.014)} quaternion={markerQuat}>
+          <mesh>
+            <sphereGeometry args={[0.012, 16, 16]} />
+            <meshBasicMaterial color="#FFB800" />
+          </mesh>
+          <mesh ref={pulseRef}>
+            <ringGeometry args={[0.018, 0.025, 32]} />
+            <meshBasicMaterial color="#FFB800" transparent opacity={0.6} side={THREE.DoubleSide} depthWrite={false} />
+          </mesh>
+        </group>
+
+        {/* IP CONNECT arcs */}
+        {arcs.map((arc, i) => (
+          <line key={i}>
+            <bufferGeometry ref={(el) => (arcRefs.current[i] = el)}>
+              <bufferAttribute attach="attributes-position" args={[arc, 3]} />
+            </bufferGeometry>
+            <lineBasicMaterial
+              ref={(el) => (arcMatRefs.current[i] = el)}
+              color="#FFB800"
+              transparent
+              opacity={0}
+              depthWrite={false}
+            />
+          </line>
+        ))}
+      </group>
+    </>
+  );
+};
+
 const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [C4S, C4E], [0, 1]);
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const progressRef  = useRef(0);
-  const rafRef       = useRef(0);
-
+  const progressRef = useRef(0);
   useMotionValueEvent(p, 'change', (v) => { progressRef.current = v; });
 
-  const textOp = useTransform(p, [0.00, 0.10, 0.38, 0.68], [0, 1, 1, 0]);
-  const exitOp = useTransform(p, [0.84, 0.97], [1, 0]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
-    const ctx = canvas.getContext('2d')!;
-    let cancelled = false;
-
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = canvas.offsetWidth, h = canvas.offsetHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      ctx.scale(dpr, dpr);
-    };
-    resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-
-    const SEOUL_LAT = 37.5665, SEOUL_LON = 126.978;
-    const LINE_START = 0.42, LINE_GAP = 0.018, LINE_DUR = 0.05;
-    const eio = (t: number) => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
-
-    const draw = () => {
-      if (cancelled) return;
-      rafRef.current = requestAnimationFrame(draw);
-
-      const w = canvas.offsetWidth, h = canvas.offsetHeight;
-      ctx.clearRect(0, 0, w, h);
-      const pv = progressRef.current;
-      const cx = w * 0.5, cy = h * 0.52;
-
-      // zoomPhase: 1=Korea zoomed in, 0=world flat map
-      const zoomRaw = Math.max(0, Math.min(1, 1 - (pv - 0.30) / 0.36));
-      const zoomPhase = eio(zoomRaw);
-
-      // Scale: world = w/360 px/deg, Korea = 20× zoom
-      const worldScale = w / 360;
-      const koreaScale = worldScale * 20;
-      const scale = worldScale + (koreaScale - worldScale) * zoomPhase;
-      // Center drifts from Seoul to (lat=20, lon=0) standard
-      const cLat = 20 + (SEOUL_LAT - 20) * zoomPhase;
-      const cLon = 0  + (SEOUL_LON - 0)  * zoomPhase;
-
-      const ll = (lat: number, lon: number) => latLonToXY(lat, lon, cx, cy, scale, cLat, cLon);
-
-      // ── Ocean background ─────────────────────────────────────────────────────
-      const oceanGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.7);
-      oceanGrad.addColorStop(0,   'rgba(8, 22, 52, 0.55)');
-      oceanGrad.addColorStop(0.6, 'rgba(4, 12, 32, 0.40)');
-      oceanGrad.addColorStop(1,   'rgba(2,  6, 18, 0.20)');
-      ctx.fillStyle = oceanGrad;
-      ctx.fillRect(0, 0, w, h);
-
-      // ── Grid ────────────────────────────────────────────────────────────────
-      ctx.globalAlpha = 0.09;
-      ctx.lineWidth = 0.5;
-      ctx.strokeStyle = 'rgba(60,140,255,1)';
-      for (let lat = -60; lat <= 90; lat += 30) {
-        ctx.beginPath();
-        for (let lon = -180; lon <= 180; lon += 3) {
-          const [px, py] = ll(lat, lon);
-          lon === -180 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-      }
-      for (let lon = -180; lon <= 180; lon += 30) {
-        ctx.beginPath();
-        for (let lat = -80; lat <= 85; lat += 3) {
-          const [px, py] = ll(lat, lon);
-          lat === -80 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-
-      // ── Continent outlines ───────────────────────────────────────────────────
-      CONTINENTS.forEach(outline => {
-        ctx.beginPath();
-        outline.forEach(([lat, lon], i) => {
-          const [px, py] = ll(lat, lon);
-          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        });
-        ctx.closePath();
-        ctx.fillStyle = 'rgba(45, 50, 68, 0.72)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(100, 120, 180, 0.22)';
-        ctx.lineWidth = 0.9;
-        ctx.stroke();
-      });
-
-      // ── Korea filled + traced outline ────────────────────────────────────────
-      const traceProgress = Math.min(1, pv / 0.10);
-      const traceCount = Math.floor(traceProgress * KOREA_OUTLINE.length);
-
-      ctx.beginPath();
-      KOREA_OUTLINE.forEach(([lat, lon], i) => {
-        const [px, py] = ll(lat, lon);
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-      });
-      ctx.closePath();
-      ctx.fillStyle = `rgba(255,184,0,${0.04 + zoomPhase * 0.14})`;
-      ctx.fill();
-
-      if (traceCount > 0) {
-        ctx.save();
-        ctx.shadowColor = '#FFB800';
-        ctx.shadowBlur = 28;
-        ctx.beginPath();
-        for (let i = 0; i < traceCount; i++) {
-          const [lat, lon] = KOREA_OUTLINE[i];
-          const [px, py] = ll(lat, lon);
-          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        if (traceCount >= KOREA_OUTLINE.length) ctx.closePath();
-        ctx.strokeStyle = 'rgba(255,184,0,0.95)';
-        ctx.lineWidth = 3.5;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        for (let i = 0; i < traceCount; i++) {
-          const [lat, lon] = KOREA_OUTLINE[i];
-          const [px, py] = ll(lat, lon);
-          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        if (traceCount >= KOREA_OUTLINE.length) ctx.closePath();
-        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // ── Connection lines Seoul → cities ──────────────────────────────────────
-      GLOBE_CITIES.forEach((dest, i) => {
-        const prog = Math.max(0, Math.min(1, (pv - LINE_START - i * LINE_GAP) / LINE_DUR));
-        if (prog <= 0) return;
-        const STEPS = 60;
-        const endStep = Math.round(STEPS * prog);
-        const dLat = dest.lat - SEOUL_LAT;
-        let dLon = dest.lon - SEOUL_LON;
-        if (dLon > 180) dLon -= 360;
-        if (dLon < -180) dLon += 360;
-
-        ctx.beginPath();
-        for (let s = 0; s <= endStep; s++) {
-          const t = s / STEPS;
-          const [px, py] = ll(SEOUL_LAT + dLat * t, SEOUL_LON + dLon * t);
-          s === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        const a = Math.min(1, prog * 4);
-        ctx.strokeStyle = `rgba(255,184,0,${0.65 * a})`;
-        ctx.lineWidth = 1.3;
-        ctx.stroke();
-
-        if (prog >= 0.97) {
-          const [dpx, dpy] = ll(dest.lat, dest.lon);
-          ctx.beginPath(); ctx.arc(dpx, dpy, 3, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(255,184,0,0.9)'; ctx.fill();
-          ctx.beginPath(); ctx.arc(dpx, dpy, 7, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(255,184,0,0.22)'; ctx.lineWidth = 0.8; ctx.stroke();
-          ctx.font = 'bold 9px Manrope, sans-serif';
-          ctx.fillStyle = 'rgba(255,255,255,0.75)';
-          ctx.fillText(dest.name, dpx + 10, dpy + 3);
-        } else if (prog > 0.04) {
-          const t = endStep / STEPS;
-          const [lpx, lpy] = ll(SEOUL_LAT + dLat * t, SEOUL_LON + dLon * t);
-          ctx.beginPath(); ctx.arc(lpx, lpy, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,184,0,${a})`; ctx.fill();
-        }
-      });
-
-      // ── Seoul pulse dot ──────────────────────────────────────────────────────
-      if (pv > 0.01) {
-        const [spx, spy] = ll(SEOUL_LAT, SEOUL_LON);
-        const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
-        const dotAlpha = Math.min(1, pv * 20);
-        const dotSize = 4 + zoomPhase * 5;
-        for (let r = 1; r <= 3; r++) {
-          ctx.beginPath();
-          ctx.arc(spx, spy, dotSize + r * (5 + zoomPhase * 6) * pulse, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(255,184,0,${(0.2/r) * dotAlpha})`;
-          ctx.lineWidth = 0.7; ctx.stroke();
-        }
-        ctx.beginPath(); ctx.arc(spx, spy, dotSize, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,184,0,${dotAlpha})`; ctx.fill();
-        ctx.font = `bold ${9 + Math.round(zoomPhase * 4)}px Manrope, sans-serif`;
-        ctx.fillStyle = `rgba(255,184,0,${0.95 * dotAlpha})`;
-        ctx.fillText('SEOUL', spx + dotSize + 6, spy + 4);
-      }
-    };
-
-    draw();
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(rafRef.current);
-      ro.disconnect();
-    };
-  }, []);
+  const headOp = useTransform(p, [0.00, 0.08, 0.36, 0.52], [0, 1, 1, 0]);
+  const koreaLabelOp = useTransform(p, [0.20, 0.32, 0.50, 0.60], [0, 1, 1, 0]);
+  const koreaLabelY = useTransform(p, [0.20, 0.32], ['18px', '0px']);
+  const titleOp = useTransform(p, [0.50, 0.60, 0.86, 0.94], [0, 1, 1, 0]);
+  const exitOp = useTransform(p, [0.90, 0.99], [1, 0]);
 
   return (
     <div style={{ height: `${H4}vh` }}>
       <motion.div
-        ref={containerRef}
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)`, opacity: exitOp }}
-        className="relative overflow-hidden"
+        className="relative overflow-hidden bg-[#04060d]"
       >
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-        <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24 pointer-events-none">
-          <motion.div style={{ opacity: textOp }}>
-            <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold">
-              IP CONNECT — GLOBAL
-            </p>
-            <h2 className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-              style={{ fontSize: 'clamp(5rem, 16vw, 13rem)' }}>IP</h2>
-            <h2 className="font-black tracking-[-0.03em] leading-[0.85] block"
-              style={{ fontSize: 'clamp(5rem, 16vw, 13rem)', color: '#FFB800' }}>CONNECT.</h2>
-            <p className="mt-8 text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl font-light">
-              핵심 IP부터 글로벌 에이전시 네트워크까지 — 모든 것을 하나로 연결하는<br className="hidden md:block" />
-              올인원 파트너. 세계 어디서도, 어떤 브랜드든 완성합니다.
+        <Canvas
+          className="absolute inset-0"
+          style={{ pointerEvents: 'none' }}
+          camera={{ position: [0, 1.35, 5.4], fov: 42, near: 0.01, far: 100 }}
+          dpr={[1, 2]}
+          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        >
+          <Suspense fallback={null}>
+            <RealGlobe progressRef={progressRef} />
+          </Suspense>
+        </Canvas>
+
+        {/* Descent target label — 대한민국 / KOREA */}
+        <motion.div style={{ opacity: koreaLabelOp, y: koreaLabelY }}
+          className="absolute inset-x-0 top-[57%] flex flex-col items-center text-center pointer-events-none">
+          <p className="text-[11px] md:text-[13px] tracking-[0.6em] uppercase text-[#FFB800] font-bold mb-2">KOREA</p>
+          <h2 className="font-black text-white tracking-[-0.02em] leading-none"
+            style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)' }}>대한민국</h2>
+          <p className="mt-3 text-white/55 text-[11px] md:text-xs tracking-[0.35em] font-light">SEOUL · 37.5°N 127.0°E</p>
+        </motion.div>
+
+        {/* DOM overlay text */}
+        <div className="absolute inset-0 flex flex-col justify-between px-8 md:px-16 lg:px-24 py-10 pointer-events-none">
+          <motion.p style={{ opacity: headOp }}
+            className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
+            IP CONNECT — GLOBAL
+          </motion.p>
+
+          <motion.div style={{ opacity: titleOp }} className="mb-2">
+            <p className="text-[11px] tracking-[0.45em] uppercase text-[#FFB800] font-bold mb-5">SEOUL · KOREA</p>
+            <h2 className="font-black tracking-[-0.03em] leading-[0.86] text-white block"
+              style={{ fontSize: 'clamp(3.5rem, 12vw, 10rem)' }}>IP</h2>
+            <h2 className="font-black tracking-[-0.03em] leading-[0.86] block"
+              style={{ fontSize: 'clamp(3.5rem, 12vw, 10rem)', color: '#FFB800' }}>CONNECT.</h2>
+            <p className="mt-6 text-white/65 text-base md:text-xl leading-relaxed max-w-2xl font-light">
+              핵심 IP부터 글로벌 에이전시 네트워크까지 — 서울에서 세계 11개 도시로,<br className="hidden md:block" />
+              모든 것을 하나로 연결하는 올인원 파트너.
             </p>
           </motion.div>
         </div>
@@ -587,10 +688,16 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 };
 
 // ── Broadcast data ────────────────────────────────────────────────────────────
-const BROADCAST_CHANNELS = {
-  tv: ['KBS', 'MBC', 'SBS', 'JTBC', 'TV조선', 'MBN', 'tvN', 'tvN SHOW', 'E채널', 'MNET', 'MBC ON', '채널A', 'YTN'],
-  iptv: ['KT 올레TV', 'SK Btv', 'LG U+TV'],
-};
+// 전국 송출 가능 채널 — 공영·지역민방·종편·케이블·보도·IPTV·위성 전체 커버리지
+const BROADCAST_CHANNELS = [
+  { cat: '공영 · 지상파',     items: ['KBS', 'MBC', 'SBS', 'EBS'] },
+  { cat: '지역 민방',         items: ['TBC', 'KNN', 'KBC', 'TJB', 'JTV', 'UBC', 'CJB', 'G1', 'JIBS'] },
+  { cat: '종합편성',          items: ['JTBC', '채널A', 'TV조선', 'MBN'] },
+  { cat: '케이블 PP',         items: ['tvN', 'tvN SHOW', 'OCN', 'ENA', 'Mnet', 'E채널', 'OtvN', '코미디TV', 'MBC every1', 'MBC ON', '채널S'] },
+  { cat: '보도 전문',         items: ['YTN', '연합뉴스TV'] },
+  { cat: 'IPTV',              items: ['KT 지니TV', 'SK Btv', 'LG U+tv'] },
+  { cat: '위성 · 케이블 SO',  items: ['KT 스카이라이프', 'LG헬로비전', '딜라이브', 'CMB', 'HCN'] },
+];
 
 const BTL_ITEMS = [
   { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역',  img: 'http://www.newad.kr/upload_board_files/code_5/20210222092921-6b25109b040389ce5b4d35fc426d17e4.jpg' },
@@ -609,21 +716,17 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
   const p = useTransform(g, [C5S, C5E], [0, 1]);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // ── 4 word slides (fast) — each ~16% ──
-  const w1Op = useTransform(p, [0.00, 0.06, 0.12, 0.16], [0, 1, 1, 0]);
-  const w1X  = useTransform(p, [0.00, 0.06, 0.12, 0.16], ['80vw', '0vw', '0vw', '-80vw']);
-  const w2Op = useTransform(p, [0.17, 0.22, 0.28, 0.32], [0, 1, 1, 0]);
-  const w2X  = useTransform(p, [0.17, 0.22, 0.28, 0.32], ['80vw', '0vw', '0vw', '-80vw']);
-  const w3Op = useTransform(p, [0.33, 0.38, 0.44, 0.48], [0, 1, 1, 0]);
-  const w3X  = useTransform(p, [0.33, 0.38, 0.44, 0.48], ['80vw', '0vw', '0vw', '-80vw']);
-  const w4Op = useTransform(p, [0.49, 0.54, 0.59, 0.63], [0, 1, 1, 0]);
-  const w4X  = useTransform(p, [0.49, 0.54, 0.59, 0.63], ['80vw', '0vw', '0vw', '-80vw']);
+  // ── Intro phrase — one screen, quick reveal (like the About opening) ──
+  const phraseOp = useTransform(p, [0.01, 0.08, 0.50, 0.58], [0, 1, 1, 0]);
+  const l1Y = useTransform(p, [0.01, 0.10], ['10%', '0%']);
+  const l2Op = useTransform(p, [0.07, 0.16], [0, 1]);
+  const l2Y = useTransform(p, [0.07, 0.16], ['12%', '0%']);
 
   // ── S1: Channels ──
   const s1Op  = useTransform(p, [0.61, 0.66, 0.72, 0.76], [0, 1, 1, 0]);
   const s1Y   = useTransform(p, [0.61, 0.66], ['4%', '0%']);
-  const tvL   = useTransform(p, [0.62, 0.68], [0, 1]);
-  const iptvL = useTransform(p, [0.67, 0.73], [0, 1]);
+  const aOp   = useTransform(p, [0.62, 0.68], [0, 1]);
+  const bOp   = useTransform(p, [0.67, 0.73], [0, 1]);
 
   // ── S2: BTL 4 image slides — declared individually (no useTransform in .map) ──
   // Slide 1: 지하철 스크린도어
@@ -658,22 +761,17 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
           </p>
         </div>
 
-        {/* ── WORD SLIDES ── */}
-        <motion.div style={{ opacity: w1Op, x: w1X }}
-          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
-          <h2 style={{ ...FS_SHORT, color: 'white', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1 }}>TVC</h2>
-        </motion.div>
-        <motion.div style={{ opacity: w2Op, x: w2X }}
-          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
-          <h2 style={{ ...FS_LONG, color: 'white', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>제작부터</h2>
-        </motion.div>
-        <motion.div style={{ opacity: w3Op, x: w3X }}
-          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
-          <h2 style={{ ...FS_SHORT, color: '#FFB800', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1 }}>전국</h2>
-        </motion.div>
-        <motion.div style={{ opacity: w4Op, x: w4X }}
-          className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24 will-change-transform">
-          <h2 style={{ ...FS_LONG, color: '#FFB800', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>송출까지.</h2>
+        {/* ── INTRO PHRASE — one screen, quick reveal ── */}
+        <motion.div style={{ opacity: phraseOp }}
+          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24 will-change-transform">
+          <motion.h2 style={{ y: l1Y, fontSize: 'clamp(3rem, 11vw, 9.5rem)', lineHeight: 0.92, letterSpacing: '-0.04em', fontWeight: 900 }}
+            className="text-white block">
+            TVC 제작부터
+          </motion.h2>
+          <motion.h2 style={{ opacity: l2Op, y: l2Y, fontSize: 'clamp(3rem, 11vw, 9.5rem)', lineHeight: 0.92, letterSpacing: '-0.04em', fontWeight: 900, color: '#FFB800' }}
+            className="block mt-1">
+            전국 송출까지.
+          </motion.h2>
         </motion.div>
 
         {/* ── S1: CHANNELS — video background + channel list text ── */}
@@ -692,20 +790,24 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
             <span className="text-[9px] font-bold text-white tracking-wider">JTBC ON-AIR</span>
           </div>
 
-          {/* Channel text */}
+          {/* Channel categories — 전국 송출 채널 전체 커버리지 */}
           <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-            <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-8">공영 · 케이블 · 종편</p>
-            <motion.p style={{ opacity: tvL, fontSize: 'clamp(2.2rem, 6vw, 6.5rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}
-              className="font-black leading-tight text-white/90 mb-10">
-              {BROADCAST_CHANNELS.tv.join(' · ')}
-            </motion.p>
-            <motion.div style={{ opacity: iptvL }}>
-              <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-5">IPTV</p>
-              <p className="font-black leading-tight text-white/90"
-                style={{ fontSize: 'clamp(2rem, 5.5vw, 6rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-                {BROADCAST_CHANNELS.iptv.join(' · ')}
-              </p>
-            </motion.div>
+            <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">
+              공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성
+            </p>
+            <p className="text-white/45 text-xs md:text-sm font-light mb-7">전국 모든 송출 채널 — 어디든 닿습니다</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 max-w-5xl">
+              {BROADCAST_CHANNELS.map((grp, gi) => (
+                <motion.div key={grp.cat} style={{ opacity: gi < 4 ? aOp : bOp }}
+                  className="border-l-2 border-[#FFB800]/40 pl-4">
+                  <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">{grp.cat}</p>
+                  <p className="font-black leading-tight text-white/90"
+                    style={{ fontSize: 'clamp(1.05rem, 2vw, 1.85rem)', letterSpacing: '-0.01em' }}>
+                    {grp.items.join(' · ')}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </div>
           <p className="absolute bottom-5 right-8 md:right-16 lg:right-24 text-[8px] text-white/20 font-light">
             실제 방영 모니터링 영상 · 2025.11
