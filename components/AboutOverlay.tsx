@@ -8,7 +8,7 @@ import { WORLD_LAND } from './worldGeo';
 const HEADER_H = 57;
 
 // Chapter heights (vh)
-const H1 = 250, H2 = 270, H3 = 500, H4 = 600, H5 = 1100;
+const H1 = 100, H2 = 120, H3 = 220, H4 = 260, H5 = 280; // 스크러빙 대폭 단축 2720→980vh — 짧게 빨리 넘어가게 (대표 룰 2026-06-13)
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 const C1S = 0,               C1E = H1 / TOTAL;
@@ -710,28 +710,29 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
   const p = useTransform(g, [C5S, C5E], [0, 1]);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // ── Intro phrase — one screen, quick reveal (like the About opening) ──
-  const phraseOp = useTransform(p, [0.01, 0.08, 0.50, 0.58], [0, 1, 1, 0]);
-  const l1Y = useTransform(p, [0.01, 0.10], ['10%', '0%']);
-  const l2Op = useTransform(p, [0.07, 0.16], [0, 1]);
-  const l2Y = useTransform(p, [0.07, 0.16], ['12%', '0%']);
+  // ── 4개 화면 고르게·짧게 (phrase→채널→BTL→CTA) 빠른 전환 대표 룰 2026-06-13 ──
+  // Intro phrase — 빠르게 등장, 짧게 유지 후 넘어감
+  const phraseOp = useTransform(p, [0.01, 0.06, 0.22, 0.30], [0, 1, 1, 0]);
+  const l1Y = useTransform(p, [0.01, 0.07], ['10%', '0%']);
+  const l2Op = useTransform(p, [0.05, 0.12], [0, 1]);
+  const l2Y = useTransform(p, [0.05, 0.12], ['12%', '0%']);
 
   // ── S1: Channels ──
-  const s1Op  = useTransform(p, [0.61, 0.66, 0.72, 0.76], [0, 1, 1, 0]);
-  const s1Y   = useTransform(p, [0.61, 0.66], ['4%', '0%']);
-  const aOp   = useTransform(p, [0.62, 0.68], [0, 1]);
-  const bOp   = useTransform(p, [0.67, 0.73], [0, 1]);
+  const s1Op  = useTransform(p, [0.31, 0.36, 0.53, 0.58], [0, 1, 1, 0]);
+  const s1Y   = useTransform(p, [0.31, 0.36], ['4%', '0%']);
+  const aOp   = useTransform(p, [0.33, 0.39], [0, 1]);
+  const bOp   = useTransform(p, [0.38, 0.44], [0, 1]);
 
-  // ── S2: BTL — 4개 매체 한 화면 그리드 (순차 등장, 모두 머무름) 대표 룰 2026-06-13 ──
-  const btlSecOp = useTransform(p, [0.76, 0.82, 0.91, 0.95], [0, 1, 1, 0]);
-  const b1Op = useTransform(p, [0.77, 0.83], [0, 1]); const b1Y = useTransform(p, [0.77, 0.83], ['30px', '0px']);
-  const b2Op = useTransform(p, [0.79, 0.85], [0, 1]); const b2Y = useTransform(p, [0.79, 0.85], ['30px', '0px']);
-  const b3Op = useTransform(p, [0.81, 0.87], [0, 1]); const b3Y = useTransform(p, [0.81, 0.87], ['30px', '0px']);
-  const b4Op = useTransform(p, [0.83, 0.89], [0, 1]); const b4Y = useTransform(p, [0.83, 0.89], ['30px', '0px']);
+  // ── S2: BTL — 4개 매체 한 화면 그리드 (순차 등장, 모두 머무름) ──
+  const btlSecOp = useTransform(p, [0.58, 0.64, 0.86, 0.90], [0, 1, 1, 0]);
+  const b1Op = useTransform(p, [0.60, 0.66], [0, 1]); const b1Y = useTransform(p, [0.60, 0.66], ['30px', '0px']);
+  const b2Op = useTransform(p, [0.63, 0.69], [0, 1]); const b2Y = useTransform(p, [0.63, 0.69], ['30px', '0px']);
+  const b3Op = useTransform(p, [0.66, 0.72], [0, 1]); const b3Y = useTransform(p, [0.66, 0.72], ['30px', '0px']);
+  const b4Op = useTransform(p, [0.69, 0.75], [0, 1]); const b4Y = useTransform(p, [0.69, 0.75], ['30px', '0px']);
 
   // ── S3: CTA — 중앙 정렬, BTL 후 등장 ──
-  const s3Op = useTransform(p, [0.93, 0.98], [0, 1]);
-  const s3Y  = useTransform(p, [0.93, 0.98], ['4%', '0%']);
+  const s3Op = useTransform(p, [0.88, 0.94], [0, 1]);
+  const s3Y  = useTransform(p, [0.88, 0.94], ['4%', '0%']);
 
   return (
     <div style={{ height: `${H5}vh` }}>
