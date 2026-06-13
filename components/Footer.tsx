@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 interface FooterProps {
   onContactClick?: () => void;
@@ -13,33 +13,36 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
     offset: ['start start', 'end end'],
   });
 
+  // 스프링 댐핑 — 스크러빙 부드럽게 (대표 룰 2026-06-13)
+  const smooth = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
+
   // ── Word 1: "LET'S" ─ slides in from left
-  const w1Op  = useTransform(scrollYProgress, [0.00, 0.12], [0, 1]);
-  const w1X   = useTransform(scrollYProgress, [0.00, 0.12], ['-8%', '0%']);
-  const w1Out = useTransform(scrollYProgress, [0.52, 0.64], [1, 0]);
-  const w1OutY = useTransform(scrollYProgress, [0.52, 0.64], ['0%', '-6%']);
+  const w1Op  = useTransform(smooth, [0.00, 0.12], [0, 1]);
+  const w1X   = useTransform(smooth, [0.00, 0.12], ['-8%', '0%']);
+  const w1Out = useTransform(smooth, [0.52, 0.64], [1, 0]);
+  const w1OutY = useTransform(smooth, [0.52, 0.64], ['0%', '-6%']);
 
   // ── Word 2: "BE" ─ slides in from right
-  const w2Op  = useTransform(scrollYProgress, [0.10, 0.22], [0, 1]);
-  const w2X   = useTransform(scrollYProgress, [0.10, 0.22], ['8%', '0%']);
-  const w2Out = useTransform(scrollYProgress, [0.55, 0.67], [1, 0]);
-  const w2OutY = useTransform(scrollYProgress, [0.55, 0.67], ['0%', '-6%']);
+  const w2Op  = useTransform(smooth, [0.10, 0.22], [0, 1]);
+  const w2X   = useTransform(smooth, [0.10, 0.22], ['8%', '0%']);
+  const w2Out = useTransform(smooth, [0.55, 0.67], [1, 0]);
+  const w2OutY = useTransform(smooth, [0.55, 0.67], ['0%', '-6%']);
 
   // ── Word 3: "TOGETHER." ─ slides up from below
-  const w3Op  = useTransform(scrollYProgress, [0.20, 0.34], [0, 1]);
-  const w3Y   = useTransform(scrollYProgress, [0.20, 0.34], ['8%', '0%']);
-  const w3Out = useTransform(scrollYProgress, [0.58, 0.70], [1, 0]);
-  const w3OutY = useTransform(scrollYProgress, [0.58, 0.70], ['0%', '-6%']);
+  const w3Op  = useTransform(smooth, [0.20, 0.34], [0, 1]);
+  const w3Y   = useTransform(smooth, [0.20, 0.34], ['8%', '0%']);
+  const w3Out = useTransform(smooth, [0.58, 0.70], [1, 0]);
+  const w3OutY = useTransform(smooth, [0.58, 0.70], ['0%', '-6%']);
 
   // ── Sub copy ─ brief appearance then fades
-  const subOp = useTransform(scrollYProgress, [0.32, 0.44, 0.50, 0.60], [0, 1, 1, 0]);
+  const subOp = useTransform(smooth, [0.32, 0.44, 0.50, 0.60], [0, 1, 1, 0]);
 
   // ── CTA ─ appears last, stays
-  const ctaOp = useTransform(scrollYProgress, [0.72, 0.88], [0, 1]);
-  const ctaY  = useTransform(scrollYProgress, [0.72, 0.88], ['6%', '0%']);
+  const ctaOp = useTransform(smooth, [0.72, 0.88], [0, 1]);
+  const ctaY  = useTransform(smooth, [0.72, 0.88], ['6%', '0%']);
 
   // ── Bottom info bar
-  const barOp = useTransform(scrollYProgress, [0.88, 0.97], [0, 1]);
+  const barOp = useTransform(smooth, [0.88, 0.97], [0, 1]);
 
   return (
     <div ref={sectionRef} id="contact" style={{ height: '400vh' }} className="relative">

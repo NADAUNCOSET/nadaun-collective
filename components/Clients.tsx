@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform, useMotionValueEvent } from 'framer-motion';
 
 // ── 최고의 파트너 배경: 사진 포폴 메인컷 빠르게 순환 (대표 룰 2026-06-13) ──
 const PHOTOS = [
@@ -145,10 +145,12 @@ const Clients: React.FC = () => {
     setSpread(2.6 - eased * 1.6);
   });
 
-  const headerOp   = useTransform(scrollYProgress, [0.00, 0.08], [0, 1]);
-  const headerY    = useTransform(scrollYProgress, [0.00, 0.08], ['20px', '0px']);
-  const lineOp     = useTransform(scrollYProgress, [0.55, 0.85], [0, 0.35]);
-  const counterOp  = useTransform(scrollYProgress, [0.70, 0.90], [0, 1]);
+  // 스프링 댐핑 — 스크러빙 부드럽게 (대표 룰 2026-06-13)
+  const smooth = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
+  const headerOp   = useTransform(smooth, [0.00, 0.08], [0, 1]);
+  const headerY    = useTransform(smooth, [0.00, 0.08], ['20px', '0px']);
+  const lineOp     = useTransform(smooth, [0.55, 0.85], [0, 0.35]);
+  const counterOp  = useTransform(smooth, [0.70, 0.90], [0, 1]);
 
   // live count label: "4 BRANDS" → "11 BRANDS" → "37 BRANDS"
   const lgCount = NODES.filter(n => n.size === 'lg').length;

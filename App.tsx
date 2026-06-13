@@ -19,10 +19,12 @@ import { motion, useScroll, useSpring, useTransform, useMotionTemplate, AnimateP
 const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const opacity = useTransform(scrollYProgress, [0, 0.10, 0.86, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.10, 0.86, 1], [40, 0, 0, -20]);
-  // 스크롤 연동 모션블러 — 들어올 때 흐려졌다 선명, 나갈 때 흐려짐 (자연스럽게 이어짐) 대표 룰 2026-06-13
-  const blurNum = useTransform(scrollYProgress, [0, 0.12, 0.84, 1], [14, 0, 0, 14]);
+  // 스프링 댐핑으로 위아래 스크롤에 부드럽게 반응 (대표 룰 2026-06-13)
+  const sp = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
+  const opacity = useTransform(sp, [0, 0.10, 0.86, 1], [0, 1, 1, 0]);
+  const y = useTransform(sp, [0, 0.10, 0.86, 1], [40, 0, 0, -20]);
+  // 스크롤 연동 모션블러 — 들어올 때 흐려졌다 선명, 나갈 때 흐려짐 (자연스럽게 이어짐)
+  const blurNum = useTransform(sp, [0, 0.12, 0.84, 1], [14, 0, 0, 14]);
   const filter = useMotionTemplate`blur(${blurNum}px)`;
   return (
     <motion.div ref={ref} id={id} style={{ opacity, y, filter }} className="snap-section will-change-[filter,opacity,transform]">
