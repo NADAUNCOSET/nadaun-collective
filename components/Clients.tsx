@@ -19,8 +19,8 @@ const PhotoReel: React.FC = () => {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       {PHOTOS.map((src, idx) => (
-        <div key={src} className={`absolute inset-0 transition-opacity duration-[900ms] ${i === idx ? 'opacity-100' : 'opacity-0'}`}>
-          <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" style={{ filter: 'brightness(0.26) saturate(0.9)' }} />
+        <div key={src} className={`absolute inset-0 transition-[opacity,filter] duration-[1100ms] ease-out ${i === idx ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'}`}>
+          <img src={src} alt="" loading="lazy" className="w-full h-full object-cover scale-105" style={{ filter: 'brightness(0.26) saturate(0.9)' }} />
         </div>
       ))}
       <div className="absolute inset-0 bg-black/45" />
