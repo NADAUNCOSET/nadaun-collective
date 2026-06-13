@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// 비디오 포트폴리오 — R2. 새로고침마다 셔플. 모바일=세로, PC=가로 (대표 룰 2026-06-13)
-const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-const CAT = isMobile ? '세로' : '가로';
-const R2_BASE = `https://media.nadaun.co/video/${encodeURIComponent(CAT)}`;
+// 비디오 포트폴리오(가로) — R2. 새로고침마다 셔플. 모바일도 가로(세로클립 회전 이슈로 가로 통일) 대표 룰 2026-06-13
+const R2_BASE = `https://media.nadaun.co/video/${encodeURIComponent('가로')}`;
 const DURATION_MS = 2800;
 const MAX_CLIPS = 12;
 
@@ -22,7 +20,7 @@ const VideoReel: React.FC = () => {
     fetch('/video-portfolio.json', { signal: AbortSignal.timeout(6000) })
       .then(r => r.json())
       .then((d: any) => {
-        const list = Array.isArray(d?.[CAT]) ? d[CAT] : (Array.isArray(d?.['가로']) ? d['가로'] : []);
+        const list = Array.isArray(d?.['가로']) ? d['가로'] : [];
         const mapped: Clip[] = list
           .filter((x: any) => x?.file)
           .map((x: any) => ({ name: String(x.name || ''), src: `${R2_BASE}/${encodeURIComponent(x.file)}` }));
