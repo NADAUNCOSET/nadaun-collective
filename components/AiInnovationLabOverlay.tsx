@@ -34,6 +34,21 @@ interface AiInnovationLabOverlayProps {
   onBack?: () => void;
 }
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
+  <span className="inline-flex flex-wrap">
+    {text.split(' ').map((w, i) => (
+      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
+        <motion.span className="inline-block"
+          initial={{ x: '-45%', opacity: 0 }} animate={{ x: '0%', opacity: 1 }}
+          transition={{ duration: 0.72, delay: delay + i * 0.09, ease: EASE }} style={style}>
+          {w}&nbsp;
+        </motion.span>
+      </span>
+    ))}
+  </span>
+);
+
 const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen, onClose, onBack }) => {
   const [activeCategory, setActiveCategory] = useState('ALL');
 
@@ -77,15 +92,10 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                 <span className="font-bold tracking-[0.3em] text-sm uppercase">Innovation Lab</span>
               </motion.div>
               
-              <motion.h2 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.096, duration: 0.374 }}
-                className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 leading-[0.9]"
-              >
-                EXPLORE <br/>
-                <span className="text-gray-600">AI UNIVERSE.</span>
-              </motion.h2>
+              <h2 className="font-black tracking-[-0.04em] mb-8 leading-[0.88]" style={{ fontSize: 'clamp(3rem, 9vw, 7rem)' }}>
+                <WordSlide text="EXPLORE" /><br />
+                <WordSlide text="AI UNIVERSE." delay={0.2} style={{ color: '#FFB800' }} />
+              </h2>
 
               <motion.p
                 initial={{ opacity: 0, y: 30 }}

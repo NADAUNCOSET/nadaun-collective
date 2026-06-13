@@ -60,6 +60,22 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: React.React
   </motion.div>
 );
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
+  <span className="inline-flex flex-wrap justify-center">
+    {text.split(' ').map((w, i) => (
+      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
+        <motion.span className="inline-block"
+          initial={{ x: '-45%', opacity: 0 }} whileInView={{ x: '0%', opacity: 1 }}
+          viewport={{ once: false, margin: '-10%' }}
+          transition={{ duration: 0.72, delay: delay + i * 0.09, ease: EASE }} style={style}>
+          {w}&nbsp;
+        </motion.span>
+      </span>
+    ))}
+  </span>
+);
+
 const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ isOpen, onClose, onBack, onContactClick }) => {
   return (
     <AnimatePresence>
@@ -89,16 +105,15 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
 
           {/* Intro Section */}
           <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
-            <FadeIn>
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-[#FFB800] to-orange-500 rounded-full flex items-center justify-center mb-12 shadow-[0_0_60px_rgba(255,184,0,0.3)]">
-                <Layers className="w-10 h-10 text-black" />
-              </div>
-              <h2 className="text-6xl md:text-[10rem] font-bold tracking-tighter mb-8 leading-[0.85]">
-                INTEGRATED <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-800">SOLUTION.</span>
-              </h2>
-              <p className="text-gray-400 text-xl md:text-3xl max-w-4xl mx-auto font-light leading-relaxed tracking-tight">
-                나다운은 기획부터 제작, 매체 집행, 데이터 분석까지 <br className="hidden md:block"/>
+            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-9" />
+            <FadeIn><p className="text-xs md:text-sm tracking-[0.55em] uppercase text-[#FFB800] font-bold mb-9">01 — INTEGRATED SOLUTION</p></FadeIn>
+            <h2 className="font-black tracking-[-0.045em] leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 11rem)' }}>
+              <WordSlide text="INTEGRATED" /><br />
+              <WordSlide text="SOLUTION." delay={0.22} style={{ color: '#FFB800' }} />
+            </h2>
+            <FadeIn delay={0.5}>
+              <p className="text-white/55 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed break-keep">
+                기획부터 제작, 매체 집행, 데이터 분석까지 —<br className="hidden md:block"/>
                 브랜드의 성공을 위한 모든 과정을 하나로 연결합니다.
               </p>
             </FadeIn>
