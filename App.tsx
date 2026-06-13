@@ -10,7 +10,6 @@ import ContactOverlay from './components/ContactOverlay';
 import BusinessOverlay from './components/BusinessOverlay';
 import InsightsOverlay from './components/InsightsOverlay';
 import Intro from './components/Intro';
-import Manifesto from './components/Manifesto';
 import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import ImmersiveCreativeOverlay from './components/ImmersiveCreativeOverlay';
@@ -133,7 +132,6 @@ const App: React.FC = () => {
         <main>
           <Hero />
           <VideoReel />
-          <Manifesto />
           <Clients />
           <ScrollSection id="isoworld">
             <Suspense fallback={<div className="h-screen w-full bg-black" />}>

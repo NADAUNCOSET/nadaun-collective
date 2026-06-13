@@ -1,6 +1,26 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, ArrowRight, Globe, ChevronDown } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+// 단어별 좌→우 슬라이드 (문장 완성)
+const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
+  <span className="inline-flex flex-wrap justify-center">
+    {text.split(' ').map((w, i) => (
+      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
+        <motion.span className="inline-block"
+          initial={{ x: '-45%', opacity: 0 }}
+          whileInView={{ x: '0%', opacity: 1 }}
+          viewport={{ once: false, margin: '-10%' }}
+          transition={{ duration: 0.72, delay: delay + i * 0.09, ease: EASE }}
+          style={style}>
+          {w}&nbsp;
+        </motion.span>
+      </span>
+    ))}
+  </span>
+);
 
 interface GlobalNetworkOverlayProps {
   isOpen: boolean;
@@ -80,16 +100,17 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
 
           {/* Intro */}
           <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
+            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-9" />
             <FadeIn>
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-[#FFB800] to-orange-500 rounded-full flex items-center justify-center mb-10 shadow-[0_0_60px_rgba(255,184,0,0.3)]">
-                <Globe className="w-10 h-10 text-black" />
-              </div>
-              <p className="text-xs md:text-sm tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-6">03 · GLOBAL NETWORK</p>
-              <h2 className="font-black tracking-tighter leading-[0.85] mb-8" style={{ fontSize: 'clamp(4rem, 13vw, 11rem)' }}>
-                전국에서<br /><span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-700">전세계로.</span>
-              </h2>
-              <p className="text-gray-400 text-lg md:text-2xl max-w-3xl mx-auto font-light leading-relaxed break-keep">
-                방송·IPTV·케이블부터 오프라인 BTL, 해외 미디어까지 —<br className="hidden md:block" />
+              <p className="text-xs md:text-sm tracking-[0.55em] uppercase text-[#FFB800] font-bold mb-9">03 — GLOBAL NETWORK</p>
+            </FadeIn>
+            <h2 className="font-black tracking-[-0.045em] leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 11rem)' }}>
+              <WordSlide text="전국에서" /><br />
+              <WordSlide text="전세계로." delay={0.22} style={{ color: '#FFB800' }} />
+            </h2>
+            <FadeIn delay={0.5}>
+              <p className="text-white/55 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed break-keep">
+                방송 · IPTV · 케이블부터 오프라인 BTL, 해외 미디어까지 —<br className="hidden md:block" />
                 어떤 매체든, 어디든 닿는 나다운의 송출 네트워크.
               </p>
             </FadeIn>

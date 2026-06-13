@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// 비디오 포트폴리오(가로) — R2. 새로고침마다 셔플해서 다른 클립 노출 (대표 룰 2026-06-13)
-const R2_BASE = `https://media.nadaun.co/video/${encodeURIComponent('가로')}`;
+// 비디오 포트폴리오 — R2. 새로고침마다 셔플. 모바일=세로, PC=가로 (대표 룰 2026-06-13)
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+const CAT = isMobile ? '세로' : '가로';
+const R2_BASE = `https://media.nadaun.co/video/${encodeURIComponent(CAT)}`;
 const DURATION_MS = 2800;
 const MAX_CLIPS = 12;
 
@@ -20,7 +22,7 @@ const VideoReel: React.FC = () => {
     fetch('/video-portfolio.json', { signal: AbortSignal.timeout(6000) })
       .then(r => r.json())
       .then((d: any) => {
-        const list = Array.isArray(d?.['가로']) ? d['가로'] : [];
+        const list = Array.isArray(d?.[CAT]) ? d[CAT] : (Array.isArray(d?.['가로']) ? d['가로'] : []);
         const mapped: Clip[] = list
           .filter((x: any) => x?.file)
           .map((x: any) => ({ name: String(x.name || ''), src: `${R2_BASE}/${encodeURIComponent(x.file)}` }));
@@ -70,18 +72,6 @@ const VideoReel: React.FC = () => {
       </div>
 
       <div className="absolute bottom-10 left-8 md:left-16 right-8 md:right-16 pointer-events-none">
-        {current.name && (
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={current.name}
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="text-white font-bold text-lg md:text-2xl tracking-tight mb-5 line-clamp-1 max-w-[80%]"
-            >
-              {current.name}
-            </motion.p>
-          </AnimatePresence>
-        )}
         <div className="flex gap-2">
           {clips.map((_, i) => (
             <motion.div key={i}

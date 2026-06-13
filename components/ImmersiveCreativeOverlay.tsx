@@ -1,6 +1,26 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, ArrowRight, Zap, ChevronDown } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+// 단어별 좌→우 슬라이드 (문장 완성)
+const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
+  <span className="inline-flex flex-wrap justify-center">
+    {text.split(' ').map((w, i) => (
+      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
+        <motion.span className="inline-block"
+          initial={{ x: '-45%', opacity: 0 }}
+          whileInView={{ x: '0%', opacity: 1 }}
+          viewport={{ once: false, margin: '-10%' }}
+          transition={{ duration: 0.72, delay: delay + i * 0.09, ease: EASE }}
+          style={style}>
+          {w}&nbsp;
+        </motion.span>
+      </span>
+    ))}
+  </span>
+);
 
 interface ImmersiveCreativeOverlayProps {
   isOpen: boolean;
@@ -54,16 +74,17 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
 
           {/* Intro */}
           <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
+            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-9" />
             <FadeIn>
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-[#FFB800] to-orange-500 rounded-full flex items-center justify-center mb-10 shadow-[0_0_60px_rgba(255,184,0,0.3)]">
-                <Zap className="w-10 h-10 text-black" />
-              </div>
-              <p className="text-xs md:text-sm tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-6">02 · IMMERSIVE CREATIVE</p>
-              <h2 className="font-black tracking-tighter leading-[0.85] mb-8" style={{ fontSize: 'clamp(3.6rem, 12vw, 10rem)' }}>
-                IMMERSIVE<br /><span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-700">CREATIVE.</span>
-              </h2>
-              <p className="text-gray-400 text-lg md:text-2xl max-w-3xl mx-auto font-light leading-relaxed break-keep">
-                TVC·브랜드필름·3D 모션 — 하이엔드 IP 제작.<br className="hidden md:block" />
+              <p className="text-xs md:text-sm tracking-[0.55em] uppercase text-[#FFB800] font-bold mb-9">02 — IMMERSIVE CREATIVE</p>
+            </FadeIn>
+            <h2 className="font-black tracking-[-0.045em] leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 11rem)' }}>
+              <WordSlide text="IMMERSIVE" /><br />
+              <WordSlide text="CREATIVE." delay={0.22} style={{ color: '#FFB800' }} />
+            </h2>
+            <FadeIn delay={0.5}>
+              <p className="text-white/55 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed break-keep">
+                TVC · 브랜드필름 · 3D 모션 — 하이엔드 IP 제작.<br className="hidden md:block" />
                 제작 의뢰부터 전국 송출까지, 한 흐름으로 완성합니다.
               </p>
             </FadeIn>
