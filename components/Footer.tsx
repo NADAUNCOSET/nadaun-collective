@@ -51,6 +51,8 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
         {/* ── Words layer ─────────────────────────── */}
         <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
 
+          {/* Line 1: LET'S BE (한 줄) */}
+          <div className="flex items-baseline gap-x-[0.3em] flex-wrap">
           {/* LET'S */}
           <motion.div style={{ opacity: w1Out, y: w1OutY }}>
             <motion.p
@@ -86,8 +88,9 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
               BE
             </motion.p>
           </motion.div>
+          </div>
 
-          {/* TOGETHER. */}
+          {/* Line 2: TOGETHER. */}
           <motion.div style={{ opacity: w3Out, y: w3OutY }}>
             <motion.p
               style={{
@@ -156,7 +159,7 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
             <div className="flex flex-col gap-1">
               <span className="font-bold text-sm text-white/70 mb-1">NADAUN COLLECTIVE</span>
               <p>서울특별시 영등포구 영등포로33길 18, 1층</p>
-              <p>T. 02-6053-6231 · E. rbsent.info@gmail.com</p>
+              <p>T. 02-6053-6231 · E. info@nadaun.co</p>
             </div>
             <div className="flex flex-col md:items-end gap-2">
               <div className="flex gap-5 text-white/40 tracking-widest uppercase">
