@@ -69,12 +69,12 @@ const UNIVERSE_DATA: BuildingData[] = [
   },
   {
     id: 'starlogin',
-    title: 'STAR LOGIN',
-    subtitle: 'IP CONNECT — GLOBAL',
+    title: 'IP CONNECT',
+    subtitle: 'GLOBAL IP NETWORK',
     desc: '글로벌 IP 네트워크로\n브랜드를 세계와 연결',
     b2b: 'https://starlogin.com',
     b2c: 'https://starlogin.com',
-    btnLabels: { b2b: 'IP CONNECT →', b2c: 'Global Agency →' },
+    btnLabels: { b2b: 'IP 네트워크 →', b2c: 'Global Agency →' },
     color: '#FF6B35',
     position: [0, 0, 5],
     height: 2.8,
@@ -270,18 +270,18 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                       >{link.label} →</button>
                     ))}
                   </div>
-                ) : item.id === 'moment' ? (
+                ) : (item.b2b || item.b2c) ? (
                   <div className="flex gap-1.5 mt-3">
                     <button
-                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform"
+                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform leading-tight"
                       style={{ borderColor: item.color + '60', color: item.color }}
                       onClick={() => item.b2b && window.open(item.b2b, '_blank')}
-                    >PHOTO</button>
+                    >{(item.btnLabels?.b2b ?? 'PHOTO →').replace(' →', '')}</button>
                     <button
-                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border"
+                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform leading-tight"
                       style={item.b2c ? { borderColor: item.color + '60', color: item.color } : { borderColor: '#333', color: '#555' }}
                       onClick={() => item.b2c && window.open(item.b2c, '_blank')}
-                    >{item.b2c ? 'VIDEO' : 'Soon'}</button>
+                    >{item.b2c ? (item.btnLabels?.b2c ?? 'VIDEO →').replace(' →', '') : 'Soon'}</button>
                   </div>
                 ) : (
                   <button
