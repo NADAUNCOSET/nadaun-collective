@@ -82,9 +82,10 @@ const IPTV3 = [
 interface InsightsOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onContactClick?: () => void;
 }
 
-const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) => {
+const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose, onContactClick }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -115,7 +116,7 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
               <FadeIn delay={0.5}>
                 <p className="text-gray-300 text-lg md:text-2xl max-w-3xl mx-auto font-light leading-relaxed break-keep">
                   PP · IPTV 3사 · 케이블 · 재핑까지 — 한 달간 전국 전 매체로 송출한<br className="hidden md:block" />
-                  레인보우베네 <span className="text-white font-medium">리버노보</span> 캠페인 실측 결과입니다.
+                  <span className="text-white font-medium">Livernovo TVC 캠페인</span> 실측 결과입니다.
                 </p>
               </FadeIn>
               <motion.div animate={{ y: [0, 14, 0], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut' }}
@@ -192,7 +193,7 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
                 {[
                   { k: '집행 기간', v: '31일', s: '2025.10.22 — 11.21' },
                   { k: '매체', v: '4종', s: 'PP · IPTV · 케이블 · 재핑' },
-                  { k: '소재', v: '2편', s: '리버노보 남 / 여 15초' },
+                  { k: '소재', v: '2편', s: 'Livernovo 남 / 여 15초' },
                   { k: '케이블 송출', v: '322회', s: '심포니 (계약 262)' },
                 ].map((x, i) => (
                   <FadeIn key={x.k} delay={0.06 * i}>
@@ -205,7 +206,21 @@ const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose }) =>
                 ))}
               </div>
               <FadeIn delay={0.3}>
-                <p className="mt-20 text-white/25 text-xs tracking-widest uppercase">NADAUN COLLECTIVE · LIVERNOVO 매체 분석 보고서 (2025.11.25 집계)</p>
+                <p className="mt-20 text-white/25 text-xs tracking-widest uppercase">NADAUN COLLECTIVE · Livernovo TVC 캠페인 실측 (2025.11.25 집계)</p>
+              </FadeIn>
+            </section>
+
+            {/* CTA — 마지막은 문의하기로 */}
+            <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 border-t border-white/5 bg-gradient-to-b from-transparent to-[#FFB800]/8">
+              <FadeIn>
+                <p className="text-xs md:text-sm tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-9">NEXT CAMPAIGN</p>
+                <h3 className="font-black text-white mb-12 tracking-tighter leading-[0.9]" style={{ fontSize: 'clamp(3rem, 9vw, 8rem)' }}>
+                  <WordSlide text="다음 성과의" /><br /><WordSlide text="주인공은?" delay={0.22} style={{ color: '#FFB800' }} />
+                </h3>
+                <button onClick={() => { onClose(); onContactClick?.(); }}
+                  className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 text-lg md:text-xl">
+                  프로젝트 문의하기 →
+                </button>
               </FadeIn>
             </section>
 

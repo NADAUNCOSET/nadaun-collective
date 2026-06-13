@@ -110,6 +110,7 @@ const App: React.FC = () => {
         <InsightsOverlay
           isOpen={activeOverlay === 'insights'}
           onClose={closeOverlay}
+          onContactClick={() => setActiveOverlay('contact')}
         />
         <ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />
         <IntegratedSolutionOverlay
