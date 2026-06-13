@@ -37,6 +37,8 @@ const VideoReel: React.FC = () => {
 
   useEffect(() => {
     if (!videoRef.current) return;
+    videoRef.current.muted = true;
+    videoRef.current.volume = 0;
     videoRef.current.currentTime = 0;
     videoRef.current.play().catch(() => {});
   }, [index]);
@@ -68,29 +70,6 @@ const VideoReel: React.FC = () => {
       <div className="absolute top-8 left-8 md:left-16 pointer-events-none">
         <p className="text-[#FFB800] font-bold tracking-[0.3em] text-xs uppercase">VIDEO PORTFOLIO</p>
       </div>
-
-      <div className="absolute bottom-10 left-8 md:left-16 right-8 md:right-16 pointer-events-none">
-        <div className="flex gap-2">
-          {clips.map((_, i) => (
-            <motion.div key={i}
-              animate={{ width: i === index ? 28 : 6, backgroundColor: i === index ? '#FFB800' : 'rgba(255,255,255,0.3)' }}
-              transition={{ duration: 0.14 }}
-              className="h-[3px] rounded-full"
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="absolute bottom-10 right-8 md:right-16 pointer-events-none">
-        <p className="text-white/30 font-mono text-xs tabular-nums">
-          {String(index + 1).padStart(2, '0')} / {String(clips.length).padStart(2, '0')}
-        </p>
-      </div>
-
-      <a href="https://video.nadaun.co" target="_blank" rel="noopener noreferrer"
-        className="absolute top-8 right-8 md:right-16 z-10 text-[11px] font-bold tracking-wider uppercase text-white/60 hover:text-[#FFB800] border border-white/15 hover:border-[#FFB800]/40 rounded-full px-4 py-2 transition-colors">
-        포트폴리오 전체 →
-      </a>
     </section>
   );
 };
