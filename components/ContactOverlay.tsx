@@ -219,6 +219,25 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         </button>
                       ))}
                     </div>
+
+                    {/* 광고 제작 선택 시 상세 입력칸 (클릭 순간 등장) 대표 룰 2026-06-13 */}
+                    {inquiryTypes.production && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                        className="mt-10"
+                      >
+                        <p className="text-xs tracking-[0.3em] uppercase text-[#FFB800]/70 mb-4 font-bold">광고 제작 — 어떤 작업이 필요하세요?</p>
+                        <textarea
+                          name="광고제작_상세"
+                          rows={3}
+                          placeholder="예: TVC 30초 · 브랜드필름 · 제품/인물 촬영 · 앨범/화보 · 지면 등 자유롭게 적어주세요"
+                          className="w-full bg-transparent border-b border-white/15 focus:border-white pb-3 text-white font-light outline-none placeholder-white/20 transition-colors duration-300 resize-none leading-relaxed"
+                          style={{ fontSize: 'clamp(1.05rem, 2.2vw, 1.6rem)' }}
+                        />
+                      </motion.div>
+                    )}
                   </SectionReveal>
                 </section>
 

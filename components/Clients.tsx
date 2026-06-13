@@ -51,7 +51,7 @@ const NODES: ClientNode[] = [
   { name: 'AMOREPACIFIC',   x: 44,  y: 89,  size: 'md' },
   { name: 'COWAY',          x: 26,  y: 80,  size: 'md' },
   { name: 'JUNG SAEM MOOL', x: 10,  y: 70,  size: 'sm' },
-  { name: 'ACMÉ DE LA VIE', x: 6,   y: 52,  size: 'sm' },
+  { name: 'KBS',            x: 6,   y: 52,  size: 'md' },
   { name: 'HD HYUNDAI',     x: 8,   y: 36,  size: 'sm' },
   { name: 'HYUNDAI STEEL',  x: 22,  y: 28,  size: 'sm' },
   { name: 'GAONCHIPS',      x: 38,  y: 32,  size: 'sm' },
@@ -76,6 +76,10 @@ const NODES: ClientNode[] = [
   { name: 'INNOCEAN',       x: 38,  y: 4,   size: 'md' },
   { name: 'CHEIL',          x: 62,  y: 96,  size: 'md' },
   { name: 'SBS',            x: 80,  y: 56,  size: 'md' },
+  { name: 'tvN',            x: 76,  y: 17,  size: 'md' },
+  { name: 'TBC',            x: 90,  y: 46,  size: 'md' },
+  { name: 'CJ',             x: 6,   y: 82,  size: 'md' },
+  { name: 'HANATOUR',       x: 48,  y: 40,  size: 'md' },
 ];
 
 const EDGES: [number, number][] = [
