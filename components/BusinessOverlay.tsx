@@ -146,7 +146,7 @@ const Ch2: React.FC<{
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, x: exitX }}>
           <motion.p style={{ opacity: titleOp, x: titleX }}
-            className="text-xs tracking-[0.4em] uppercase text-[#FFB800] mb-10 font-bold"
+            className="text-sm md:text-base tracking-[0.4em] uppercase text-[#FFB800] mb-8 md:mb-12 font-bold"
           >BUSINESS DOMAINS</motion.p>
           <div className="flex flex-col gap-0">
             {DOMAINS.map((d, i) => {
@@ -155,7 +155,7 @@ const Ch2: React.FC<{
                 <motion.div
                   key={d.id}
                   style={{ opacity: dOps[i], x: dXs[i] }}
-                  className="group border-t border-white/10 py-5 md:py-6 flex items-center gap-5 md:gap-8 cursor-pointer hover:bg-white/[0.02] -mx-4 px-4 rounded transition-colors"
+                  className="group border-t border-white/12 py-6 md:py-9 flex items-center gap-4 md:gap-8 cursor-pointer hover:bg-white/[0.03] -mx-4 px-4 rounded-lg transition-colors"
                   onClick={() => {
                     if (d.id === '01' && onIntegratedClick) onIntegratedClick();
                     if (d.id === '02' && onCreativeClick) onCreativeClick();
@@ -163,25 +163,25 @@ const Ch2: React.FC<{
                     if (d.id === '04' && onAiLabClick) onAiLabClick();
                   }}
                 >
-                  <span className="font-mono text-sm text-white/25 shrink-0 w-6">{d.id}</span>
-                  <Icon className="w-5 h-5 text-white/30 group-hover:text-[#FFB800] transition-colors shrink-0" />
+                  <span className="font-mono text-xs md:text-sm text-white/25 shrink-0 w-6 md:w-8">{d.id}</span>
+                  <Icon className="w-6 h-6 md:w-8 md:h-8 text-white/30 group-hover:text-[#FFB800] transition-colors shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-black tracking-[-0.02em] text-white/80 group-hover:text-white transition-colors leading-none"
-                      style={{ fontSize: 'clamp(1.6rem, 4vw, 3.5rem)' }}>
+                    <h3 className="font-black tracking-[-0.02em] text-white/85 group-hover:text-white transition-colors leading-[0.95]"
+                      style={{ fontSize: 'clamp(2.3rem, 7vw, 6rem)' }}>
                       {d.title}
                     </h3>
-                    <p className="text-[10px] tracking-[0.2em] uppercase text-[#FFB800]/50 font-bold mt-1 hidden md:block">
+                    <p className="text-[10px] md:text-[12px] tracking-[0.2em] uppercase text-[#FFB800]/55 font-bold mt-2 block">
                       {d.subtitle}
                     </p>
                   </div>
-                  <div className="hidden md:flex flex-wrap gap-1.5 ml-auto">
+                  <div className="hidden lg:flex flex-wrap gap-1.5 ml-auto max-w-[40%] justify-end">
                     {d.tags.map(tag => (
-                      <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-[#FFB800]/60 border border-[#FFB800]/20 px-2.5 py-1 rounded-full">
+                      <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-[#FFB800]/60 border border-[#FFB800]/20 px-3 py-1.5 rounded-full">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <span className="text-white/20 group-hover:text-[#FFB800] transition-colors text-sm ml-4">→</span>
+                  <span className="text-white/25 group-hover:text-[#FFB800] group-hover:translate-x-1 transition-all text-xl md:text-3xl ml-3 md:ml-5 shrink-0">→</span>
                 </motion.div>
               );
             })}
@@ -370,13 +370,14 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
         {/* A. 방송채널 */}
         <motion.div style={{ opacity: aOp }} className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성</p>
-          <p className="text-white/45 text-xs md:text-sm font-light mb-7">전국 모든 송출 채널 — 어디든 닿습니다</p>
+          <p className="text-[11px] md:text-[13px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">NATIONWIDE BROADCAST</p>
+          <h2 className="font-black text-white leading-[0.9] mb-3 md:mb-5" style={{ fontSize: 'clamp(2.6rem, 7vw, 6rem)', letterSpacing: '-0.03em' }}>전국 방송 송출</h2>
+          <p className="text-white/45 text-sm md:text-base font-light mb-7 md:mb-10">공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성 — 어디든 닿습니다</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 max-w-5xl">
             {BROADCAST_CHANNELS.map((grp, gi) => (
               <motion.div key={grp.cat} style={{ opacity: gi < 4 ? ch1 : ch2 }} className="border-l-2 border-[#FFB800]/40 pl-4">
                 <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">{grp.cat}</p>
-                <p className="font-black leading-tight text-white/90" style={{ fontSize: 'clamp(1.05rem, 2vw, 1.85rem)', letterSpacing: '-0.01em' }}>{grp.items.join(' · ')}</p>
+                <p className="font-black leading-tight text-white/90" style={{ fontSize: 'clamp(1.3rem, 2.7vw, 2.4rem)', letterSpacing: '-0.01em' }}>{grp.items.join(' · ')}</p>
               </motion.div>
             ))}
           </div>
@@ -384,8 +385,9 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
         {/* B. 오프라인 BTL */}
         <motion.div style={{ opacity: bOp }} className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">오프라인 BTL — 전국 매체</p>
-          <p className="text-white/45 text-xs md:text-sm font-light mb-6 md:mb-8">지하철 · 옥외 전광판 · 택시 · 버스</p>
+          <p className="text-[11px] md:text-[13px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">OFFLINE BTL</p>
+          <h2 className="font-black text-white leading-[0.9] mb-3 md:mb-5" style={{ fontSize: 'clamp(2.6rem, 7vw, 6rem)', letterSpacing: '-0.03em' }}>오프라인 매체</h2>
+          <p className="text-white/45 text-sm md:text-base font-light mb-6 md:mb-8">지하철 · 옥외 전광판 · 택시 · 버스</p>
           <div className="grid grid-cols-2 gap-3 md:gap-5 max-w-5xl w-full">
             {BTL_ITEMS.map((item, i) => (
               <motion.div key={item.label} style={{ opacity: btlT[i].op, y: btlT[i].y, willChange: 'transform, opacity' }} className="relative rounded-xl overflow-hidden aspect-[16/10]">
@@ -393,7 +395,7 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-4 md:p-6">
                   <p className="text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">오프라인 BTL · 0{i + 1}</p>
-                  <p className="font-black text-white leading-none mb-1.5" style={{ fontSize: 'clamp(1.4rem, 3.2vw, 2.8rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
+                  <p className="font-black text-white leading-none mb-1.5" style={{ fontSize: 'clamp(1.7rem, 4.2vw, 3.6rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
                   <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.72rem, 1.1vw, 1rem)' }}>{item.spec}</p>
                 </div>
               </motion.div>
@@ -403,8 +405,9 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
         {/* C. 해외 광고 */}
         <motion.div style={{ opacity: cOp }} className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">해외 광고 — 글로벌 미디어 네트워크</p>
-          <p className="text-white/45 text-xs md:text-sm font-light mb-6 md:mb-8">일본 · 중국 · 동남아 · 미국 · 유럽 · 글로벌 팬덤</p>
+          <p className="text-[11px] md:text-[13px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">GLOBAL NETWORK</p>
+          <h2 className="font-black text-white leading-[0.9] mb-3 md:mb-5" style={{ fontSize: 'clamp(2.6rem, 7vw, 6rem)', letterSpacing: '-0.03em' }}>해외 광고</h2>
+          <p className="text-white/45 text-sm md:text-base font-light mb-6 md:mb-8">일본 · 중국 · 동남아 · 미국 · 유럽 · 글로벌 팬덤</p>
           <div className="grid grid-cols-2 gap-3 md:gap-5 max-w-5xl w-full">
             {OVERSEAS_ITEMS.map((item, i) => (
               <motion.div key={item.label} style={{ opacity: ovT[i].op, y: ovT[i].y, willChange: 'transform, opacity' }} className="relative rounded-xl overflow-hidden aspect-[16/10]">
@@ -412,7 +415,7 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-4 md:p-6">
                   <p className="text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">OVERSEAS · 0{i + 1}</p>
-                  <p className="font-black text-white leading-none mb-1.5" style={{ fontSize: 'clamp(1.4rem, 3.2vw, 2.8rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
+                  <p className="font-black text-white leading-none mb-1.5" style={{ fontSize: 'clamp(1.7rem, 4.2vw, 3.6rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
                   <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.72rem, 1.1vw, 1rem)' }}>{item.spec}</p>
                 </div>
               </motion.div>
