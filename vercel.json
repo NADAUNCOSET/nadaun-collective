@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/livernovo-videos.json", "destination": "https://media.nadaun.co/website/video-manifest.json" }
+    { "source": "/livernovo-videos.json", "destination": "https://media.nadaun.co/website/video-manifest.json" },
+    { "source": "/video-portfolio.json", "destination": "https://media.nadaun.co/video/manifest.json" }
   ],
   "headers": [
     {
