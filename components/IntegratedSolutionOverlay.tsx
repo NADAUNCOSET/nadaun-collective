@@ -11,39 +11,39 @@ interface IntegratedSolutionOverlayProps {
 
 const SERVICES = [
   {
-    id: 'strategy',
+    id: 'plan',
     icon: <Layers className="w-8 h-8 md:w-10 md:h-10" />,
-    title: 'Strategy & Planning',
-    subtitle: '전략 기획',
-    desc: '브랜드의 본질을 분석하고 시장의 흐름을 읽어, 타겟의 마음을 움직이는 최적의 캠페인 전략을 수립합니다.',
-    features: ['브랜드 포지셔닝', '캠페인 기획', '타겟 분석', '크리에이티브 전략'],
-    color: 'from-blue-500 to-purple-500'
+    title: 'Creative Strategy',
+    subtitle: '크리에이티브 기획',
+    desc: '제작 이전에 전략으로 승부합니다. 브랜드의 본질과 시장을 읽어, 어떤 IP로 · 누구에게 · 어떤 메시지로 닿을지 캠페인의 큰 그림을 설계합니다.',
+    features: ['IP · 브랜드 전략', '캠페인 설계', '타겟 오디언스 정의', '메시지 · 컨셉 도출'],
+    color: 'from-blue-500 to-indigo-500'
   },
   {
-    id: 'creative',
+    id: 'produce',
     icon: <MonitorPlay className="w-8 h-8 md:w-10 md:h-10" />,
-    title: 'Creative Production',
-    subtitle: '크리에이티브 제작',
-    desc: '시선을 사로잡는 영상, 압도적인 3D 비주얼, 그리고 직관적인 웹/앱 환경까지. 상상을 현실로 구현합니다.',
-    features: ['TV/디지털 CF', '3D 모션그래픽', '웹/앱 UI·UX', '브랜드 필름'],
+    title: 'Content Production',
+    subtitle: '하이엔드 콘텐츠 제작',
+    desc: '기획을 압도적인 비주얼로 구현합니다. TVC · 브랜드필름 · 기업 VCR · 3D 모션, 사진·영상 촬영부터 후반작업, On-Air까지 한 흐름으로.',
+    features: ['TVC · CF · 브랜드필름', '기업 VCR', '3D · 모션그래픽', '사진 · 영상 촬영'],
     color: 'from-[#FFB800] to-orange-500'
   },
   {
-    id: 'media',
+    id: 'broadcast',
     icon: <TrendingUp className="w-8 h-8 md:w-10 md:h-10" />,
-    title: 'Media Execution',
-    subtitle: '미디어 집행',
-    desc: '가장 효율적인 매체 믹스를 통해 타겟에게 도달하며, 퍼포먼스 마케팅과 바이럴로 확산의 극대화를 이끌어냅니다.',
-    features: ['퍼포먼스 마케팅', 'SNS 바이럴', 'OOH (옥외광고)', '인플루언서 마케팅'],
+    title: 'Media & Broadcast',
+    subtitle: '전국 · 글로벌 송출',
+    desc: '제작물을 전국 방송 · IPTV · 케이블 · 오프라인 BTL, 그리고 해외 매체까지 직접 송출합니다. LIVERNOVO 캠페인은 계약 대비 416%를 초과 달성했습니다.',
+    features: ['방송 · IPTV · 케이블', '오프라인 BTL', '해외 · 글로벌', '퍼포먼스 · 바이럴'],
     color: 'from-emerald-500 to-teal-500'
   },
   {
-    id: 'data',
+    id: 'ip',
     icon: <BarChart3 className="w-8 h-8 md:w-10 md:h-10" />,
-    title: 'Data Analysis',
-    subtitle: '데이터 분석 및 최적화',
-    desc: '캠페인 진행 중 발생하는 모든 데이터를 실시간으로 트래킹하고 분석하여, ROAS를 극대화하는 솔루션을 제공합니다.',
-    features: ['실시간 성과 측정', 'A/B 테스트', '고객 여정 분석', '인사이트 리포팅'],
+    title: 'IP & Influencer',
+    subtitle: 'IP · 인플루언서 타겟팅',
+    desc: '난컴퍼니 MCN과 AI 데이터를 기반으로, 브랜드 IP와 인플루언서가 정확한 타겟에게 닿는 방법을 설계하고 운영합니다. 도달에서 끝나지 않고 팬덤으로 이어집니다.',
+    features: ['MCN · 크리에이터 운영', '인플루언서 매칭', 'IP 타겟 오디언스', 'AI 데이터 타겟팅'],
     color: 'from-rose-500 to-pink-500'
   }
 ];
@@ -113,8 +113,8 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
             </h2>
             <FadeIn delay={0.5}>
               <p className="text-white/55 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed break-keep">
-                기획부터 제작, 매체 집행, 데이터 분석까지 —<br className="hidden md:block"/>
-                브랜드의 성공을 위한 모든 과정을 하나로 연결합니다.
+                크리에이티브 기획 → 하이엔드 제작 → 전국·글로벌 송출 → IP·인플루언서 타겟팅까지 —<br className="hidden md:block"/>
+                나다운이 한 흐름으로 완성하는 올인원 솔루션.
               </p>
             </FadeIn>
 

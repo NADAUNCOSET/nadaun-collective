@@ -14,7 +14,7 @@ const C3S = C2E, C3E = 1;
 
 const DOMAINS = [
   { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',        tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
-  { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',        tags: ['TVC Production', 'Brand Film', '3D Motion'],               icon: Zap       },
+  { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',        tags: ['TVC · CF', '브랜드필름', '기업 VCR', '3D · 모션', '사진 촬영', '영상 촬영', '지면 · 앨범'], icon: Zap },
   { id: '03', title: 'GLOBAL NETWORK',      subtitle: 'Nationwide & Global Media',     tags: ['Broadcast · IPTV · BTL', 'Global Media', 'Overseas'],      icon: Globe     },
   { id: '04', title: 'AI INNOVATION LAB',   subtitle: 'Next-Gen Tech Enhancement',     tags: ['AI Production', 'VFX Pipeline', 'Gen AI'],                 icon: Sparkles  },
 ];
@@ -141,7 +141,7 @@ const Ch2: React.FC<{
                       {d.subtitle}
                     </p>
                   </div>
-                  <div className="hidden lg:flex flex-wrap gap-1.5 ml-auto max-w-[40%] justify-end">
+                  <div className="hidden lg:flex flex-wrap gap-1.5 ml-auto max-w-[46%] justify-end">
                     {d.tags.map(tag => (
                       <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-[#FFB800]/60 border border-[#FFB800]/20 px-3 py-1.5 rounded-full">
                         {tag}

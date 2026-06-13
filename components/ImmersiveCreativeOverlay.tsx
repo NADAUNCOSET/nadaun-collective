@@ -4,6 +4,18 @@ import { X, ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+const PRODUCE = [
+  { t: 'TVC · CF', s: '방송 · 디지털 광고 영상' },
+  { t: '브랜드 필름', s: '브랜드 스토리 · 홍보 영상' },
+  { t: '기업 VCR', s: '행사 · IR · 사내 영상' },
+  { t: '3D · 모션그래픽', s: 'CG · VFX · 모션 디자인' },
+  { t: '사진 촬영', s: '제품 · 인물 · 화보 촬영' },
+  { t: '영상 촬영', s: '현장 · 스튜디오 촬영' },
+  { t: '지면 · 인쇄', s: '광고 지면 · 카탈로그' },
+  { t: '앨범 · 화보', s: '아티스트 앨범 · 화보' },
+  { t: '웹 · 디자인', s: '랜딩 · 브랜딩 · 키비주얼' },
+];
+
 // 단어별 좌→우 슬라이드 (문장 완성)
 const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
   <span className="inline-flex flex-wrap justify-center">
@@ -93,6 +105,22 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
               <span className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-bold">Process</span>
               <ChevronDown className="text-gray-500 w-5 h-5" />
             </motion.div>
+          </section>
+
+          {/* 제작 영역 — 사진·영상·지면·앨범 등 전 항목 */}
+          <section className="py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-6xl mx-auto w-full">
+            <FadeIn><p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">WHAT WE PRODUCE</p></FadeIn>
+            <FadeIn delay={0.05}><h3 className="font-black leading-[0.9] mb-12" style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', letterSpacing: '-0.03em' }}>제작 영역</h3></FadeIn>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+              {PRODUCE.map((p, i) => (
+                <FadeIn key={p.t} delay={0.035 * i}>
+                  <div className="border border-white/10 rounded-2xl p-6 md:p-7 hover:border-[#FFB800]/40 hover:bg-white/[0.02] transition-colors h-full">
+                    <p className="font-black text-white mb-1.5" style={{ fontSize: 'clamp(1.2rem, 2.6vw, 1.9rem)', letterSpacing: '-0.02em' }}>{p.t}</p>
+                    <p className="text-white/45 text-sm font-light">{p.s}</p>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
           </section>
 
           {/* Production process */}
