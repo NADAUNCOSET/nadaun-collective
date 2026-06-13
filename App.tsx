@@ -13,6 +13,8 @@ import Intro from './components/Intro';
 import Manifesto from './components/Manifesto';
 import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
+import ImmersiveCreativeOverlay from './components/ImmersiveCreativeOverlay';
+import GlobalNetworkOverlay from './components/GlobalNetworkOverlay';
 import { motion, useScroll, useSpring, useTransform, AnimatePresence, useMotionValue } from 'framer-motion';
 
 const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
@@ -90,12 +92,15 @@ const App: React.FC = () => {
 
         {/* OVERLAYS */}
         <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />
-        <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} />
+        <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={() => setActiveOverlay('business')} />
         <BusinessOverlay
           isOpen={activeOverlay === 'business'}
           onClose={closeOverlay}
           onAiLabClick={() => setActiveOverlay('ai-lab')}
           onIntegratedClick={() => setActiveOverlay('integrated-solution')}
+          onCreativeClick={() => setActiveOverlay('immersive-creative')}
+          onGlobalClick={() => setActiveOverlay('global-network')}
+          onContactClick={() => setActiveOverlay('contact')}
         />
         <InsightsOverlay
           isOpen={activeOverlay === 'insights'}
@@ -105,6 +110,20 @@ const App: React.FC = () => {
         <IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
           onClose={closeOverlay}
+          onBack={() => setActiveOverlay('business')}
+          onContactClick={() => setActiveOverlay('contact')}
+        />
+        <ImmersiveCreativeOverlay
+          isOpen={activeOverlay === 'immersive-creative'}
+          onClose={closeOverlay}
+          onBack={() => setActiveOverlay('business')}
+          onContactClick={() => setActiveOverlay('contact')}
+          onGlobalClick={() => setActiveOverlay('global-network')}
+        />
+        <GlobalNetworkOverlay
+          isOpen={activeOverlay === 'global-network'}
+          onClose={closeOverlay}
+          onBack={() => setActiveOverlay('business')}
           onContactClick={() => setActiveOverlay('contact')}
         />
 

@@ -1,10 +1,11 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Layers, MonitorPlay, TrendingUp, BarChart3, ArrowRight, ChevronDown } from 'lucide-react';
+import { X, Layers, MonitorPlay, TrendingUp, BarChart3, ArrowRight, ArrowLeft, ChevronDown } from 'lucide-react';
 
 interface IntegratedSolutionOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onBack?: () => void;
   onContactClick: () => void;
 }
 
@@ -59,7 +60,7 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: React.React
   </motion.div>
 );
 
-const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ isOpen, onClose, onContactClick }) => {
+const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ isOpen, onClose, onBack, onContactClick }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -70,8 +71,16 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
           transition={{ duration: 0.374 }}
           className="fixed inset-0 z-[100] bg-[#050505] text-white overflow-y-auto overflow-x-hidden scroll-smooth"
         >
-          {/* Close Button */}
-          <button 
+          {/* Back → 사업영역 */}
+          {onBack && (
+            <button onClick={onBack}
+              className="fixed top-8 left-8 md:top-12 md:left-12 z-[110] flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all"
+            >
+              <ArrowLeft size={16} /> 사업영역
+            </button>
+          )}
+          {/* Close Button → 홈 */}
+          <button
             onClick={onClose}
             className="fixed top-8 right-8 md:top-12 md:right-12 z-[110] p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md"
           >
