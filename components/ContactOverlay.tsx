@@ -71,6 +71,10 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
         inquiryTypes.promotion && '광고 홍보',
       ].filter(Boolean).join(', ');
       object['문의_분야'] = types;
+      // 어느 사이트에서 온 문의인지 표기 (대표 룰 2026-06-13)
+      object['출처_사이트'] = 'COLLECTIVE (collective.nadaun.co)';
+      object.subject = '[COLLECTIVE] 나다운 컬렉티브 — 광고 문의';
+      object.from_name = 'NADAUN COLLECTIVE 웹사이트';
 
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
