@@ -238,6 +238,25 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         />
                       </motion.div>
                     )}
+
+                    {/* 광고 홍보 선택 시 상세 입력칸 (대표 룰 2026-06-13) */}
+                    {inquiryTypes.promotion && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                        className="mt-10"
+                      >
+                        <p className="text-xs tracking-[0.3em] uppercase text-[#FFB800]/70 mb-4 font-bold">광고 홍보 · 송출 — 어떤 매체가 필요하세요?</p>
+                        <textarea
+                          name="광고홍보_상세"
+                          rows={3}
+                          placeholder="예: 방송/IPTV/케이블 송출 · 지하철/옥외/택시/버스 BTL · 해외 · 퍼포먼스/바이럴 등 자유롭게 적어주세요"
+                          className="w-full bg-transparent border-b border-white/15 focus:border-white pb-3 text-white font-light outline-none placeholder-white/20 transition-colors duration-300 resize-none leading-relaxed"
+                          style={{ fontSize: 'clamp(1.05rem, 2.2vw, 1.6rem)' }}
+                        />
+                      </motion.div>
+                    )}
                   </SectionReveal>
                 </section>
 
