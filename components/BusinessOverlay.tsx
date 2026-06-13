@@ -194,6 +194,7 @@ const Ch3: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = (
 // ── Main overlay ──────────────────────────────────────────────────────────────
 interface BusinessOverlayProps {
   isOpen: boolean;
+  startAtDomains?: boolean;
   onClose: () => void;
   onAiLabClick?: () => void;
   onIntegratedClick?: () => void;
@@ -202,7 +203,7 @@ interface BusinessOverlayProps {
   onContactClick?: () => void;
 }
 
-const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAiLabClick, onIntegratedClick, onCreativeClick, onGlobalClick, onContactClick }) => {
+const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, startAtDomains, onClose, onAiLabClick, onIntegratedClick, onCreativeClick, onGlobalClick, onContactClick }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
@@ -212,14 +213,22 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
     const el = scrollRef.current;
     if (!el) return;
     progress.set(0);
-    el.scrollTop = 0;
+    if (startAtDomains) {
+      // 상세 새창에서 백 → 인트로 건너뛰고 도메인(사업영역) 화면으로 바로
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const max = el.scrollHeight - el.clientHeight;
+        if (max > 0) el.scrollTop = (C2S + 0.05) * max;
+      }));
+    } else {
+      el.scrollTop = 0;
+    }
     const onScroll = () => {
       const max = el.scrollHeight - el.clientHeight;
       if (max > 0) progress.set(el.scrollTop / max);
     };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
-  }, [isOpen, progress]);
+  }, [isOpen, startAtDomains, progress]);
 
   useEffect(() => {
     if (!isOpen) return;

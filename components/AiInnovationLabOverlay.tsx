@@ -47,21 +47,21 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
           transition={{ duration: 0.374, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[100] bg-black text-white overflow-y-auto"
         >
-          {/* Back → 사업영역 */}
-          {onBack && (
-            <button onClick={onBack}
-              className="fixed top-8 left-8 md:top-12 md:left-12 z-[110] flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all"
+          {/* 우상단: 사업영역(백) + X(홈) 나란히 */}
+          <div className="fixed top-8 right-8 md:top-12 md:right-12 z-[110] flex items-center gap-2 md:gap-3">
+            {onBack && (
+              <button onClick={onBack}
+                className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all"
+              >
+                <ArrowLeft size={16} /> 사업영역
+              </button>
+            )}
+            <button onClick={onClose}
+              className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md"
             >
-              <ArrowLeft size={16} /> 사업영역
+              <X size={24} className="text-white group-hover:text-[#FFB800] transition-colors" />
             </button>
-          )}
-          {/* Close Button → 홈 */}
-          <button
-            onClick={onClose}
-            className="fixed top-8 right-8 md:top-12 md:right-12 z-[110] p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md"
-          >
-            <X size={24} className="text-white group-hover:text-[#FFB800] transition-colors" />
-          </button>
+          </div>
 
           <div className="min-h-screen container mx-auto px-6 py-24 md:py-32">
             

@@ -40,6 +40,7 @@ const App: React.FC = () => {
 
   const [introFinished, setIntroFinished] = useState(false);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
+  const [bizFromBack, setBizFromBack] = useState(false); // 상세 새창 백버튼 → 도메인으로 복귀
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -56,7 +57,8 @@ const App: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [activeOverlay]);
 
-  const handleNavClick = (id: string) => setActiveOverlay(id);
+  const handleNavClick = (id: string) => { if (id === 'business') setBizFromBack(false); setActiveOverlay(id); };
+  const backToDomains = () => { setBizFromBack(true); setActiveOverlay('business'); };
   const closeOverlay = () => setActiveOverlay(null);
 
   return (
@@ -92,9 +94,10 @@ const App: React.FC = () => {
 
         {/* OVERLAYS */}
         <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />
-        <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={() => setActiveOverlay('business')} />
+        <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToDomains} />
         <BusinessOverlay
           isOpen={activeOverlay === 'business'}
+          startAtDomains={bizFromBack}
           onClose={closeOverlay}
           onAiLabClick={() => setActiveOverlay('ai-lab')}
           onIntegratedClick={() => setActiveOverlay('integrated-solution')}
@@ -110,20 +113,20 @@ const App: React.FC = () => {
         <IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
           onClose={closeOverlay}
-          onBack={() => setActiveOverlay('business')}
+          onBack={backToDomains}
           onContactClick={() => setActiveOverlay('contact')}
         />
         <ImmersiveCreativeOverlay
           isOpen={activeOverlay === 'immersive-creative'}
           onClose={closeOverlay}
-          onBack={() => setActiveOverlay('business')}
+          onBack={backToDomains}
           onContactClick={() => setActiveOverlay('contact')}
           onGlobalClick={() => setActiveOverlay('global-network')}
         />
         <GlobalNetworkOverlay
           isOpen={activeOverlay === 'global-network'}
           onClose={closeOverlay}
-          onBack={() => setActiveOverlay('business')}
+          onBack={backToDomains}
           onContactClick={() => setActiveOverlay('contact')}
         />
 

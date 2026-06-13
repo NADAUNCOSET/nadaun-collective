@@ -66,16 +66,17 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
           transition={{ duration: 0.374 }}
           className="fixed inset-0 z-[120] bg-[#050505] text-white overflow-y-auto overflow-x-hidden scroll-smooth"
         >
-          {/* BACK → 사업영역 */}
-          <button onClick={onBack}
-            className="fixed top-7 left-7 md:top-10 md:left-10 z-[130] flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all">
-            <ArrowLeft size={16} /> 사업영역
-          </button>
-          {/* X → 홈 */}
-          <button onClick={onClose}
-            className="fixed top-7 right-7 md:top-10 md:right-10 z-[130] p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md">
-            <X size={22} className="text-white group-hover:text-[#FFB800] transition-colors" />
-          </button>
+          {/* 우상단: 사업영역(백) + X(홈) 나란히 */}
+          <div className="fixed top-7 right-7 md:top-10 md:right-10 z-[130] flex items-center gap-2 md:gap-3">
+            <button onClick={onBack}
+              className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all">
+              <ArrowLeft size={16} /> 사업영역
+            </button>
+            <button onClick={onClose}
+              className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md">
+              <X size={22} className="text-white group-hover:text-[#FFB800] transition-colors" />
+            </button>
+          </div>
 
           {/* Intro */}
           <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
