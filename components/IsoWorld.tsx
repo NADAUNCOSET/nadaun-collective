@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Environment } from '@react-three/drei';
+import { motion } from 'framer-motion';
 import * as THREE from 'three';
 
 type LinkItem = { label: string; url: string };
@@ -241,9 +242,13 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
             NADAUN <span className="text-[#FFB800]">UNIVERSE</span>
           </h2>
           <div className="grid grid-cols-2 gap-3 flex-1 overflow-y-auto pb-4">
-            {UNIVERSE_DATA.map(item => (
-              <div
+            {UNIVERSE_DATA.map((item, idx) => (
+              <motion.div
                 key={item.id}
+                initial={{ opacity: 0, y: 26 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-6%' }}
+                transition={{ duration: 0.5, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col p-4 rounded-xl border bg-white/5 text-left"
                 style={{ borderColor: item.color + '30' }}
               >
@@ -295,7 +300,7 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                     {item.id === 'ailab' ? 'Explore →' : (item.url ? 'Enter →' : 'Coming Soon')}
                   </button>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

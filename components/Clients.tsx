@@ -216,7 +216,13 @@ const Clients: React.FC = () => {
           </motion.div>
 
           {/* Constellation (PC) / 파트너 리스트 (모바일) */}
-          <div className="relative flex-1">
+          {/* 클러스터 호흡 — 펼쳐졌다 모여드는 왔다갔다 (PC만) 대표 룰 2026-06-13 */}
+          <motion.div
+            className="relative flex-1"
+            style={{ transformOrigin: 'center center' }}
+            animate={IS_MOBILE ? undefined : { scale: [1, 1.14, 1] }}
+            transition={IS_MOBILE ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
+          >
 
             {IS_MOBILE && (
               <div className="absolute inset-0 flex flex-wrap content-center justify-center items-center gap-x-4 gap-y-3.5 px-2">
@@ -297,7 +303,7 @@ const Clients: React.FC = () => {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
         </div>
       </div>
