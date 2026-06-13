@@ -5,6 +5,10 @@ interface FooterProps {
   onContactClick?: () => void;
 }
 
+// 모바일은 LET'S BE TOGETHER 폰트 축소(정렬·가독), PC는 유지 (대표 룰 2026-06-14)
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+const WORD_FS = IS_MOBILE ? 'clamp(2.4rem, 13vw, 4.5rem)' : 'clamp(4.5rem, 17vw, 14rem)';
+
 const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -62,7 +66,7 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
               style={{
                 opacity: w1Op,
                 x: w1X,
-                fontSize: 'clamp(4.5rem, 17vw, 14rem)',
+                fontSize: WORD_FS,
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 900,
                 letterSpacing: '-0.04em',
@@ -80,7 +84,7 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
               style={{
                 opacity: w2Op,
                 x: w2X,
-                fontSize: 'clamp(4.5rem, 17vw, 14rem)',
+                fontSize: WORD_FS,
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 900,
                 letterSpacing: '-0.04em',
@@ -99,7 +103,7 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
               style={{
                 opacity: w3Op,
                 y: w3Y,
-                fontSize: 'clamp(4.5rem, 17vw, 14rem)',
+                fontSize: WORD_FS,
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 900,
                 letterSpacing: '-0.04em',
