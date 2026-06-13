@@ -681,58 +681,20 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   );
 };
 
-// ── Broadcast data ────────────────────────────────────────────────────────────
-// 전국 송출 가능 채널 — 공영·지역민방·종편·케이블·보도·IPTV·위성 전체 커버리지
-const BROADCAST_CHANNELS = [
-  { cat: '공영 · 지상파',     items: ['KBS', 'MBC', 'SBS', 'EBS'] },
-  { cat: '지역 민방',         items: ['TBC', 'KNN', 'KBC', 'TJB', 'JTV', 'UBC', 'CJB', 'G1', 'JIBS'] },
-  { cat: '종합편성',          items: ['JTBC', '채널A', 'TV조선', 'MBN'] },
-  { cat: '케이블 PP',         items: ['tvN', 'tvN SHOW', 'OCN', 'ENA', 'Mnet', 'E채널', 'OtvN', '코미디TV', 'MBC every1', 'MBC ON', '채널S'] },
-  { cat: '보도 전문',         items: ['YTN', '연합뉴스TV'] },
-  { cat: 'IPTV',              items: ['KT 지니TV', 'SK Btv', 'LG U+tv'] },
-  { cat: '위성 · 케이블 SO',  items: ['KT 스카이라이프', 'LG헬로비전', '딜라이브', 'CMB', 'HCN'] },
-];
-
-const BTL_ITEMS = [
-  { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역',  img: 'https://media.nadaun.co/collective/btl/01-subway.webp' },
-  { label: '옥외 전광판',      spec: 'Full HD / 4K · 가로·세로형',   img: 'https://media.nadaun.co/collective/btl/02-outdoor.webp' },
-  { label: '택시 미디어',      spec: '후면 LED · 측면 랩핑 · 전국',  img: 'https://media.nadaun.co/collective/btl/03-taxi.webp' },
-  { label: '버스 외부광고',    spec: '슈퍼사이드 · 풀백 · 측면랩',   img: 'https://media.nadaun.co/collective/btl/04-bus.webp' },
-];
-
-const FANCLUB_ITEMS = [
-  { label: 'K-POP 팬클럽 광고', spec: '공항·지하철·옥외 팬이벤트 집행' },
-  { label: '해외 광고',          spec: '일본·중국·동남아·미국·유럽 집행' },
-];
+// (방송채널·BTL·해외 데이터는 Business 메뉴 GLOBAL NETWORK로 이동 — 대표 룰 2026-06-13)
 
 // ── Chapter 5 — word slides → channels → 4 BTL image slides → CTA ────────────
 const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
   const p = useTransform(g, [C5S, C5E], [0, 1]);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // phrase 빠르게 등장·짧게 유지 후 바로 문의하기로 (채널·BTL은 Business GLOBAL NETWORK로 이동) 대표 룰 2026-06-13
+  const phraseOp = useTransform(p, [0.02, 0.10, 0.42, 0.52], [0, 1, 1, 0]);
+  const l1Y = useTransform(p, [0.02, 0.12], ['10%', '0%']);
+  const l2Op = useTransform(p, [0.08, 0.18], [0, 1]);
+  const l2Y = useTransform(p, [0.08, 0.18], ['12%', '0%']);
 
-  // ── 4개 화면 고르게·짧게 (phrase→채널→BTL→CTA) 빠른 전환 대표 룰 2026-06-13 ──
-  // Intro phrase — 빠르게 등장, 짧게 유지 후 넘어감
-  const phraseOp = useTransform(p, [0.01, 0.06, 0.22, 0.30], [0, 1, 1, 0]);
-  const l1Y = useTransform(p, [0.01, 0.07], ['10%', '0%']);
-  const l2Op = useTransform(p, [0.05, 0.12], [0, 1]);
-  const l2Y = useTransform(p, [0.05, 0.12], ['12%', '0%']);
-
-  // ── S1: Channels ──
-  const s1Op  = useTransform(p, [0.31, 0.36, 0.53, 0.58], [0, 1, 1, 0]);
-  const s1Y   = useTransform(p, [0.31, 0.36], ['4%', '0%']);
-  const aOp   = useTransform(p, [0.33, 0.39], [0, 1]);
-  const bOp   = useTransform(p, [0.38, 0.44], [0, 1]);
-
-  // ── S2: BTL — 4개 매체 한 화면 그리드 (순차 등장, 모두 머무름) ──
-  const btlSecOp = useTransform(p, [0.58, 0.64, 0.86, 0.90], [0, 1, 1, 0]);
-  const b1Op = useTransform(p, [0.60, 0.66], [0, 1]); const b1Y = useTransform(p, [0.60, 0.66], ['30px', '0px']);
-  const b2Op = useTransform(p, [0.63, 0.69], [0, 1]); const b2Y = useTransform(p, [0.63, 0.69], ['30px', '0px']);
-  const b3Op = useTransform(p, [0.66, 0.72], [0, 1]); const b3Y = useTransform(p, [0.66, 0.72], ['30px', '0px']);
-  const b4Op = useTransform(p, [0.69, 0.75], [0, 1]); const b4Y = useTransform(p, [0.69, 0.75], ['30px', '0px']);
-
-  // ── S3: CTA — 중앙 정렬, BTL 후 등장 ──
-  const s3Op = useTransform(p, [0.88, 0.94], [0, 1]);
-  const s3Y  = useTransform(p, [0.88, 0.94], ['4%', '0%']);
+  // ── CTA: 프로젝트 문의하기 — 중앙 정렬, phrase 후 등장·유지 ──
+  const s3Op = useTransform(p, [0.52, 0.64], [0, 1]);
+  const s3Y  = useTransform(p, [0.52, 0.64], ['4%', '0%']);
 
   return (
     <div style={{ height: `${H5}vh` }}>
@@ -759,78 +721,9 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
           </motion.h2>
         </motion.div>
 
-        {/* ── S1: CHANNELS — video background + channel list text ── */}
-        <motion.div style={{ opacity: s1Op, y: s1Y }} className="absolute inset-0">
-          {/* Full-screen background video */}
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover"
-            src="/livernovo-jtbc.mp4" muted loop playsInline autoPlay
-            onLoadedMetadata={() => { if (videoRef.current) videoRef.current.currentTime = 0; }} />
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
+        {/* 채널·BTL·해외 광고매체는 Business 메뉴 GLOBAL NETWORK로 이동 (대표 룰 2026-06-13) */}
 
-          {/* ON-AIR badge */}
-          <div className="absolute top-8 right-8 md:right-16 lg:right-24 flex items-center gap-2 bg-black/70 border border-white/10 px-3 py-1.5 rounded-full">
-            <span className="w-1.5 h-1.5 bg-red-500 rounded-full" style={{ animation: 'pulse 1.2s ease-in-out infinite' }} />
-            <span className="text-[9px] font-bold text-white tracking-wider">JTBC ON-AIR</span>
-          </div>
-
-          {/* Channel categories — 전국 송출 채널 전체 커버리지 */}
-          <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-            <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">
-              공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성
-            </p>
-            <p className="text-white/45 text-xs md:text-sm font-light mb-7">전국 모든 송출 채널 — 어디든 닿습니다</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 max-w-5xl">
-              {BROADCAST_CHANNELS.map((grp, gi) => (
-                <motion.div key={grp.cat} style={{ opacity: gi < 4 ? aOp : bOp }}
-                  className="border-l-2 border-[#FFB800]/40 pl-4">
-                  <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">{grp.cat}</p>
-                  <p className="font-black leading-tight text-white/90"
-                    style={{ fontSize: 'clamp(1.05rem, 2vw, 1.85rem)', letterSpacing: '-0.01em' }}>
-                    {grp.items.join(' · ')}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-          <p className="absolute bottom-5 right-8 md:right-16 lg:right-24 text-[8px] text-white/20 font-light">
-            실제 방영 모니터링 영상 · 2025.11
-          </p>
-        </motion.div>
-
-        {/* ── S2: BTL — 4개 매체 한 화면 그리드 (지하철·옥외·택시·버스) ── */}
-        <motion.div style={{ opacity: btlSecOp }}
-          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">오프라인 BTL — 전국 매체</p>
-          <p className="text-white/45 text-xs md:text-sm font-light mb-6 md:mb-8">지하철 · 옥외 전광판 · 택시 · 버스 — 어디든 닿습니다</p>
-          <div className="grid grid-cols-2 gap-3 md:gap-5 max-w-5xl w-full">
-            {[
-              { op: b1Op, y: b1Y, item: BTL_ITEMS[0], n: '01' },
-              { op: b2Op, y: b2Y, item: BTL_ITEMS[1], n: '02' },
-              { op: b3Op, y: b3Y, item: BTL_ITEMS[2], n: '03' },
-              { op: b4Op, y: b4Y, item: BTL_ITEMS[3], n: '04' },
-            ].map(({ op, y, item, n }) => (
-              <motion.div key={n} style={{ opacity: op, y, willChange: 'transform, opacity' }}
-                className="relative rounded-xl overflow-hidden aspect-[16/10]">
-                <img src={item.img} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-4 md:p-6">
-                  <p className="text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">오프라인 BTL · {n}</p>
-                  <p className="font-black text-white leading-none mb-1.5"
-                    style={{ fontSize: 'clamp(1.4rem, 3.2vw, 2.8rem)', letterSpacing: '-0.03em' }}>
-                    {item.label}
-                  </p>
-                  <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.72rem, 1.1vw, 1rem)' }}>
-                    {item.spec}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ── S3: CTA — 중앙 정렬 ── */}
+        {/* ── CTA: 프로젝트 문의하기 — 중앙 정렬 ── */}
         <motion.div style={{ opacity: s3Op, y: s3Y }}
           className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
           <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">

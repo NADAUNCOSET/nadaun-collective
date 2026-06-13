@@ -4,13 +4,14 @@ import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
 
 const HEADER_H = 57;
 
-// Ch1 intro + Ch2 domain list + Ch3 production scroll-scrub
-const H1 = 120, H2 = 200, H3 = 280; // 스크러빙 단축 1420→600vh — 빨리 지나가게 (대표 룰 2026-06-13)
-const TOTAL = H1 + H2 + H3;
+// Ch1 intro + Ch2 domain list + Ch3 IMMERSIVE CREATIVE process + Ch4 GLOBAL NETWORK (채널·BTL·해외)
+const H1 = 120, H2 = 200, H3 = 280, H4 = 420; // 대표 룰 2026-06-13: GLOBAL NETWORK 허브 신설
+const TOTAL = H1 + H2 + H3 + H4;
 
 const C1S = 0,   C1E = H1 / TOTAL;
 const C2S = C1E, C2E = (H1 + H2) / TOTAL;
-const C3S = C2E, C3E = 1;
+const C3S = C2E, C3E = (H1 + H2 + H3) / TOTAL;
+const C4S = C3E, C4E = 1;
 
 const DOMAINS = [
   { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',       tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
@@ -27,6 +28,31 @@ const PROCESS = [
   { num: '04', title: '후반작업', desc: '전문 영상 편집자들이 고객의 요청에 맞추어 편집을 진행합니다.' },
   { num: '05', title: '시사 및 수정', desc: '고객과 함께 시사를 통해 피드백을 받은 후 수정사항을 반영합니다.' },
   { num: '06', title: 'On-Air',   desc: '최종 확인 후 완성된 제작물을 매체로 On-Air합니다.' },
+];
+
+// ── GLOBAL NETWORK 데이터 (About에서 이동) ───────────────────────────────────
+const BROADCAST_CHANNELS = [
+  { cat: '공영 · 지상파',     items: ['KBS', 'MBC', 'SBS', 'EBS'] },
+  { cat: '지역 민방',         items: ['TBC', 'KNN', 'KBC', 'TJB', 'JTV', 'UBC', 'CJB', 'G1', 'JIBS'] },
+  { cat: '종합편성',          items: ['JTBC', '채널A', 'TV조선', 'MBN'] },
+  { cat: '케이블 PP',         items: ['tvN', 'tvN SHOW', 'OCN', 'ENA', 'Mnet', 'E채널', 'OtvN', '코미디TV', 'MBC every1', 'MBC ON', '채널S'] },
+  { cat: '보도 전문',         items: ['YTN', '연합뉴스TV'] },
+  { cat: 'IPTV',              items: ['KT 지니TV', 'SK Btv', 'LG U+tv'] },
+  { cat: '위성 · 케이블 SO',  items: ['KT 스카이라이프', 'LG헬로비전', '딜라이브', 'CMB', 'HCN'] },
+];
+
+const BTL_ITEMS = [
+  { label: '지하철 스크린도어', spec: '1,470 × 470mm · 전국 주요역', img: 'https://media.nadaun.co/collective/btl/01-subway.webp' },
+  { label: '옥외 전광판',      spec: 'Full HD / 4K · 가로·세로형',  img: 'https://media.nadaun.co/collective/btl/02-outdoor.webp' },
+  { label: '택시 미디어',      spec: '후면 LED · 측면 랩핑 · 전국', img: 'https://media.nadaun.co/collective/btl/03-taxi.webp' },
+  { label: '버스 외부광고',    spec: '슈퍼사이드 · 풀백 · 측면랩',  img: 'https://media.nadaun.co/collective/btl/04-bus.webp' },
+];
+
+const OVERSEAS_ITEMS = [
+  { label: '일본 · 중국', spec: '도쿄 · 오사카 · 상하이 옥외/디지털',  img: 'https://media.nadaun.co/collective/ad-media/overseas-01.webp' },
+  { label: '동남아',      spec: '베트남 · 태국 · 인니 미디어 집행',     img: 'https://media.nadaun.co/collective/ad-media/overseas-02.webp' },
+  { label: '미국 · 유럽', spec: '뉴욕 · LA · 런던 · 파리 캠페인',       img: 'https://media.nadaun.co/collective/ad-media/overseas-03.webp' },
+  { label: '글로벌 팬덤', spec: 'K-POP 팬클럽 · 공항 · 글로벌 옥외',    img: 'https://media.nadaun.co/collective/ad-media/overseas-04.webp' },
 ];
 
 const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -97,7 +123,8 @@ const Ch2: React.FC<{
   onAiLabClick?: () => void;
   onIntegratedClick?: () => void;
   onCreativeClick?: () => void;
-}> = ({ g, onAiLabClick, onIntegratedClick, onCreativeClick }) => {
+  onGlobalClick?: () => void;
+}> = ({ g, onAiLabClick, onIntegratedClick, onCreativeClick, onGlobalClick }) => {
   const p = useTransform(g, [C2S, C2E], [0, 1]);
 
   const titleOp = useTransform(p, [0.00, 0.10], [0, 1]);
@@ -134,6 +161,7 @@ const Ch2: React.FC<{
                     if (d.id === '01' && onIntegratedClick) onIntegratedClick();
                     if (d.id === '02' && onCreativeClick) onCreativeClick();
                     if (d.id === '03' && onAiLabClick) onAiLabClick();
+                    if (d.id === '05' && onGlobalClick) onGlobalClick();
                   }}
                 >
                   <span className="font-mono text-sm text-white/25 shrink-0 w-6">{d.id}</span>
@@ -161,7 +189,7 @@ const Ch2: React.FC<{
             <div className="border-t border-white/10" />
           </div>
           <motion.p style={{ opacity: d4Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-widest uppercase">
-            02 · IMMERSIVE CREATIVE 클릭하여 상세 확인
+            도메인을 클릭하여 상세 확인 — 02 IMMERSIVE CREATIVE · 05 GLOBAL NETWORK
           </motion.p>
         </motion.div>
       </StickyPanel>
@@ -175,7 +203,8 @@ const ProcessSlide: React.FC<{
   index: number;
   total: number;
   p: MotionValue<number>;
-}> = ({ step, index, total, p }) => {
+  onGlobalClick?: () => void;
+}> = ({ step, index, total, p, onGlobalClick }) => {
   const seg = 1 / total;
   const start = index * seg;
   const end = (index + 1) * seg;
@@ -203,7 +232,7 @@ const ProcessSlide: React.FC<{
   return (
     <motion.div
       style={{ opacity: op, position: 'absolute', inset: 0 }}
-      className="flex flex-col justify-center px-8 md:px-16 lg:px-24"
+      className="flex flex-col justify-center px-8 md:px-16 lg:px-24 pointer-events-none"
     >
       <p className="text-[11px] tracking-[0.45em] uppercase text-[#FFB800]/60 font-bold mb-6">
         IMMERSIVE CREATIVE · PRODUCTION PROCESS
@@ -231,12 +260,30 @@ const ProcessSlide: React.FC<{
       <motion.p style={{ opacity: descOp }} className="mt-8 text-white/55 text-base md:text-xl font-light leading-relaxed max-w-lg">
         {step.desc}
       </motion.p>
+
+      {/* On-Air 단계: 포트폴리오 + GLOBAL NETWORK 링크 (대표 룰 2026-06-13) */}
+      {step.num === '06' && (
+        <motion.div style={{ opacity: descOp }} className="mt-9 flex flex-wrap gap-3 pointer-events-auto">
+          <a href="https://photo.nadaun.co" target="_blank" rel="noopener noreferrer"
+            className="text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full border border-[#FFB800]/40 text-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-colors">
+            사진 포트폴리오 →
+          </a>
+          <a href="https://video.nadaun.co" target="_blank" rel="noopener noreferrer"
+            className="text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full border border-[#FFB800]/40 text-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-colors">
+            영상 포트폴리오 →
+          </a>
+          <button onClick={onGlobalClick}
+            className="text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full border border-white/30 text-white hover:bg-white hover:text-black transition-colors">
+            GLOBAL NETWORK →
+          </button>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
 
 // ── Ch3 — IMMERSIVE CREATIVE: production steps one-by-one ────────────────────
-const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+const Ch3: React.FC<{ g: MotionValue<number>; onGlobalClick?: () => void }> = ({ g, onGlobalClick }) => {
   const p = useTransform(g, [C3S, C3E], [0, 1]);
   const exitOp = useTransform(p, [0.88, 0.98], [1, 0]);
 
@@ -276,7 +323,7 @@ const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           {/* Dissolving process slides */}
           <div className="absolute inset-0 pt-24">
             {PROCESS.map((step, i) => (
-              <ProcessSlide key={step.num} step={step} index={i} total={PROCESS.length} p={p} />
+              <ProcessSlide key={step.num} step={step} index={i} total={PROCESS.length} p={p} onGlobalClick={onGlobalClick} />
             ))}
           </div>
 
@@ -284,6 +331,93 @@ const Ch3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           <div className="absolute bottom-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 flex items-center justify-between">
             <p className="text-white/18 text-[10px]">COPYRIGHT © 2026 NADAUN All Rights Reserved</p>
             <p className="text-[#FFB800] text-[10px] tracking-widest uppercase font-bold">NADAUN COLLECTIVE</p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+// ── Ch4 — GLOBAL NETWORK: 방송채널 → 오프라인 BTL → 해외 광고 (대표 룰 2026-06-13) ──
+const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C4S, C4E], [0, 1]);
+
+  const aOp = useTransform(p, [0.00, 0.05, 0.28, 0.34], [0, 1, 1, 0]); // 방송채널
+  const bOp = useTransform(p, [0.34, 0.40, 0.62, 0.68], [0, 1, 1, 0]); // BTL
+  const cOp = useTransform(p, [0.68, 0.74, 1.00, 1.00], [0, 1, 1, 1]); // 해외
+
+  const ch1 = useTransform(p, [0.04, 0.12], [0, 1]);
+  const ch2 = useTransform(p, [0.10, 0.18], [0, 1]);
+
+  const t1 = useTransform(p, [0.36, 0.42], [0, 1]); const t1y = useTransform(p, [0.36, 0.42], ['30px', '0px']);
+  const t2 = useTransform(p, [0.39, 0.45], [0, 1]); const t2y = useTransform(p, [0.39, 0.45], ['30px', '0px']);
+  const t3 = useTransform(p, [0.42, 0.48], [0, 1]); const t3y = useTransform(p, [0.42, 0.48], ['30px', '0px']);
+  const t4 = useTransform(p, [0.45, 0.51], [0, 1]); const t4y = useTransform(p, [0.45, 0.51], ['30px', '0px']);
+
+  const o1 = useTransform(p, [0.70, 0.76], [0, 1]); const o1y = useTransform(p, [0.70, 0.76], ['30px', '0px']);
+  const o2 = useTransform(p, [0.73, 0.79], [0, 1]); const o2y = useTransform(p, [0.73, 0.79], ['30px', '0px']);
+  const o3 = useTransform(p, [0.76, 0.82], [0, 1]); const o3y = useTransform(p, [0.76, 0.82], ['30px', '0px']);
+  const o4 = useTransform(p, [0.79, 0.85], [0, 1]); const o4y = useTransform(p, [0.79, 0.85], ['30px', '0px']);
+
+  const btlT = [{ op: t1, y: t1y }, { op: t2, y: t2y }, { op: t3, y: t3y }, { op: t4, y: t4y }];
+  const ovT  = [{ op: o1, y: o1y }, { op: o2, y: o2y }, { op: o3, y: o3y }, { op: o4, y: o4y }];
+
+  return (
+    <div style={{ height: `${H4}vh` }}>
+      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }} className="relative overflow-hidden">
+        <div className="absolute top-8 left-8 md:left-16 lg:left-24 z-10 pointer-events-none">
+          <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold">05 · GLOBAL NETWORK — 전국·전세계 송출</p>
+        </div>
+
+        {/* A. 방송채널 */}
+        <motion.div style={{ opacity: aOp }} className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
+          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성</p>
+          <p className="text-white/45 text-xs md:text-sm font-light mb-7">전국 모든 송출 채널 — 어디든 닿습니다</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 max-w-5xl">
+            {BROADCAST_CHANNELS.map((grp, gi) => (
+              <motion.div key={grp.cat} style={{ opacity: gi < 4 ? ch1 : ch2 }} className="border-l-2 border-[#FFB800]/40 pl-4">
+                <p className="text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">{grp.cat}</p>
+                <p className="font-black leading-tight text-white/90" style={{ fontSize: 'clamp(1.05rem, 2vw, 1.85rem)', letterSpacing: '-0.01em' }}>{grp.items.join(' · ')}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* B. 오프라인 BTL */}
+        <motion.div style={{ opacity: bOp }} className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
+          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">오프라인 BTL — 전국 매체</p>
+          <p className="text-white/45 text-xs md:text-sm font-light mb-6 md:mb-8">지하철 · 옥외 전광판 · 택시 · 버스</p>
+          <div className="grid grid-cols-2 gap-3 md:gap-5 max-w-5xl w-full">
+            {BTL_ITEMS.map((item, i) => (
+              <motion.div key={item.label} style={{ opacity: btlT[i].op, y: btlT[i].y, willChange: 'transform, opacity' }} className="relative rounded-xl overflow-hidden aspect-[16/10]">
+                <img src={item.img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-4 md:p-6">
+                  <p className="text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">오프라인 BTL · 0{i + 1}</p>
+                  <p className="font-black text-white leading-none mb-1.5" style={{ fontSize: 'clamp(1.4rem, 3.2vw, 2.8rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
+                  <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.72rem, 1.1vw, 1rem)' }}>{item.spec}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* C. 해외 광고 */}
+        <motion.div style={{ opacity: cOp }} className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
+          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-2">해외 광고 — 글로벌 미디어 네트워크</p>
+          <p className="text-white/45 text-xs md:text-sm font-light mb-6 md:mb-8">일본 · 중국 · 동남아 · 미국 · 유럽 · 글로벌 팬덤</p>
+          <div className="grid grid-cols-2 gap-3 md:gap-5 max-w-5xl w-full">
+            {OVERSEAS_ITEMS.map((item, i) => (
+              <motion.div key={item.label} style={{ opacity: ovT[i].op, y: ovT[i].y, willChange: 'transform, opacity' }} className="relative rounded-xl overflow-hidden aspect-[16/10]">
+                <img src={item.img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-4 md:p-6">
+                  <p className="text-[9px] md:text-[10px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-1.5">OVERSEAS · 0{i + 1}</p>
+                  <p className="font-black text-white leading-none mb-1.5" style={{ fontSize: 'clamp(1.4rem, 3.2vw, 2.8rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
+                  <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.72rem, 1.1vw, 1rem)' }}>{item.spec}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
@@ -339,6 +473,7 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
 
   const handleBack = () => scrollToProgress(C2S + 0.01);
   const handleCreativeClick = () => scrollToProgress(C3S + 0.01);
+  const handleGlobalClick = () => scrollToProgress(C4S + 0.01);
 
   return (
     <AnimatePresence>
@@ -386,8 +521,9 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, onClose, onAi
             style={{ scrollbarWidth: 'none' }}
           >
             <Ch1 g={progress} />
-            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} onCreativeClick={handleCreativeClick} />
-            <Ch3 g={progress} />
+            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} onCreativeClick={handleCreativeClick} onGlobalClick={handleGlobalClick} />
+            <Ch3 g={progress} onGlobalClick={handleGlobalClick} />
+            <Ch4 g={progress} />
           </div>
         </motion.div>
       )}
