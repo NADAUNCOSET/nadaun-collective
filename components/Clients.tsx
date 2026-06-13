@@ -80,6 +80,9 @@ const NODES: ClientNode[] = [
   { name: 'TBC',            x: 90,  y: 46,  size: 'md' },
   { name: 'CJ',             x: 6,   y: 82,  size: 'md' },
   { name: 'HANATOUR',       x: 48,  y: 40,  size: 'md' },
+  { name: 'AENTIO',         x: 30,  y: 66,  size: 'sm' },
+  { name: 'MIRAE',          x: 64,  y: 20,  size: 'sm' },
+  { name: 'DA+F',           x: 86,  y: 30,  size: 'sm' },
 ];
 
 const EDGES: [number, number][] = [

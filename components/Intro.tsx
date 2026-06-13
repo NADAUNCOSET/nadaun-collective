@@ -57,7 +57,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: stage >= 2 ? 1 : 0 }}
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            style={{ background: 'radial-gradient(circle at 50% 46%, rgba(255,184,0,0.16), transparent 62%)' }}
+            style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,184,0,0.16), transparent 62%)' }}
           />
         )}
 
@@ -91,7 +91,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
               src="/symbol-white.webp"
               alt=""
               aria-hidden="true"
-              className="w-[42vw] max-w-[42vw] min-w-[200px] select-none"
+              className="w-[55vw] md:w-[42vw] max-w-[480px] min-w-[200px] select-none"
               draggable={false}
             />
           </motion.div>
@@ -109,7 +109,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
               src="/symbol-black.webp"
               alt=""
               aria-hidden="true"
-              className="w-[42vw] max-w-[42vw] min-w-[200px] select-none"
+              className="w-[55vw] md:w-[42vw] max-w-[480px] min-w-[200px] select-none"
               draggable={false}
             />
           </motion.div>
