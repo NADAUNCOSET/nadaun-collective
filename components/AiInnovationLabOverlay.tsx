@@ -9,23 +9,30 @@ const AI_TOOLS = [
   { name: 'Claude', url: 'https://claude.ai', category: 'LLM', desc: 'Anthropic의 안전하고 강력한 AI 모델입니다.', icon: <Cpu className="w-5 h-5" />, color: '#d97757' },
   { name: 'Gemini', url: 'https://gemini.google.com', category: 'LLM', desc: 'Google의 가장 범용적이고 강력한 AI입니다.', icon: <Sparkles className="w-5 h-5" />, color: '#4285f4' },
   { name: 'Perplexity', url: 'https://www.perplexity.ai', category: 'LLM', desc: '실시간 정보를 제공하는 AI 검색 엔진입니다.', icon: <Search className="w-5 h-5" />, color: '#20b2aa' },
-  
+  { name: 'Grok', url: 'https://grok.com', category: 'LLM', desc: 'xAI의 실시간 정보 결합 대화형 AI입니다.', icon: <Cpu className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'DeepSeek', url: 'https://www.deepseek.com', category: 'LLM', desc: '고성능 오픈 추론(reasoning) AI 모델입니다.', icon: <Cpu className="w-5 h-5" />, color: '#4d6bfe' },
+
   { name: 'Midjourney', url: 'https://www.midjourney.com', category: 'IMAGE', desc: '예술적인 고퀄리티 이미지를 생성합니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Stable Diffusion', url: 'https://stability.ai', category: 'IMAGE', desc: '오픈 소스 기반의 강력한 이미지 생성 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#9b51e0' },
+  { name: 'FLUX', url: 'https://blackforestlabs.ai', category: 'IMAGE', desc: '사실적이고 정교한 차세대 이미지 생성 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'Ideogram', url: 'https://ideogram.ai', category: 'IMAGE', desc: '텍스트·타이포 표현에 강한 이미지 AI입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ff7a00' },
+  { name: 'Krea', url: 'https://www.krea.ai', category: 'IMAGE', desc: '실시간 생성·업스케일 크리에이티브 툴입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
   { name: 'Leonardo AI', url: 'https://leonardo.ai', category: 'IMAGE', desc: '게임 에셋 및 예술 작품 생성에 특화된 AI입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ff9900' },
-  
-  { name: 'Sora', url: 'https://openai.com/sora', category: 'VIDEO', desc: '텍스트를 고해상도 비디오로 변환합니다.', icon: <Video className="w-5 h-5" />, color: '#ff4b4b' },
+
+  { name: 'Sora', url: 'https://sora.com', category: 'VIDEO', desc: 'OpenAI의 고해상도 영상 생성 모델입니다.', icon: <Video className="w-5 h-5" />, color: '#ff4b4b' },
+  { name: 'Veo', url: 'https://deepmind.google/technologies/veo/', category: 'VIDEO', desc: 'Google의 시네마틱 고품질 영상 생성 모델입니다.', icon: <Video className="w-5 h-5" />, color: '#4285f4' },
   { name: 'Runway', url: 'https://runwayml.com', category: 'VIDEO', desc: '차세대 비디오 생성 및 편집 도구입니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Pika', url: 'https://pika.art', category: 'VIDEO', desc: '아이디어를 생동감 넘치는 비디오로 만듭니다.', icon: <Video className="w-5 h-5" />, color: '#f3d23a' },
-  { name: 'Luma Dream Machine', url: 'https://lumalabs.ai/dream-machine', category: 'VIDEO', desc: '고품질의 사실적인 비디오를 빠르게 생성합니다.', icon: <Video className="w-5 h-5" />, color: '#000000' },
-  
+  { name: 'Kling', url: 'https://klingai.com', category: 'VIDEO', desc: '사실적 모션의 영상 생성 AI입니다.', icon: <Video className="w-5 h-5" />, color: '#ff4d6d' },
+  { name: 'Hailuo', url: 'https://hailuoai.video', category: 'VIDEO', desc: 'MiniMax의 역동적인 AI 영상 생성기입니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'Luma Dream Machine', url: 'https://lumalabs.ai/dream-machine', category: 'VIDEO', desc: '고품질의 사실적인 비디오를 빠르게 생성합니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
+
   { name: 'Suno AI', url: 'https://suno.com', category: 'AUDIO', desc: '간단한 텍스트로 완성도 높은 음악을 생성합니다.', icon: <Music className="w-5 h-5" />, color: '#ff8c00' },
   { name: 'Udio', url: 'https://www.udio.com', category: 'AUDIO', desc: '감정을 담은 고품질 AI 음악 생성기입니다.', icon: <Music className="w-5 h-5" />, color: '#2563eb' },
   { name: 'ElevenLabs', url: 'https://elevenlabs.io', category: 'AUDIO', desc: '가장 자연스러운 AI 음성 합성 플랫폼입니다.', icon: <Music className="w-5 h-5" />, color: '#ffffff' },
-  
-  { name: 'Gamma', url: 'https://gamma.app', category: 'DESIGN & 3D', desc: 'AI를 활용해 프레젠테이션과 웹사이트를 제작합니다.', icon: <Palette className="w-5 h-5" />, color: '#ff69b4' },
+
+  { name: 'Gamma', url: 'https://gamma.app', category: 'DESIGN & 3D', desc: 'AI로 프레젠테이션·웹사이트를 제작합니다.', icon: <Palette className="w-5 h-5" />, color: '#ff69b4' },
+  { name: 'Spline', url: 'https://spline.design', category: 'DESIGN & 3D', desc: '웹 기반 3D 디자인 및 AI 생성 도구입니다.', icon: <Box className="w-5 h-5" />, color: '#ff00ff' },
+  { name: 'Meshy', url: 'https://www.meshy.ai', category: 'DESIGN & 3D', desc: '텍스트·이미지를 3D 모델로 생성합니다.', icon: <Box className="w-5 h-5" />, color: '#7c3aed' },
   { name: 'Canva Magic', url: 'https://www.canva.com', category: 'DESIGN & 3D', desc: '디자인 프로세스를 혁신하는 AI 도구 모음입니다.', icon: <Palette className="w-5 h-5" />, color: '#00c4cc' },
-  { name: 'Spline', url: 'https://spline.design', category: 'DESIGN & 3D', desc: '웹 기반의 3D 디자인 및 AI 생성 도구입니다.', icon: <Box className="w-5 h-5" />, color: '#ff00ff' },
 ];
 
 interface AiInnovationLabOverlayProps {
@@ -103,8 +110,8 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                 transition={{ delay: 0.128, duration: 0.374 }}
                 className="text-gray-400 text-lg md:text-xl max-w-2xl font-light leading-relaxed"
               >
-                NADAUN AI LAB에서 엄선한 글로벌 AI 솔루션들을 만나보세요. 
-                비즈니스의 혁신을 이끄는 최첨단 도구들이 여러분의 상상력을 현실로 만듭니다.
+                나다운이 실제 제작 현장에서 쓰는 글로벌 AI 도구들 —
+                LLM · 이미지 · 영상 · 오디오 · 3D까지, 최전선의 도구를 큐레이션해 한곳에 모았습니다.
               </motion.p>
             </div>
 
