@@ -181,9 +181,9 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                     <BigQ>어떤 도움이<br />필요하신가요?</BigQ>
                     <div className="flex flex-col sm:flex-row gap-6">
                       {[
-                        { key: 'production' as const, label: '광고 제작', sub: '영상·3D·디자인·웹' },
-                        { key: 'promotion' as const, label: '광고 홍보', sub: '퍼포먼스·바이럴·미디어' },
-                      ].map(({ key, label, sub }) => (
+                        { key: 'production' as const, label: '광고 제작', items: ['영상 촬영', '사진 촬영', 'TVC · CF', '브랜드 필름', '기업 VCR', '3D · 모션그래픽', '지면 · 앨범', '웹 · 디자인'] },
+                        { key: 'promotion' as const, label: '광고 홍보 · 송출', items: ['공영 · 지상파', '종합편성', '케이블 PP', 'IPTV 3사', '위성 · 케이블 SO', '지하철 스크린도어', '옥외 전광판', '택시 · 버스', '해외 · 글로벌', '퍼포먼스 · 바이럴'] },
+                      ].map(({ key, label, items }) => (
                         <button
                           key={key}
                           type="button"
@@ -194,16 +194,24 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                             backgroundColor: inquiryTypes[key] ? 'rgba(255,184,0,0.05)' : 'transparent',
                           }}
                         >
-                          <p className="font-black mb-2" style={{
+                          <p className="font-black mb-5" style={{
                             fontSize: 'clamp(1.8rem, 4vw, 3.5rem)',
                             fontFamily: 'Manrope, sans-serif',
                             color: inquiryTypes[key] ? '#FFB800' : 'rgba(255,255,255,0.9)',
                           }}>
                             {label}
                           </p>
-                          <p className="text-sm font-light" style={{ color: inquiryTypes[key] ? 'rgba(255,184,0,0.6)' : 'rgba(255,255,255,0.3)' }}>
-                            {sub}
-                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {items.map(it => (
+                              <span key={it} className="text-[11px] md:text-xs font-light px-3 py-1.5 rounded-full border"
+                                style={{
+                                  borderColor: inquiryTypes[key] ? 'rgba(255,184,0,0.3)' : 'rgba(255,255,255,0.12)',
+                                  color: inquiryTypes[key] ? 'rgba(255,184,0,0.85)' : 'rgba(255,255,255,0.5)',
+                                }}>
+                                {it}
+                              </span>
+                            ))}
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -218,14 +226,14 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
                       <div>
                         <p className="text-xs tracking-[0.3em] uppercase text-white/30 mb-4 font-light">예산 (Budget)</p>
-                        <BigSelect name="예산">
-                          <option value="">예산 범위 선택</option>
-                          <option value="1000만원 미만">1,000만원 미만</option>
-                          <option value="1000만원 ~ 3000만원">1,000만원 ~ 3,000만원</option>
-                          <option value="3000만원 ~ 5000만원">3,000만원 ~ 5,000만원</option>
-                          <option value="5000만원 ~ 1억원">5,000만원 ~ 1억원</option>
-                          <option value="1억원 이상">1억원 이상</option>
-                          <option value="미정">미정 (협의 필요)</option>
+                        <BigSelect name="예산" defaultValue="">
+                          <option value="" disabled style={{ color: '#888', background: '#0a0a0a' }}>예산 범위 선택</option>
+                          <option value="1000만원 미만" style={{ color: '#fff', background: '#0a0a0a' }}>1,000만원 미만</option>
+                          <option value="1000만원 ~ 3000만원" style={{ color: '#fff', background: '#0a0a0a' }}>1,000만원 ~ 3,000만원</option>
+                          <option value="3000만원 ~ 5000만원" style={{ color: '#fff', background: '#0a0a0a' }}>3,000만원 ~ 5,000만원</option>
+                          <option value="5000만원 ~ 1억원" style={{ color: '#fff', background: '#0a0a0a' }}>5,000만원 ~ 1억원</option>
+                          <option value="1억원 이상" style={{ color: '#fff', background: '#0a0a0a' }}>1억원 이상</option>
+                          <option value="미정" style={{ color: '#fff', background: '#0a0a0a' }}>미정 (협의 필요)</option>
                         </BigSelect>
                       </div>
                       <div>
@@ -279,7 +287,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                       )}
                     </div>
                     <div className="mt-16 pt-8 border-t border-white/8 flex flex-col md:flex-row gap-2 text-white/25 text-xs font-light tracking-wider">
-                      <span>rbsent.info@gmail.com</span>
+                      <span>info@nadaun.co</span>
                       <span className="hidden md:inline mx-3">·</span>
                       <span>02-6053-6231</span>
                       <span className="hidden md:inline mx-3">·</span>
