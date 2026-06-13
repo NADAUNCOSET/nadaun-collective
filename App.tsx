@@ -14,15 +14,18 @@ import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import ImmersiveCreativeOverlay from './components/ImmersiveCreativeOverlay';
 import GlobalNetworkOverlay from './components/GlobalNetworkOverlay';
-import { motion, useScroll, useSpring, useTransform, AnimatePresence, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform, useMotionTemplate, AnimatePresence, useMotionValue } from 'framer-motion';
 
 const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const opacity = useTransform(scrollYProgress, [0, 0.08, 0.88, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.08, 0.88, 1], [40, 0, 0, -20]);
+  const opacity = useTransform(scrollYProgress, [0, 0.10, 0.86, 1], [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.10, 0.86, 1], [40, 0, 0, -20]);
+  // 스크롤 연동 모션블러 — 들어올 때 흐려졌다 선명, 나갈 때 흐려짐 (자연스럽게 이어짐) 대표 룰 2026-06-13
+  const blurNum = useTransform(scrollYProgress, [0, 0.12, 0.84, 1], [14, 0, 0, 14]);
+  const filter = useMotionTemplate`blur(${blurNum}px)`;
   return (
-    <motion.div ref={ref} id={id} style={{ opacity, y }} className="snap-section">
+    <motion.div ref={ref} id={id} style={{ opacity, y, filter }} className="snap-section will-change-[filter,opacity,transform]">
       {children}
     </motion.div>
   );

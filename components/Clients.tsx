@@ -19,8 +19,8 @@ const PhotoReel: React.FC = () => {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       {PHOTOS.map((src, idx) => (
-        <div key={src} className={`absolute inset-0 transition-[opacity,filter] duration-[1100ms] ease-out ${i === idx ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'}`}>
-          <img src={src} alt="" loading="lazy" className="w-full h-full object-cover scale-105" style={{ filter: 'brightness(0.26) saturate(0.9)' }} />
+        <div key={src} className={`absolute inset-0 transition-opacity duration-[1100ms] ${i === idx ? 'opacity-100' : 'opacity-0'}`}>
+          <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" style={{ filter: 'brightness(0.26) saturate(0.9)' }} />
         </div>
       ))}
       <div className="absolute inset-0 bg-black/45" />
@@ -275,16 +275,23 @@ const Clients: React.FC = () => {
                     zIndex: node.size === 'lg' ? 3 : node.size === 'md' ? 2 : 1,
                   }}
                   animate={visible
-                    ? { opacity: 1, scale: 1, y: 0 }
-                    : { opacity: 0, scale: 0.7, y: 8 }
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.7 }
                   }
                   transition={{ duration: 0.234, delay, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div
-                    className="rounded-full mb-1.5"
-                    style={{ width: dotSize, height: dotSize, backgroundColor: dotColor }}
-                  />
-                  <NodeLabel node={node} />
+                  {/* 은은한 부유 모션 — 집약된 채 살아있게 */}
+                  <motion.div
+                    className="flex flex-col items-center"
+                    animate={{ y: [0, -6 - (i % 3) * 2, 0], x: [0, (i % 2 ? 3 : -3), 0] }}
+                    transition={{ duration: 4.5 + (i % 5), repeat: Infinity, ease: 'easeInOut', delay: (i % 7) * 0.28 }}
+                  >
+                    <div
+                      className="rounded-full mb-1.5"
+                      style={{ width: dotSize, height: dotSize, backgroundColor: dotColor }}
+                    />
+                    <NodeLabel node={node} />
+                  </motion.div>
                 </motion.div>
               );
             })}

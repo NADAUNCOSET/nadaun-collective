@@ -60,10 +60,10 @@ const VideoReel: React.FC = () => {
             src={current.src}
             autoPlay muted playsInline preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
-            initial={{ opacity: 0, filter: 'blur(14px)', scale: 1.04 }}
-            animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
-            exit={{ opacity: 0, filter: 'blur(14px)', scale: 1.04 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
           />
         </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/25 pointer-events-none" />
