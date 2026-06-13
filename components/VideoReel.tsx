@@ -69,10 +69,6 @@ const VideoReel: React.FC = () => {
       </div>
 
       <video key={`pre-${next.src}`} src={next.src} muted preload="auto" className="hidden" aria-hidden />
-
-      <div className="absolute top-8 left-8 md:left-16 pointer-events-none z-10">
-        <p className="text-[#FFB800] font-bold tracking-[0.3em] text-xs uppercase">VIDEO PORTFOLIO</p>
-      </div>
     </section>
   );
 };
