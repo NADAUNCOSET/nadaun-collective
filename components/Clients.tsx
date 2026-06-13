@@ -8,6 +8,8 @@ const PHOTOS = [
   '/people/laon-band-00.webp', '/people/thenewgrey-00.webp', '/people/thenewgrey-01.webp',
 ];
 
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+
 const PhotoReel: React.FC = () => {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -211,11 +213,32 @@ const Clients: React.FC = () => {
             </motion.p>
           </motion.div>
 
-          {/* Constellation */}
+          {/* Constellation (PC) / 파트너 리스트 (모바일) */}
           <div className="relative flex-1">
 
-            {/* SVG lines */}
-            <motion.svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible', opacity: lineOp }}>
+            {IS_MOBILE && (
+              <div className="absolute inset-0 flex flex-wrap content-center justify-center items-center gap-x-4 gap-y-3.5 px-2">
+                {NODES.map((n, i) => (
+                  <motion.span
+                    key={n.name}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-5%' }}
+                    transition={{ duration: 0.34, delay: Math.min(i * 0.018, 0.5), ease: [0.16, 1, 0.3, 1] }}
+                    className="font-bold tracking-tight leading-none"
+                    style={{
+                      color: n.size === 'lg' ? 'rgba(255,255,255,0.95)' : n.size === 'md' ? 'rgba(255,255,255,0.62)' : 'rgba(255,255,255,0.4)',
+                      fontSize: n.size === 'lg' ? '1.2rem' : n.size === 'md' ? '0.98rem' : '0.82rem',
+                    }}
+                  >
+                    {n.name}
+                  </motion.span>
+                ))}
+              </div>
+            )}
+
+            {/* SVG lines (PC only) */}
+            {!IS_MOBILE && <motion.svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible', opacity: lineOp }}>
               {EDGES.map(([ai, bi], ei) => {
                 const a = computed[ai];
                 const b = computed[bi];
@@ -230,10 +253,10 @@ const Clients: React.FC = () => {
                   />
                 );
               })}
-            </motion.svg>
+            </motion.svg>}
 
-            {/* Nodes */}
-            {computed.map((node, i) => {
+            {/* Nodes (PC only) */}
+            {!IS_MOBILE && computed.map((node, i) => {
               const dotSize = node.size === 'lg' ? 7 : node.size === 'md' ? 5 : 3;
               const dotColor = node.size === 'lg' ? 'rgba(255,255,255,0.9)'
                 : node.size === 'md' ? 'rgba(255,255,255,0.5)'
