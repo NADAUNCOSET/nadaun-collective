@@ -29,9 +29,9 @@ const VideoBg: React.FC = () => {
         onEnded={() => setIdx(i => (i + 1) % vids.length)}
         onError={() => setIdx(i => (i + 1) % vids.length)}
         className="w-full h-full object-cover"
-        style={{ opacity: 0.22 }}
+        style={{ opacity: 0.42 }}
       />
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(7,7,7,0.82) 0%, rgba(7,7,7,0.6) 45%, rgba(7,7,7,0.92) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(7,7,7,0.55) 0%, rgba(7,7,7,0.32) 45%, rgba(7,7,7,0.7) 100%)' }} />
     </div>
   );
 };
