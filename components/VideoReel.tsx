@@ -49,25 +49,28 @@ const VideoReel: React.FC = () => {
   const next = clips[(index + 1) % clips.length];
 
   return (
-    <section className="relative w-full h-screen bg-black overflow-hidden">
-      <AnimatePresence mode="sync">
-        <motion.video
-          key={index}
-          ref={videoRef}
-          src={current.src}
-          autoPlay muted playsInline preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease: 'easeInOut' }}
-        />
-      </AnimatePresence>
+    // 모바일: 가로영상 16:9 밴드(잘림 없이) 중앙 / PC: 풀스크린
+    <section className="relative w-full bg-black overflow-hidden flex items-center justify-center min-h-[60vh] md:min-h-0 md:h-screen">
+      {/* 영상 래퍼 — 모바일 aspect-video, PC 풀 */}
+      <div className="relative w-full aspect-video md:aspect-auto md:absolute md:inset-0 md:h-full">
+        <AnimatePresence mode="sync">
+          <motion.video
+            key={index}
+            ref={videoRef}
+            src={current.src}
+            autoPlay muted playsInline preload="auto"
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/25 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent pointer-events-none" />
+      </div>
 
       <video key={`pre-${next.src}`} src={next.src} muted preload="auto" className="hidden" aria-hidden />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/25 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent pointer-events-none" />
-
-      <div className="absolute top-8 left-8 md:left-16 pointer-events-none">
+      <div className="absolute top-8 left-8 md:left-16 pointer-events-none z-10">
         <p className="text-[#FFB800] font-bold tracking-[0.3em] text-xs uppercase">VIDEO PORTFOLIO</p>
       </div>
     </section>
