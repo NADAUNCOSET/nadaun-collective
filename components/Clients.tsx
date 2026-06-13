@@ -1,5 +1,30 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+
+// ── 최고의 파트너 배경: 사진 포폴 메인컷 빠르게 순환 (대표 룰 2026-06-13) ──
+const PHOTOS = [
+  '/hero/pepsi-festa.webp', '/hero/hd-hyundai.webp', '/hero/royal-salute.webp', '/hero/banyan-tree.webp', '/hero/varilux-seoul.webp',
+  '/people/beethoven-00.webp', '/people/dong-wook-00.webp', '/people/dong-wook-01.webp', '/people/estevan-00.webp', '/people/estevan-01.webp',
+  '/people/laon-band-00.webp', '/people/thenewgrey-00.webp', '/people/thenewgrey-01.webp',
+];
+
+const PhotoReel: React.FC = () => {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI(p => (p + 1) % PHOTOS.length), 1600);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {PHOTOS.map((src, idx) => (
+        <div key={src} className={`absolute inset-0 transition-opacity duration-[900ms] ${i === idx ? 'opacity-100' : 'opacity-0'}`}>
+          <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" style={{ filter: 'brightness(0.26) saturate(0.9)' }} />
+        </div>
+      ))}
+      <div className="absolute inset-0 bg-black/45" />
+    </div>
+  );
+};
 
 interface ClientNode {
   name: string;
@@ -153,6 +178,9 @@ const Clients: React.FC = () => {
     <div ref={sectionRef} style={{ height: '150vh' }} className="relative">
 
       <div className="sticky top-0 w-full h-screen bg-black overflow-hidden">
+
+        {/* 사진 포폴 메인컷 빠른 순환 배경 */}
+        <PhotoReel />
 
         {/* Dot grid */}
         <div
