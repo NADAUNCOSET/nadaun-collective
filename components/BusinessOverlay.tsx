@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
-import { X, Lightbulb, Cpu, Zap, Globe, Sparkles } from 'lucide-react';
+import { X, Lightbulb, Zap, Globe, Sparkles } from 'lucide-react';
 
 const HEADER_H = 57;
 
@@ -14,11 +14,10 @@ const C3S = C2E, C3E = (H1 + H2 + H3) / TOTAL;
 const C4S = C3E, C4E = 1;
 
 const DOMAINS = [
-  { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',       tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
-  { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',       tags: ['TVC Production', 'Brand Film', '3D Motion'],               icon: Zap       },
-  { id: '03', title: 'AI INNOVATION LAB',   subtitle: 'Next-Gen Tech Enhancement',    tags: ['AI Production', 'VFX Pipeline', 'Gen AI'],                 icon: Sparkles  },
-  { id: '04', title: 'AD-TECH PLATFORM',    subtitle: 'Targeted IP Distribution',     tags: ['Programmatic', 'DMP Analytics', 'Performance'],            icon: Cpu       },
-  { id: '05', title: 'GLOBAL NETWORK',      subtitle: 'Global Scale-Up',              tags: ['Localization', 'Global Media Buying', 'IP Expansion'],      icon: Globe     },
+  { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',        tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
+  { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',        tags: ['TVC Production', 'Brand Film', '3D Motion'],               icon: Zap       },
+  { id: '03', title: 'GLOBAL NETWORK',      subtitle: 'Nationwide & Global Media',     tags: ['Broadcast · IPTV · BTL', 'Global Media', 'Overseas'],      icon: Globe     },
+  { id: '04', title: 'AI INNOVATION LAB',   subtitle: 'Next-Gen Tech Enhancement',     tags: ['AI Production', 'VFX Pipeline', 'Gen AI'],                 icon: Sparkles  },
 ];
 
 const PROCESS = [
@@ -160,8 +159,8 @@ const Ch2: React.FC<{
                   onClick={() => {
                     if (d.id === '01' && onIntegratedClick) onIntegratedClick();
                     if (d.id === '02' && onCreativeClick) onCreativeClick();
-                    if (d.id === '03' && onAiLabClick) onAiLabClick();
-                    if (d.id === '05' && onGlobalClick) onGlobalClick();
+                    if (d.id === '03' && onGlobalClick) onGlobalClick();
+                    if (d.id === '04' && onAiLabClick) onAiLabClick();
                   }}
                 >
                   <span className="font-mono text-sm text-white/25 shrink-0 w-6">{d.id}</span>
@@ -188,8 +187,8 @@ const Ch2: React.FC<{
             })}
             <div className="border-t border-white/10" />
           </div>
-          <motion.p style={{ opacity: d4Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-widest uppercase">
-            도메인을 클릭하여 상세 확인 — 02 IMMERSIVE CREATIVE · 05 GLOBAL NETWORK
+          <motion.p style={{ opacity: d3Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-widest uppercase">
+            도메인을 클릭하여 상세 확인 — 02 IMMERSIVE CREATIVE · 03 GLOBAL NETWORK
           </motion.p>
         </motion.div>
       </StickyPanel>
@@ -366,7 +365,7 @@ const Ch4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     <div style={{ height: `${H4}vh` }}>
       <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }} className="relative overflow-hidden">
         <div className="absolute top-8 left-8 md:left-16 lg:left-24 z-10 pointer-events-none">
-          <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold">05 · GLOBAL NETWORK — 전국·전세계 송출</p>
+          <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold">03 · GLOBAL NETWORK — 전국·전세계 송출</p>
         </div>
 
         {/* A. 방송채널 */}
