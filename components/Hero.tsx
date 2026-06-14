@@ -12,6 +12,7 @@ const Hero: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [vids, setVids] = useState<string[]>([]);
   const [vIdx, setVIdx] = useState(0);
+  const [inView, setInView] = useState(true); // 화면 밖이면 영상 멈춤 (경량화)
 
   // LIVERNOVO 프록시 영상 배경 (R2) — 새로고침마다 셔플
   useEffect(() => {
@@ -23,6 +24,21 @@ const Hero: React.FC = () => {
       })
       .catch(() => {});
   }, []);
+
+  // 뷰포트 밖이면 배경영상 디코딩 중단 (CPU/배터리 절약)
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.01 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (inView) v.play().catch(() => {}); else v.pause();
+  }, [inView, vIdx, vids.length]);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
 

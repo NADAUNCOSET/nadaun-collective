@@ -14,7 +14,9 @@ const VideoReel: React.FC = () => {
   const [clips, setClips] = useState<Clip[]>([]);
   const [index, setIndex] = useState(0);
   const [ready, setReady] = useState(false);
+  const [inView, setInView] = useState(true); // 화면 밖이면 순환·재생 중단 (경량화)
   const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     fetch('/video-portfolio.json', { signal: AbortSignal.timeout(6000) })
@@ -29,19 +31,29 @@ const VideoReel: React.FC = () => {
       .catch(() => {});
   }, []);
 
+  // 뷰포트 밖이면 디코딩·순환 정지 (CPU/배터리 절약)
   useEffect(() => {
-    if (!ready || !clips.length) return;
-    const t = setTimeout(() => setIndex(i => (i + 1) % clips.length), DURATION_MS);
-    return () => clearTimeout(t);
-  }, [index, ready, clips.length]);
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.01 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = true;
-    videoRef.current.volume = 0;
-    videoRef.current.currentTime = 0;
-    videoRef.current.play().catch(() => {});
-  }, [index]);
+    if (!ready || !clips.length || !inView) return;
+    const t = setTimeout(() => setIndex(i => (i + 1) % clips.length), DURATION_MS);
+    return () => clearTimeout(t);
+  }, [index, ready, clips.length, inView]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.volume = 0;
+    if (inView) { v.currentTime = 0; v.play().catch(() => {}); }
+    else v.pause();
+  }, [index, inView]);
 
   if (!ready || !clips.length) return null;
 
@@ -50,7 +62,7 @@ const VideoReel: React.FC = () => {
 
   return (
     // 모바일: 가로영상 16:9 밴드(잘림 없이) 중앙 / PC: 풀스크린
-    <section className="relative w-full bg-black overflow-hidden flex items-center justify-center min-h-[60vh] md:min-h-0 md:h-screen">
+    <section ref={sectionRef} className="relative w-full bg-black overflow-hidden flex items-center justify-center min-h-[60vh] md:min-h-0 md:h-screen">
       {/* 영상 래퍼 — 모바일 aspect-video, PC 풀 */}
       <div className="relative w-full aspect-video md:aspect-auto md:absolute md:inset-0 md:h-full">
         <AnimatePresence mode="sync">

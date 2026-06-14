@@ -10,12 +10,13 @@ const PHOTOS = [
 
 const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
 
-const PhotoReel: React.FC = () => {
+const PhotoReel: React.FC<{ active: boolean }> = ({ active }) => {
   const [i, setI] = useState(0);
   useEffect(() => {
+    if (!active) return; // 화면 밖이면 순환 정지 (경량화)
     const t = setInterval(() => setI(p => (p + 1) % PHOTOS.length), 1600);
     return () => clearInterval(t);
-  }, []);
+  }, [active]);
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       {PHOTOS.map((src, idx) => (
@@ -124,6 +125,16 @@ const NodeLabel: React.FC<{ node: ClientNode }> = ({ node }) => (
 
 const Clients: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false); // 화면 밖이면 무한 애니메이션 정지 (경량화)
+
+  // 뷰포트 진입 여부 — PhotoReel 순환 / breathing / float 게이트
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.01 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // tier visibility (lg → md → sm)
   const [lgVisible, setLgVisible] = useState(false);
@@ -191,7 +202,7 @@ const Clients: React.FC = () => {
       <div className="sticky top-0 w-full h-screen bg-black overflow-hidden">
 
         {/* 사진 포폴 메인컷 빠른 순환 배경 */}
-        <PhotoReel />
+        <PhotoReel active={inView} />
 
         {/* Dot grid */}
         <div
@@ -227,8 +238,8 @@ const Clients: React.FC = () => {
           <motion.div
             className="relative flex-1"
             style={{ transformOrigin: 'center center' }}
-            animate={IS_MOBILE ? undefined : { scale: [1, 1.14, 1] }}
-            transition={IS_MOBILE ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
+            animate={IS_MOBILE || !inView ? undefined : { scale: [1, 1.14, 1] }}
+            transition={IS_MOBILE || !inView ? undefined : { duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
           >
 
             {IS_MOBILE && (
@@ -295,11 +306,11 @@ const Clients: React.FC = () => {
                   }
                   transition={{ duration: 0.234, delay, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {/* 은은한 부유 모션 — 집약된 채 살아있게 */}
+                  {/* 은은한 부유 모션 — 집약된 채 살아있게 (화면 밖이면 정지) */}
                   <motion.div
                     className="flex flex-col items-center"
-                    animate={{ y: [0, -6 - (i % 3) * 2, 0], x: [0, (i % 2 ? 3 : -3), 0] }}
-                    transition={{ duration: 4.5 + (i % 5), repeat: Infinity, ease: 'easeInOut', delay: (i % 7) * 0.28 }}
+                    animate={inView ? { y: [0, -6 - (i % 3) * 2, 0], x: [0, (i % 2 ? 3 : -3), 0] } : undefined}
+                    transition={inView ? { duration: 4.5 + (i % 5), repeat: Infinity, ease: 'easeInOut', delay: (i % 7) * 0.28 } : undefined}
                   >
                     <div
                       className="rounded-full mb-1.5"
