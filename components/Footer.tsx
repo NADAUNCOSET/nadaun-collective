@@ -58,8 +58,8 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
         {/* ── Words layer ─────────────────────────── */}
         <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
 
-          {/* LET'S BE — 모바일 세로 스택, PC 한 줄 (대표 룰 2026-06-13) */}
-          <div className="flex flex-col md:flex-row md:items-baseline md:gap-x-[0.3em]">
+          {/* LET'S BE — 한 줄 (모바일도), TOGETHER.는 다음 줄 = 2줄 (대표 룰 2026-06-14) */}
+          <div className="flex flex-row items-baseline gap-x-[0.28em] whitespace-nowrap">
           {/* LET'S */}
           <motion.div style={{ opacity: w1Out, y: w1OutY }}>
             <motion.p

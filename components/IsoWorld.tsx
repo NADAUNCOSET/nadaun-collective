@@ -238,9 +238,14 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
         <div className="absolute inset-0 opacity-[0.12]"
           style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="relative z-10 flex flex-col h-full px-5 py-14">
-          <h2 className="text-3xl font-bold tracking-tighter text-white mb-5">
-            NADAUN <span className="text-[#FFB800]">UNIVERSE</span>
-          </h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold tracking-tighter text-white leading-none">
+              NADAUN <span className="text-[#FFB800]">UNIVERSE</span>
+            </h2>
+            <p className="mt-3 text-[10px] tracking-[0.35em] uppercase text-white/30 font-light">
+              나다운이 만드는 세계
+            </p>
+          </div>
           <div className="grid grid-cols-2 gap-3 flex-1 overflow-y-auto pb-4">
             {UNIVERSE_DATA.map((item, idx) => (
               <motion.div
@@ -253,7 +258,7 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                 style={{ borderColor: item.color + '30' }}
               >
                 <div className="w-2 h-2 rounded-full mb-2" style={{ background: item.color }} />
-                <h3 className="text-xs font-bold leading-tight mb-0.5" style={{ color: item.color }}>
+                <h3 className="text-xs font-bold leading-tight mb-0.5 text-white">
                   {item.title}
                 </h3>
                 <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-2">
