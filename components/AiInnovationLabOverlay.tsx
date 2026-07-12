@@ -4,30 +4,32 @@ import { X, ArrowLeft, ExternalLink, Sparkles, Cpu, Image as ImageIcon, Video, S
 
 const CATEGORIES = ['ALL', 'LLM', 'IMAGE', 'VIDEO', 'AUDIO', 'DESIGN & 3D'];
 
+// 2026-07 기준 최신 핫리스트 (시장 점유율·아레나 리더보드 기반)
 const AI_TOOLS = [
-  { name: 'ChatGPT', url: 'https://chat.openai.com', category: 'LLM', desc: 'OpenAI의 대화형 인공지능 서비스입니다.', icon: <Cpu className="w-5 h-5" />, color: '#10a37f' },
-  { name: 'Claude', url: 'https://claude.ai', category: 'LLM', desc: 'Anthropic의 안전하고 강력한 AI 모델입니다.', icon: <Cpu className="w-5 h-5" />, color: '#d97757' },
-  { name: 'Gemini', url: 'https://gemini.google.com', category: 'LLM', desc: 'Google의 가장 범용적이고 강력한 AI입니다.', icon: <Sparkles className="w-5 h-5" />, color: '#4285f4' },
-  { name: 'Perplexity', url: 'https://www.perplexity.ai', category: 'LLM', desc: '실시간 정보를 제공하는 AI 검색 엔진입니다.', icon: <Search className="w-5 h-5" />, color: '#20b2aa' },
+  { name: 'ChatGPT', url: 'https://chat.openai.com', category: 'LLM', desc: '점유율 1위(글로벌 54%) — OpenAI 대화형 AI의 표준입니다.', icon: <Cpu className="w-5 h-5" />, color: '#10a37f' },
+  { name: 'Gemini', url: 'https://gemini.google.com', category: 'LLM', desc: '점유율 2위 — 1년 새 450% 성장한 Google 멀티모달 AI입니다.', icon: <Sparkles className="w-5 h-5" />, color: '#4285f4' },
+  { name: 'Claude', url: 'https://claude.ai', category: 'LLM', desc: '최고 성장세(연 855%↑) — 에이전틱 작업·코딩 최강 Anthropic AI입니다.', icon: <Cpu className="w-5 h-5" />, color: '#d97757' },
+  { name: 'DeepSeek', url: 'https://www.deepseek.com', category: 'LLM', desc: '오픈소스 추론(reasoning) 모델의 대표주자입니다.', icon: <Cpu className="w-5 h-5" />, color: '#4d6bfe' },
   { name: 'Grok', url: 'https://grok.com', category: 'LLM', desc: 'xAI의 실시간 정보 결합 대화형 AI입니다.', icon: <Cpu className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'DeepSeek', url: 'https://www.deepseek.com', category: 'LLM', desc: '고성능 오픈 추론(reasoning) AI 모델입니다.', icon: <Cpu className="w-5 h-5" />, color: '#4d6bfe' },
+  { name: 'Perplexity', url: 'https://www.perplexity.ai', category: 'LLM', desc: '출처 기반 실시간 AI 검색 엔진입니다.', icon: <Search className="w-5 h-5" />, color: '#20b2aa' },
 
-  { name: 'Midjourney', url: 'https://www.midjourney.com', category: 'IMAGE', desc: '예술적인 고퀄리티 이미지를 생성합니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'FLUX', url: 'https://blackforestlabs.ai', category: 'IMAGE', desc: '사실적이고 정교한 차세대 이미지 생성 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Ideogram', url: 'https://ideogram.ai', category: 'IMAGE', desc: '텍스트·타이포 표현에 강한 이미지 AI입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ff7a00' },
+  { name: 'GPT Image 2', url: 'https://openai.com', category: 'IMAGE', desc: '이미지 아레나 1위 — OpenAI의 최신 이미지 생성 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#10a37f' },
+  { name: 'Nano Banana', url: 'https://gemini.google.com', category: 'IMAGE', desc: 'Google 화제의 이미지 생성·편집 모델(Gemini Flash Image)입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffd400' },
+  { name: 'Midjourney', url: 'https://www.midjourney.com', category: 'IMAGE', desc: 'v7 — 예술적 미감·시네마틱 라이팅의 골드 스탠다드입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'FLUX', url: 'https://bfl.ai', category: 'IMAGE', desc: '오픈소스 이미지 1위 — Black Forest Labs의 대표 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'Ideogram', url: 'https://ideogram.ai', category: 'IMAGE', desc: '텍스트·타이포 표현에 가장 강한 이미지 AI입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ff7a00' },
   { name: 'Krea', url: 'https://www.krea.ai', category: 'IMAGE', desc: '실시간 생성·업스케일 크리에이티브 툴입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Leonardo AI', url: 'https://leonardo.ai', category: 'IMAGE', desc: '게임 에셋 및 예술 작품 생성에 특화된 AI입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ff9900' },
 
-  { name: 'Sora', url: 'https://sora.com', category: 'VIDEO', desc: 'OpenAI의 고해상도 영상 생성 모델입니다.', icon: <Video className="w-5 h-5" />, color: '#ff4b4b' },
-  { name: 'Veo', url: 'https://deepmind.google/technologies/veo/', category: 'VIDEO', desc: 'Google의 시네마틱 고품질 영상 생성 모델입니다.', icon: <Video className="w-5 h-5" />, color: '#4285f4' },
-  { name: 'Runway', url: 'https://runwayml.com', category: 'VIDEO', desc: '차세대 비디오 생성 및 편집 도구입니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Kling', url: 'https://klingai.com', category: 'VIDEO', desc: '사실적 모션의 영상 생성 AI입니다.', icon: <Video className="w-5 h-5" />, color: '#ff4d6d' },
-  { name: 'Hailuo', url: 'https://hailuoai.video', category: 'VIDEO', desc: 'MiniMax의 역동적인 AI 영상 생성기입니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Luma Dream Machine', url: 'https://lumalabs.ai/dream-machine', category: 'VIDEO', desc: '고품질의 사실적인 비디오를 빠르게 생성합니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'Kling 3.0', url: 'https://klingai.com', category: 'VIDEO', desc: '영상 아레나 1위 — 사실적 모션의 최강 영상 생성 AI입니다.', icon: <Video className="w-5 h-5" />, color: '#ff4d6d' },
+  { name: 'Veo 3.1', url: 'https://deepmind.google/models/veo/', category: 'VIDEO', desc: 'Google의 시네마틱 영상 생성 — 오디오 동시 생성 지원.', icon: <Video className="w-5 h-5" />, color: '#4285f4' },
+  { name: 'Sora 2', url: 'https://sora.com', category: 'VIDEO', desc: 'OpenAI의 소셜 숏폼형 영상 생성 — 사운드·대사까지 한 번에.', icon: <Video className="w-5 h-5" />, color: '#ff4b4b' },
+  { name: 'Seedance', url: 'https://seed.bytedance.com', category: 'VIDEO', desc: 'ByteDance — 롱폼 이미지-투-비디오의 최신 강자입니다.', icon: <Video className="w-5 h-5" />, color: '#00f0ff' },
+  { name: 'Runway', url: 'https://runwayml.com', category: 'VIDEO', desc: 'Gen-4.5 — 프로덕션 컨트롤에 가장 강한 영상 툴입니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
+  { name: 'Wan', url: 'https://wan.video', category: 'VIDEO', desc: '오픈소스 영상 1위 — Alibaba의 공개 가중치 모델입니다.', icon: <Video className="w-5 h-5" />, color: '#7c3aed' },
 
-  { name: 'Suno AI', url: 'https://suno.com', category: 'AUDIO', desc: '간단한 텍스트로 완성도 높은 음악을 생성합니다.', icon: <Music className="w-5 h-5" />, color: '#ff8c00' },
+  { name: 'Suno', url: 'https://suno.com', category: 'AUDIO', desc: '텍스트 한 줄로 완성곡을 만드는 음악 생성 1위입니다.', icon: <Music className="w-5 h-5" />, color: '#ff8c00' },
+  { name: 'ElevenLabs', url: 'https://elevenlabs.io', category: 'AUDIO', desc: '가장 자연스러운 AI 음성 합성·더빙 플랫폼입니다.', icon: <Music className="w-5 h-5" />, color: '#ffffff' },
   { name: 'Udio', url: 'https://www.udio.com', category: 'AUDIO', desc: '감정을 담은 고품질 AI 음악 생성기입니다.', icon: <Music className="w-5 h-5" />, color: '#2563eb' },
-  { name: 'ElevenLabs', url: 'https://elevenlabs.io', category: 'AUDIO', desc: '가장 자연스러운 AI 음성 합성 플랫폼입니다.', icon: <Music className="w-5 h-5" />, color: '#ffffff' },
 
   { name: 'Gamma', url: 'https://gamma.app', category: 'DESIGN & 3D', desc: 'AI로 프레젠테이션·웹사이트를 제작합니다.', icon: <Palette className="w-5 h-5" />, color: '#ff69b4' },
   { name: 'Spline', url: 'https://spline.design', category: 'DESIGN & 3D', desc: '웹 기반 3D 디자인 및 AI 생성 도구입니다.', icon: <Box className="w-5 h-5" />, color: '#ff00ff' },

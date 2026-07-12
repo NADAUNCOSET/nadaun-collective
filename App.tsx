@@ -1,7 +1,6 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-const IsoWorld = lazy(() => import('./components/IsoWorld'));
 import Clients from './components/Clients';
 import Footer from './components/Footer';
 import AboutOverlay from './components/AboutOverlay';
@@ -10,28 +9,13 @@ import ContactOverlay from './components/ContactOverlay';
 import BusinessOverlay from './components/BusinessOverlay';
 import InsightsOverlay from './components/InsightsOverlay';
 import Intro from './components/Intro';
+import ServiceHub from './components/ServiceHub';
+import ServiceHubV2 from './components/ServiceHubV2';
 import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import ImmersiveCreativeOverlay from './components/ImmersiveCreativeOverlay';
 import GlobalNetworkOverlay from './components/GlobalNetworkOverlay';
-import { motion, useScroll, useSpring, useTransform, useMotionTemplate, AnimatePresence, useMotionValue } from 'framer-motion';
-
-const ScrollSection: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  // 스프링 댐핑으로 위아래 스크롤에 부드럽게 반응 (대표 룰 2026-06-13)
-  const sp = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
-  const opacity = useTransform(sp, [0, 0.10, 0.86, 1], [0, 1, 1, 0]);
-  const y = useTransform(sp, [0, 0.10, 0.86, 1], [40, 0, 0, -20]);
-  // 스크롤 연동 모션블러 — 들어올 때 흐려졌다 선명, 나갈 때 흐려짐 (자연스럽게 이어짐)
-  const blurNum = useTransform(sp, [0, 0.12, 0.84, 1], [14, 0, 0, 14]);
-  const filter = useMotionTemplate`blur(${blurNum}px)`;
-  return (
-    <motion.div ref={ref} id={id} style={{ opacity, y, filter }} className="snap-section will-change-[filter,opacity,transform]">
-      {children}
-    </motion.div>
-  );
-};
+import { motion, useScroll, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 
 const App: React.FC = () => {
   const { scrollYProgress } = useScroll();
@@ -44,6 +28,10 @@ const App: React.FC = () => {
 
   const [introFinished, setIntroFinished] = useState(false);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
+  // 기본 2안(이미지 타일). 1안 리스트 비교는 ?hub=1 로만 접근 (검수용)
+  const [hubVersion] = useState<1 | 2>(() =>
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('hub') === '1' ? 1 : 2
+  );
   const [bizFromBack, setBizFromBack] = useState(false); // 상세 새창 백버튼 → 도메인으로 복귀
 
   useEffect(() => {
@@ -136,14 +124,16 @@ const App: React.FC = () => {
         />
 
         <main>
+          <div className="relative">
+            {hubVersion === 1 ? (
+              <ServiceHub onOverlay={(id) => setActiveOverlay(id)} />
+            ) : (
+              <ServiceHubV2 onOverlay={(id) => setActiveOverlay(id)} />
+            )}
+          </div>
           <Hero />
           <VideoReel />
           <Clients />
-          <ScrollSection id="isoworld">
-            <Suspense fallback={<div className="h-screen w-full bg-black" />}>
-              <IsoWorld onAiLabClick={() => setActiveOverlay('ai-lab')} />
-            </Suspense>
-          </ScrollSection>
         </main>
 
         <Footer onContactClick={() => setActiveOverlay('contact')} />
