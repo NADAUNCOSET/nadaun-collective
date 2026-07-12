@@ -14,7 +14,7 @@ type HubItem = {
   desc: string;
   color: string;
   img?: string;
-  video?: string;
+  videos?: string[]; // 포폴 영상 플레이리스트
   rolling?: RollingItem[]; // 아티스트 롤링
   links: LinkChip[];
 };
@@ -49,7 +49,14 @@ const ITEMS: HubItem[] = [
     kr: '사진 · 영상 기획 · 제작',
     desc: '사진 · 영상 콘텐츠 기획 및 제작 — 기업의 순간을 정제된 감각으로 기록',
     color: '#FF8C00',
-    video: 'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20241022%20PEPSI%20FESTA%20SKETCH%20FILM%20v3_1080p.mp4',
+    videos: [
+      'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20241022%20PEPSI%20FESTA%20SKETCH%20FILM%20v3_1080p.mp4',
+      'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20240404_%EC%86%A1%ED%98%9C%EA%B5%90_%EB%AF%B8%EB%9E%98%EB%AF%B8_SKETCH_1080p.mp4',
+      'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20251029%20JAY%20B%20OPEN%20VCR_1080p.mp4',
+      'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20260113%20HD%ED%98%84%EB%8C%80%20%EC%8B%A0%EB%85%84%EC%82%AC%20%EC%8A%A4%EC%BC%80%EC%B9%98_1080p.mp4',
+      'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20240505_m2%20%EC%86%90%EC%98%88%EC%A7%84_SKETCH_1080p.mp4',
+      'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/MUSINSA%20STANDARD%20BRAND%20FILM%20AD_1080p.mp4',
+    ],
     links: [
       { label: 'PHOTO', url: 'https://photo.nadaun.co' },
       { label: 'VIDEO', url: 'https://video.nadaun.co' },
@@ -159,34 +166,46 @@ const RollingImages: React.FC<{ items: RollingItem[]; active: boolean; color: st
   );
 };
 
-/** 선택된 타일에서만 재생 + 2.2초마다 다른 구간으로 점프 (짧게 짧게 하이라이트) */
-const TileVideo: React.FC<{ src: string; active: boolean }> = ({ src, active }) => {
+/** 포폴 영상 플레이리스트 — 선택된 타일에서만 재생, 3.2초마다 다음 영상의 랜덤 구간으로 (짧게 짧게) */
+const TileVideo: React.FC<{ srcs: string[]; active: boolean }> = ({ srcs, active }) => {
+  const [idx, setIdx] = useState(0);
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = ref.current;
-    if (!v) return;
-    if (!active) {
-      v.pause();
-      return;
+    if (v) {
+      if (active) v.play().catch(() => {});
+      else v.pause();
     }
-    v.play().catch(() => {});
-    const t = setInterval(() => {
-      if (v.duration && isFinite(v.duration)) {
-        v.currentTime = Math.random() * v.duration * 0.88;
-      }
-    }, 2200);
+    if (!active) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % srcs.length), 3200);
     return () => clearInterval(t);
-  }, [active]);
+  }, [active, srcs.length, idx]);
   return (
-    <video
-      ref={ref}
-      src={src}
-      muted
-      loop
-      playsInline
-      preload="auto"
-      className="absolute inset-0 w-full h-full object-cover"
-    />
+    <div className="absolute inset-0 overflow-hidden">
+      <AnimatePresence initial={false}>
+        <motion.video
+          key={idx}
+          ref={ref}
+          src={srcs[idx]}
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onLoadedMetadata={(e) => {
+            const v = e.currentTarget;
+            if (v.duration && isFinite(v.duration)) {
+              v.currentTime = v.duration * (0.1 + Math.random() * 0.6);
+            }
+            if (active) v.play().catch(() => {});
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.45, ease: NADAUN_EASE as any }}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </AnimatePresence>
+    </div>
   );
 };
 
@@ -241,8 +260,8 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           >
             {item.rolling ? (
               <RollingImages items={item.rolling} active={active} color={item.color} />
-            ) : item.video ? (
-              <TileVideo src={item.video} active={active} />
+            ) : item.videos ? (
+              <TileVideo srcs={item.videos} active={active} />
             ) : item.img ? (
               <motion.img
                 src={item.img}
