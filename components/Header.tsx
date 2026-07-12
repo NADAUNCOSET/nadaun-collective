@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+
 const navItems = [
   { label: 'ABOUT', id: 'about' },
   { label: 'BUSINESS', id: 'business' },
@@ -48,9 +50,9 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
           <motion.a
             href="#"
             className="flex items-center gap-2 z-50 relative cursor-pointer select-none"
-            initial={{ y: 100 }}
-            animate={introFinished ? { y: 0 } : { y: 100 }}
-            transition={{ duration: 0.281, ease: [0.22, 1, 0.36, 1], delay: 0.032 }}
+            initial={IS_MOBILE ? { opacity: 0 } : { y: 100 }}
+            animate={introFinished ? { y: 0, opacity: 1 } : IS_MOBILE ? { opacity: 0 } : { y: 100 }}
+            transition={{ duration: IS_MOBILE ? 0.4 : 0.281, ease: [0.22, 1, 0.36, 1], delay: 0.032 }}
           >
             <div className="flex items-center gap-2">
               <span className="text-2xl md:text-3xl font-extrabold text-white leading-none tracking-tight">

@@ -386,7 +386,14 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   if (isMobile) {
     return (
       <section className="relative bg-black flex flex-col justify-center min-h-[100svh] pt-24 pb-8 overflow-hidden">
-        <div className="mb-7" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
+        {/* 글씨 먼저 등장 (대표 지시 2026-07-13) */}
+        <motion.div
+          initial={{ opacity: 0, y: 26, filter: 'blur(10px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.7, delay: 0.15, ease: NADAUN_EASE as any }}
+          className="mb-7"
+          style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
+        >
           <p className="text-[11px] tracking-[0.45em] uppercase font-bold mb-4" style={{ color: '#FFB800' }}>
             What We Do
           </p>
@@ -401,8 +408,15 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
             <br />
             모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
           </h2>
-        </div>
-        <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
+        </motion.div>
+        {/* 내용(타일)은 글씨 뒤에 등장 */}
+        <motion.div
+          initial={{ opacity: 0, y: 44, filter: 'blur(10px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.7, delay: 0.75, ease: NADAUN_EASE as any }}
+        >
+          <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
+        </motion.div>
       </section>
     );
   }
