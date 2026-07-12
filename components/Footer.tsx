@@ -169,11 +169,6 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
               <p>T. 02-6053-6231 · E. info@nadaun.co</p>
             </div>
             <div className="flex flex-col md:items-end gap-2">
-              <div className="flex gap-5 text-white/40 tracking-widest uppercase">
-                <a href="#" className="hover:text-white transition-colors">Instagram</a>
-                <a href="#" className="hover:text-white transition-colors">Youtube</a>
-                <a href="#" className="hover:text-white transition-colors">Behance</a>
-              </div>
               <p className="text-gray-700">© 2026 NADAUN COLLECTIVE. All Rights Reserved.</p>
             </div>
           </motion.div>
