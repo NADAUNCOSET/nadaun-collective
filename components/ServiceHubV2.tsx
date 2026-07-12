@@ -391,6 +391,16 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
   const contPointer = useTransform(scrollYProgress, (v) => (v > 0.36 ? 'auto' : 'none'));
 
+  // ── 모바일 전용 스크럽 (푸터 LET'S BE TOGETHER 방식, 인트로 블록 단독) ──
+  const mw1Op = useTransform(sp, [0.06, 0.22], [0, 1]);
+  const mw1X = useTransform(sp, [0.06, 0.22], ['-8%', '0%']);
+  const mw2Op = useTransform(sp, [0.18, 0.34], [0, 1]);
+  const mw2X = useTransform(sp, [0.18, 0.34], ['8%', '0%']);
+  const mw3Op = useTransform(sp, [0.30, 0.48], [0, 1]);
+  const mw3Y = useTransform(sp, [0.30, 0.48], ['8%', '0%']);
+  const mOutOp = useTransform(sp, [0.72, 0.94], [1, 0]);
+  const mOutY = useTransform(sp, [0.72, 0.94], ['0%', '-6%']);
+
   // 푸터 LET'S TOGETHER처럼 화면을 꽉 채우는 스케일 (대표 지시 2026-07-13)
   const bigWord: React.CSSProperties = {
     fontFamily: 'Manrope, sans-serif',
@@ -403,42 +413,61 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
     whiteSpace: 'nowrap',
   };
 
-  // 모바일 = 스크롤텔링 없이 일반 플로우
+  // 모바일 = 인트로 스크롤텔링(푸터 방식) → 타일 세션 일반 플로우
   if (isMobile) {
+    const mWord: React.CSSProperties = {
+      fontFamily: 'Manrope, sans-serif',
+      fontWeight: 900,
+      fontSize: 'clamp(2.4rem, 12vw, 4.2rem)',
+      letterSpacing: '-0.045em',
+      lineHeight: 0.95,
+      whiteSpace: 'nowrap',
+      color: 'rgba(255,255,255,0.92)',
+      display: 'block',
+    };
     return (
-      <section className="relative bg-black flex flex-col justify-center min-h-[100svh] pt-24 pb-8 overflow-hidden">
-        {/* 글씨 먼저 등장 (대표 지시 2026-07-13) */}
-        <motion.div
-          initial={{ opacity: 0, y: 26, filter: BLUR(10) }}
-          animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
-          transition={{ duration: 0.7, delay: 0.15, ease: NADAUN_EASE as any }}
-          className="mb-7"
-          style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
-        >
-          <p className="text-[11px] tracking-[0.45em] uppercase font-bold mb-4" style={{ color: '#FFB800' }}>
-            What We Do
-          </p>
-          {/* 푸터 LET'S BE TOGETHER 스케일 매칭 (대표 지시 2026-07-13) */}
-          <h2
-            className="text-white"
-            style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 900, fontSize: 'clamp(2.2rem, 10vw, 4rem)', letterSpacing: '-0.045em', lineHeight: 0.96, whiteSpace: 'nowrap' }}
+      <>
+        {/* 스크롤 스크럽 인트로 — 글씨가 좌/우/아래에서 (LET'S BE TOGETHER 방식) */}
+        <div ref={ref} style={{ height: '190vh' }} className="relative bg-black">
+          <div
+            className="sticky top-0 h-[100svh] overflow-hidden flex flex-col justify-center"
+            style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
           >
-            하나의
-            <br />
-            컬렉티브<span style={{ color: '#FFB800' }}>,</span>
-            <br />
-            모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
-          </h2>
-        </motion.div>
-        {/* 내용(타일)은 글씨 뒤에 등장 */}
-        <motion.div
-          initial={{ opacity: 0, y: 44, filter: BLUR(10) }}
-          animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
-          transition={{ duration: 0.7, delay: 0.75, ease: NADAUN_EASE as any }}
-        >
-          <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
-        </motion.div>
-      </section>
+            <motion.div style={{ opacity: mOutOp, y: mOutY }}>
+              <motion.p style={{ opacity: mw1Op, x: mw1X }} className="text-[11px] tracking-[0.5em] uppercase font-bold mb-6">
+                <span style={{ color: '#FFB800' }}>What We Do</span>
+              </motion.p>
+              <motion.span style={{ ...mWord, opacity: mw1Op, x: mw1X }}>하나의</motion.span>
+              <motion.span style={{ ...mWord, opacity: mw2Op, x: mw2X }}>
+                컬렉티브<span style={{ color: '#FFB800' }}>,</span>
+              </motion.span>
+              <motion.span style={{ ...mWord, opacity: mw3Op, y: mw3Y, color: '#ffffff' }}>
+                모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
+              </motion.span>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* 타일 세션 */}
+        <section className="relative bg-black min-h-[100svh] flex flex-col justify-center py-8 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, y: 48 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-8%' }}
+            transition={{ duration: 0.65, ease: NADAUN_EASE as any }}
+          >
+            <div className="mb-5" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
+              <h2
+                className="text-white font-extrabold"
+                style={{ fontFamily: 'Manrope, sans-serif', fontSize: '19px', letterSpacing: '-0.03em' }}
+              >
+                하나의 컬렉티브, 모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
+              </h2>
+            </div>
+            <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
+          </motion.div>
+        </section>
+      </>
     );
   }
 
