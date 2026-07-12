@@ -228,9 +228,9 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           key={item.id}
           layout
           onClick={() => setActiveId(item.id)}
-          animate={{ flexGrow: active ? 2.6 : 1 }}
+          animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '17vh') : '58vh' }}
           transition={NADAUN_SPRING}
-          className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 h-[26vh] lg:h-[58vh] flex-grow"
+          className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 flex-grow"
           style={{ ['--ac' as any]: item.color }}
         >
           {/* image / rolling */}
@@ -265,8 +265,8 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
               </div>
             )}
           </div>
-          {/* gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/30 pointer-events-none" />
+          {/* gradient — 활성 시 하단을 더 눌러 텍스트 가독 확보 */}
+          <div className={`absolute inset-0 bg-gradient-to-t pointer-events-none transition-opacity duration-500 ${active ? 'from-black/95 via-black/40 to-black/25' : 'from-black/85 via-black/15 to-black/30'}`} />
           {/* active accent line */}
           <motion.span
             className="absolute top-0 left-0 right-0 h-[3px] origin-left"
@@ -352,13 +352,13 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   const sp = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
 
-  // ── 인트로 대형 워드 — 스크롤로 하나씩 등장 (히어로 톤) ──
-  const w1Op = useTransform(sp, [0.02, 0.10], [0, 1]);
-  const w1Y = useTransform(sp, [0.02, 0.10], [36, 0]);
-  const w2Op = useTransform(sp, [0.10, 0.18], [0, 1]);
-  const w2Y = useTransform(sp, [0.10, 0.18], [36, 0]);
-  const w3Op = useTransform(sp, [0.18, 0.26], [0, 1]);
-  const w3Y = useTransform(sp, [0.18, 0.26], [36, 0]);
+  // ── 인트로 대형 워드 — 푸터 LET'S BE TOGETHER 방식 (좌/우/아래 슬라이드, 대표 지시 2026-07-13) ──
+  const w1Op = useTransform(sp, [0.02, 0.12], [0, 1]);
+  const w1X = useTransform(sp, [0.02, 0.12], ['-8%', '0%']);
+  const w2Op = useTransform(sp, [0.10, 0.20], [0, 1]);
+  const w2X = useTransform(sp, [0.10, 0.20], ['8%', '0%']);
+  const w3Op = useTransform(sp, [0.18, 0.30], [0, 1]);
+  const w3Y = useTransform(sp, [0.18, 0.30], ['8%', '0%']);
   const introOp = useTransform(sp, [0.30, 0.40], [1, 0]);
   const introBlurN = useTransform(sp, [0.30, 0.40], [0, 12]);
   const introFilter = useMotionTemplate`blur(${introBlurN}px)`;
@@ -370,28 +370,36 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
   const contPointer = useTransform(scrollYProgress, (v) => (v > 0.36 ? 'auto' : 'none'));
 
+  // 푸터 LET'S TOGETHER처럼 화면을 꽉 채우는 스케일 (대표 지시 2026-07-13)
   const bigWord: React.CSSProperties = {
     fontFamily: 'Manrope, sans-serif',
     fontWeight: 900,
-    fontSize: 'clamp(2.6rem, 7.2vw, 6.8rem)',
-    letterSpacing: '-0.04em',
-    lineHeight: 0.92,
+    fontSize: 'clamp(3rem, 11vw, 11rem)',
+    letterSpacing: '-0.045em',
+    lineHeight: 0.94,
     color: '#fff',
     display: 'block',
+    whiteSpace: 'nowrap',
   };
 
   // 모바일 = 스크롤텔링 없이 일반 플로우
   if (isMobile) {
     return (
       <section className="relative bg-black flex flex-col justify-center min-h-[100svh] pt-24 pb-8 overflow-hidden">
-        <div className="mb-6" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
-          <p className="text-[11px] tracking-[0.45em] uppercase font-semibold mb-3" style={{ color: '#FFB800' }}>
+        <div className="mb-7" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
+          <p className="text-[11px] tracking-[0.45em] uppercase font-bold mb-4" style={{ color: '#FFB800' }}>
             What We Do
           </p>
-          <h2 className="text-white font-extrabold leading-[0.92]" style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(2.1rem, 9vw, 3rem)', letterSpacing: '-0.035em' }}>
-            하나의 컬렉티브,
+          {/* 푸터 LET'S BE TOGETHER 스케일 매칭 (대표 지시 2026-07-13) */}
+          <h2
+            className="text-white"
+            style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 900, fontSize: 'clamp(2.2rem, 10vw, 4rem)', letterSpacing: '-0.045em', lineHeight: 0.96, whiteSpace: 'nowrap' }}
+          >
+            하나의
             <br />
-            모든 브랜드 경험.
+            컬렉티브<span style={{ color: '#FFB800' }}>,</span>
+            <br />
+            모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
           </h2>
         </div>
         <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
@@ -407,14 +415,18 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           className="absolute inset-0 z-10 flex flex-col justify-center pointer-events-none"
           style={{ opacity: introOp, filter: introFilter, paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
         >
-          <motion.p style={{ opacity: w1Op, y: w1Y }} className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8" >
+          <motion.p style={{ opacity: w1Op, x: w1X }} className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8">
             <span style={{ color: '#FFB800' }}>What We Do</span>
           </motion.p>
-          <motion.span style={{ ...bigWord, opacity: w1Op, y: w1Y }}>하나의</motion.span>
-          <motion.span style={{ ...bigWord, opacity: w2Op, y: w2Y }}>
-            컬렉티브<span style={{ color: '#FFB800' }}>,</span>
-          </motion.span>
-          <motion.span style={{ ...bigWord, opacity: w3Op, y: w3Y, marginTop: '0.18em' }}>
+          {/* 1행: 왼쪽에서 / 2행: 오른쪽에서 — 한 줄 배치 (푸터 LET'S BE 방식) */}
+          <div className="flex flex-row items-baseline gap-x-[0.45em] whitespace-nowrap">
+            <motion.span style={{ ...bigWord, color: 'rgba(255,255,255,0.92)', opacity: w1Op, x: w1X }}>하나의</motion.span>
+            <motion.span style={{ ...bigWord, color: 'rgba(255,255,255,0.92)', opacity: w2Op, x: w2X }}>
+              컬렉티브<span style={{ color: '#FFB800' }}>,</span>
+            </motion.span>
+          </div>
+          {/* 3행: 아래에서 (TOGETHER. 방식) */}
+          <motion.span style={{ ...bigWord, opacity: w3Op, y: w3Y }}>
             모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
           </motion.span>
         </motion.div>
