@@ -122,6 +122,8 @@ const ITEMS: HubItem[] = [
 const NADAUN_SPRING = { type: 'spring' as const, stiffness: 90, damping: 26, restDelta: 0.0005 };
 const NADAUN_EASE = [0.16, 1, 0.3, 1] as const;
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+// 모바일 = 블러 필터 미사용 (GPU 부하 절감, 부드러움 우선)
+const BLUR = (px: number) => (isMobile ? 'blur(0px)' : `blur(${px}px)`);
 
 /** 연예인 이미지가 차례대로 샤샤샥 지나가는 롤링 (+아티스트명 캡션) */
 const RollingImages: React.FC<{ items: RollingItem[]; active: boolean; color: string }> = ({ items, active, color }) => {
@@ -151,9 +153,9 @@ const RollingImages: React.FC<{ items: RollingItem[]; active: boolean; color: st
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={idx}
-            initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -8, filter: 'blur(6px)' }}
+            initial={{ opacity: 0, y: 8, filter: BLUR(6) }}
+            animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
+            exit={{ opacity: 0, y: -8, filter: BLUR(6) }}
             transition={{ duration: 0.4, ease: NADAUN_EASE as any }}
             className="inline-block px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider bg-black/55 backdrop-blur-sm"
             style={{ color, fontFamily: 'Manrope, sans-serif' }}
@@ -190,7 +192,7 @@ const TileVideo: React.FC<{ srcs: string[]; active: boolean }> = ({ srcs, active
           muted
           loop
           playsInline
-          preload="auto"
+          preload={active ? 'auto' : 'metadata'}
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
             if (v.duration && isFinite(v.duration)) {
@@ -212,9 +214,9 @@ const TileVideo: React.FC<{ srcs: string[]; active: boolean }> = ({ srcs, active
 const LinkWord: React.FC<{ link: LinkChip; index: number; color: string; onOverlay: (id: string) => void }> = ({ link, index, color, onOverlay }) => {
   const inner = (
     <motion.span
-      initial={{ opacity: 0, y: 16, filter: 'blur(9px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
+      initial={{ opacity: 0, y: 16, filter: BLUR(9) }}
+      animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
+      exit={{ opacity: 0, y: 8, filter: BLUR(6) }}
       transition={{ duration: 0.5, delay: 0.25 + index * 0.09, ease: NADAUN_EASE as any }}
       className="inline-flex items-center gap-1.5 font-bold tracking-tight text-white transition-colors duration-300"
       style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(1.15rem, 1.7vw, 1.45rem)' }}
@@ -255,7 +257,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           {/* image / rolling */}
           <div
             className={`absolute inset-0 transition-[filter] duration-700 ${
-              active ? '' : 'grayscale-[65%] brightness-[0.55] group-hover:grayscale-0 group-hover:brightness-90'
+              active ? '' : isMobile ? 'brightness-[0.55]' : 'grayscale-[65%] brightness-[0.55] group-hover:grayscale-0 group-hover:brightness-90'
             }`}
           >
             {item.rolling ? (
@@ -326,8 +328,8 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                   className="overflow-hidden"
                 >
                   <motion.p
-                    initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    initial={{ opacity: 0, y: 12, filter: BLUR(8) }}
+                    animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.45, delay: 0.12, ease: NADAUN_EASE as any }}
                     className="mt-3 text-[14px] md:text-[16px] text-white/75 leading-relaxed break-keep max-w-[560px]"
@@ -341,8 +343,8 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                       ))
                     ) : (
                       <motion.span
-                        initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        initial={{ opacity: 0, y: 12, filter: BLUR(8) }}
+                        animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
                         transition={{ duration: 0.5, delay: 0.2, ease: NADAUN_EASE as any }}
                         className="inline-block rounded-full border px-4 py-1.5 text-[13px] font-bold tracking-wider"
                         style={{ borderColor: `${item.color}66`, color: item.color }}
@@ -407,8 +409,8 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
       <section className="relative bg-black flex flex-col justify-center min-h-[100svh] pt-24 pb-8 overflow-hidden">
         {/* 글씨 먼저 등장 (대표 지시 2026-07-13) */}
         <motion.div
-          initial={{ opacity: 0, y: 26, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          initial={{ opacity: 0, y: 26, filter: BLUR(10) }}
+          animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
           transition={{ duration: 0.7, delay: 0.15, ease: NADAUN_EASE as any }}
           className="mb-7"
           style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
@@ -430,8 +432,8 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
         </motion.div>
         {/* 내용(타일)은 글씨 뒤에 등장 */}
         <motion.div
-          initial={{ opacity: 0, y: 44, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          initial={{ opacity: 0, y: 44, filter: BLUR(10) }}
+          animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
           transition={{ duration: 0.7, delay: 0.75, ease: NADAUN_EASE as any }}
         >
           <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
