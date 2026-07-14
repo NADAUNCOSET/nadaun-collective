@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useTransform, useMotionTemplate, useMotionValueEvent } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 type LinkChip = { label: string; url?: string; overlay?: string };
@@ -249,7 +249,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           key={item.id}
           onClick={() => setActiveId(item.id)}
           animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '17vh') : '58vh' }}
-          transition={isMobile ? { duration: 0.5, ease: NADAUN_EASE as any } : NADAUN_SPRING}
+          transition={isMobile ? { duration: 0.6, ease: NADAUN_EASE as any } : { type: 'spring', stiffness: 65, damping: 23, restDelta: 0.0005 }}
           className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 flex-grow"
           style={{ ['--ac' as any]: item.color }}
         >
@@ -382,9 +382,10 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
 
 interface ServiceHubV2Props {
   onOverlay: (id: string) => void;
+  introFinished?: boolean;
 }
 
-const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
+const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = true }) => {
   const [activeId, setActiveId] = useState<string>('moment');
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
@@ -401,6 +402,15 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const contBlurN = useTransform(sp, [0.38, 0.50], [10, 0]);
   const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
   const contPointer = useTransform(scrollYProgress, (v) => (v > 0.36 ? 'auto' : 'none'));
+
+  // ── PC: 타일 세션에서 계속 스크롤하면 모먼트부터 차례대로 선택 (안정적·편안한 전환) ──
+  useMotionValueEvent(sp, 'change', (v) => {
+    if (isMobile) return;
+    if (v < 0.52) return;
+    const seg = Math.min(ITEMS.length - 1, Math.floor(((v - 0.52) / 0.44) * ITEMS.length));
+    const id = ITEMS[seg].id;
+    setActiveId((cur) => (cur === id ? cur : id));
+  });
 
   // ── 모바일: 키비주얼 글씨는 켜자마자 바로 등장(마운트 스태거), 스크롤은 퇴장만 스크럽 ──
   const mOutOp = useTransform(sp, [0.35, 0.75], [1, 0]);
@@ -440,32 +450,32 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           >
             <motion.div style={{ opacity: mOutOp, y: mOutY }}>
               <motion.p
-                initial={{ opacity: 0, x: '-8%' }}
-                animate={{ opacity: 1, x: '0%' }}
+                initial={{ opacity: 0, x: '-12%' }}
+                animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
                 transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.1 }}
                 className="text-[11px] tracking-[0.5em] uppercase font-bold mb-6"
               >
                 <span style={{ color: '#FFB800' }}>What We Do</span>
               </motion.p>
               <motion.span
-                initial={{ opacity: 0, x: '-8%' }}
-                animate={{ opacity: 1, x: '0%' }}
+                initial={{ opacity: 0, x: '-12%' }}
+                animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
                 transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.2 }}
                 style={mWord}
               >
                 하나의
               </motion.span>
               <motion.span
-                initial={{ opacity: 0, x: '8%' }}
-                animate={{ opacity: 1, x: '0%' }}
+                initial={{ opacity: 0, x: '12%' }}
+                animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '12%' }}
                 transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.45 }}
                 style={mWord}
               >
                 컬렉티브<span style={{ color: '#FFB800' }}>,</span>
               </motion.span>
               <motion.span
-                initial={{ opacity: 0, y: '8%' }}
-                animate={{ opacity: 1, y: '0%' }}
+                initial={{ opacity: 0, y: '14%' }}
+                animate={introFinished ? { opacity: 1, y: '0%' } : { opacity: 0, y: '14%' }}
                 transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.7 }}
                 style={{ ...mWord, color: '#ffffff' }}
               >
@@ -499,7 +509,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   }
 
   return (
-    <div ref={ref} style={{ height: '260vh' }} className="relative bg-black">
+    <div ref={ref} style={{ height: '340vh' }} className="relative bg-black">
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
         {/* ── 인트로 대형 타이포 ── */}
         <motion.div
@@ -508,7 +518,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
         >
           <motion.p
             initial={{ opacity: 0, x: '-12%' }}
-            animate={{ opacity: 1, x: '0%' }}
+            animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
             transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.1 }}
             className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8"
           >
@@ -518,7 +528,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           <div className="flex flex-row items-baseline gap-x-[0.45em] whitespace-nowrap">
             <motion.span
               initial={{ opacity: 0, x: '-12%' }}
-              animate={{ opacity: 1, x: '0%' }}
+              animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
               transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.2 }}
               style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
             >
@@ -526,7 +536,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
             </motion.span>
             <motion.span
               initial={{ opacity: 0, x: '12%' }}
-              animate={{ opacity: 1, x: '0%' }}
+              animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '12%' }}
               transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.45 }}
               style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
             >
@@ -535,8 +545,8 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           </div>
           {/* 3행: 아래에서 (TOGETHER. 방식, 자동 등장) */}
           <motion.span
-            initial={{ opacity: 0, y: '8%' }}
-            animate={{ opacity: 1, y: '0%' }}
+            initial={{ opacity: 0, y: '14%' }}
+            animate={introFinished ? { opacity: 1, y: '0%' } : { opacity: 0, y: '14%' }}
             transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.7 }}
             style={bigWord}
           >

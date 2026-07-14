@@ -128,7 +128,7 @@ const App: React.FC = () => {
             {hubVersion === 1 ? (
               <ServiceHub onOverlay={(id) => setActiveOverlay(id)} />
             ) : (
-              <ServiceHubV2 onOverlay={(id) => setActiveOverlay(id)} />
+              <ServiceHubV2 onOverlay={(id) => setActiveOverlay(id)} introFinished={introFinished} />
             )}
           </div>
           <Hero />
