@@ -21,30 +21,8 @@ type HubItem = {
 
 const ITEMS: HubItem[] = [
   {
-    id: 'space',
-    num: '01',
-    title: 'NADAUN SPACE',
-    kr: '스튜디오 · 장비 구매 · 렌탈',
-    desc: '스튜디오 장비 구매 및 렌탈 — 모든 창작의 시작이 되는 공간 인프라',
-    color: '#00C2FF',
-    rolling: [
-      { src: 'https://media.nadaun.co/collective/space/07.webp', name: '다크 세트', pos: 'center' },
-      { src: 'https://media.nadaun.co/collective/space/15.webp', name: '조명 리그', pos: 'center 45%' },
-      { src: 'https://media.nadaun.co/collective/space/03.webp', name: '호리존 현장', pos: 'center 55%' },
-      { src: 'https://media.nadaun.co/collective/space/02.webp', name: '모니터링 현장', pos: 'center 45%' },
-      { src: 'https://media.nadaun.co/collective/space/16.webp', name: '로케이션 세팅', pos: 'center' },
-      { src: 'https://media.nadaun.co/collective/space/09.webp', name: '야외 로케이션', pos: 'center' },
-    ],
-    links: [
-      { label: '자사몰', url: 'https://www.rainbowbene.com/' },
-      { label: '스토어', url: 'https://smartstore.naver.com/rainbowbene' },
-      { label: '블로그', url: 'https://blog.naver.com/nadaunstudio' },
-      { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
-    ],
-  },
-  {
     id: 'moment',
-    num: '02',
+    num: '01',
     title: 'NADAUN MOMENT',
     kr: '사진 · 영상 기획 · 제작',
     desc: '사진 · 영상 콘텐츠 기획 및 제작 — 기업의 순간을 정제된 감각으로 기록',
@@ -64,7 +42,7 @@ const ITEMS: HubItem[] = [
   },
   {
     id: 'starlogin',
-    num: '03',
+    num: '02',
     title: 'STARLOGIN',
     kr: '국내 · 글로벌 에이전시',
     desc: '국내 · 글로벌 에이전시, IP 컨설팅, 글로벌 유통 · 제작 — 브랜드를 세계와 연결',
@@ -83,7 +61,7 @@ const ITEMS: HubItem[] = [
   },
   {
     id: 'marketing',
-    num: '04',
+    num: '03',
     title: 'MARKETING',
     kr: '종합 마케팅',
     desc: '온라인 · 오프라인, 국내 · 국외 풀퍼널 캠페인 설계와 집행',
@@ -100,7 +78,7 @@ const ITEMS: HubItem[] = [
   },
   {
     id: 'ailab',
-    num: '05',
+    num: '04',
     title: 'AI LAB',
     kr: 'AI 이노베이션 랩',
     desc: '사이니지 제작 · 유통, 글로벌 사이트 제작 등 — 데이터로 예측하는 마케팅의 새로운 차원',
@@ -110,12 +88,34 @@ const ITEMS: HubItem[] = [
   },
   {
     id: 'influencer',
-    num: '06',
+    num: '05',
     title: 'INFLUENCER',
     kr: '뷰티 인플루언서',
     desc: '뷰티 인플루언서 협찬 · 광고 · 제작 — 새로운 서비스를 준비하고 있습니다',
     color: '#FF4D9D',
     links: [],
+  },
+  {
+    id: 'space',
+    num: '06',
+    title: 'NADAUN SPACE',
+    kr: '스튜디오 · 장비 구매 · 렌탈',
+    desc: '스튜디오 장비 구매 및 렌탈 — 모든 창작의 시작이 되는 공간 인프라',
+    color: '#00C2FF',
+    rolling: [
+      { src: 'https://media.nadaun.co/collective/space/07.webp', name: '다크 세트', pos: 'center' },
+      { src: 'https://media.nadaun.co/collective/space/15.webp', name: '조명 리그', pos: 'center 45%' },
+      { src: 'https://media.nadaun.co/collective/space/03.webp', name: '호리존 현장', pos: 'center 55%' },
+      { src: 'https://media.nadaun.co/collective/space/02.webp', name: '모니터링 현장', pos: 'center 45%' },
+      { src: 'https://media.nadaun.co/collective/space/16.webp', name: '로케이션 세팅', pos: 'center' },
+      { src: 'https://media.nadaun.co/collective/space/09.webp', name: '야외 로케이션', pos: 'center' },
+    ],
+    links: [
+      { label: '자사몰', url: 'https://www.rainbowbene.com/' },
+      { label: '스토어', url: 'https://smartstore.naver.com/rainbowbene' },
+      { label: '블로그', url: 'https://blog.naver.com/nadaunstudio' },
+      { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
+    ],
   },
 ];
 
@@ -307,7 +307,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
             <div className="flex items-center gap-3 mb-1.5">
               {/* 모바일은 번호 제거, 얇은 폰트로 좌측 정렬 (대표 지시 2026-07-15) */}
               {!isMobile && (
-                <span className="text-[12px] font-bold tracking-[0.25em]" style={{ color: item.color }}>
+                <span className="text-[12px] font-bold tracking-[0.25em] text-white/40">
                   {item.num}
                 </span>
               )}
@@ -385,7 +385,7 @@ interface ServiceHubV2Props {
 }
 
 const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
-  const [activeId, setActiveId] = useState<string>('space');
+  const [activeId, setActiveId] = useState<string>('moment');
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   const sp = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
@@ -442,7 +442,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
               <motion.p
                 initial={{ opacity: 0, x: '-8%' }}
                 animate={{ opacity: 1, x: '0%' }}
-                transition={{ duration: 0.6, delay: 0.1, ease: NADAUN_EASE as any }}
+                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.1 }}
                 className="text-[11px] tracking-[0.5em] uppercase font-bold mb-6"
               >
                 <span style={{ color: '#FFB800' }}>What We Do</span>
@@ -450,7 +450,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
               <motion.span
                 initial={{ opacity: 0, x: '-8%' }}
                 animate={{ opacity: 1, x: '0%' }}
-                transition={{ duration: 0.65, delay: 0.15, ease: NADAUN_EASE as any }}
+                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.2 }}
                 style={mWord}
               >
                 하나의
@@ -458,7 +458,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
               <motion.span
                 initial={{ opacity: 0, x: '8%' }}
                 animate={{ opacity: 1, x: '0%' }}
-                transition={{ duration: 0.65, delay: 0.3, ease: NADAUN_EASE as any }}
+                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.45 }}
                 style={mWord}
               >
                 컬렉티브<span style={{ color: '#FFB800' }}>,</span>
@@ -466,7 +466,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
               <motion.span
                 initial={{ opacity: 0, y: '8%' }}
                 animate={{ opacity: 1, y: '0%' }}
-                transition={{ duration: 0.65, delay: 0.45, ease: NADAUN_EASE as any }}
+                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.7 }}
                 style={{ ...mWord, color: '#ffffff' }}
               >
                 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
@@ -507,9 +507,9 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           style={{ opacity: introOp, filter: introFilter, paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
         >
           <motion.p
-            initial={{ opacity: 0, x: '-8%' }}
+            initial={{ opacity: 0, x: '-12%' }}
             animate={{ opacity: 1, x: '0%' }}
-            transition={{ duration: 0.6, delay: 0.1, ease: NADAUN_EASE as any }}
+            transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.1 }}
             className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8"
           >
             <span style={{ color: '#FFB800' }}>What We Do</span>
@@ -517,17 +517,17 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           {/* 1행: 왼쪽에서 / 2행: 오른쪽에서 — 한 줄 배치 (푸터 LET'S BE 방식, 자동 등장) */}
           <div className="flex flex-row items-baseline gap-x-[0.45em] whitespace-nowrap">
             <motion.span
-              initial={{ opacity: 0, x: '-8%' }}
+              initial={{ opacity: 0, x: '-12%' }}
               animate={{ opacity: 1, x: '0%' }}
-              transition={{ duration: 0.65, delay: 0.15, ease: NADAUN_EASE as any }}
+              transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.2 }}
               style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
             >
               하나의
             </motion.span>
             <motion.span
-              initial={{ opacity: 0, x: '8%' }}
+              initial={{ opacity: 0, x: '12%' }}
               animate={{ opacity: 1, x: '0%' }}
-              transition={{ duration: 0.65, delay: 0.3, ease: NADAUN_EASE as any }}
+              transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.45 }}
               style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
             >
               컬렉티브<span style={{ color: '#FFB800' }}>,</span>
@@ -537,7 +537,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           <motion.span
             initial={{ opacity: 0, y: '8%' }}
             animate={{ opacity: 1, y: '0%' }}
-            transition={{ duration: 0.65, delay: 0.45, ease: NADAUN_EASE as any }}
+            transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.7 }}
             style={bigWord}
           >
             브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
