@@ -296,7 +296,7 @@ const ServiceHub: React.FC<ServiceHubProps> = ({ onOverlay }) => {
             >
               <BlurWords text="하나의 컬렉티브," />
               <br />
-              <BlurWords text="모든 브랜드 경험." delay={0.28} />
+              <BlurWords text="브랜드의 A to Z." delay={0.28} />
             </h2>
           </div>
         </motion.div>

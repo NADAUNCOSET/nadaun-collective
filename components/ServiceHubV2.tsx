@@ -157,7 +157,7 @@ const RollingImages: React.FC<{ items: RollingItem[]; active: boolean; color: st
             animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
             exit={{ opacity: 0, y: -8, filter: BLUR(6) }}
             transition={{ duration: 0.4, ease: NADAUN_EASE as any }}
-            className="inline-block px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider bg-black/55 backdrop-blur-sm"
+            className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider bg-black/55 ${isMobile ? '' : 'backdrop-blur-sm'}`}
             style={{ color, fontFamily: 'Manrope, sans-serif' }}
           >
             {items[idx].name}
@@ -247,17 +247,16 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
       return (
         <motion.div
           key={item.id}
-          layout
           onClick={() => setActiveId(item.id)}
           animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '17vh') : '58vh' }}
-          transition={NADAUN_SPRING}
+          transition={isMobile ? { duration: 0.5, ease: NADAUN_EASE as any } : NADAUN_SPRING}
           className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 flex-grow"
           style={{ ['--ac' as any]: item.color }}
         >
           {/* image / rolling */}
           <div
-            className={`absolute inset-0 transition-[filter] duration-700 ${
-              active ? '' : isMobile ? 'brightness-[0.55]' : 'grayscale-[65%] brightness-[0.55] group-hover:grayscale-0 group-hover:brightness-90'
+            className={`absolute inset-0 ${
+              isMobile ? '' : `transition-[filter] duration-700 ${active ? '' : 'grayscale-[65%] brightness-[0.55] group-hover:grayscale-0 group-hover:brightness-90'}`
             }`}
           >
             {item.rolling ? (
@@ -286,6 +285,13 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
               </div>
             )}
           </div>
+          {/* 모바일 비활성 딤 — filter 대신 오버레이(GPU 경량) */}
+          {isMobile && (
+            <div
+              className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-500"
+              style={{ opacity: active ? 0 : 0.45 }}
+            />
+          )}
           {/* gradient — 활성 시 하단을 더 눌러 텍스트 가독 확보 */}
           <div className={`absolute inset-0 bg-gradient-to-t pointer-events-none transition-opacity duration-500 ${active ? 'from-black/95 via-black/40 to-black/25' : 'from-black/85 via-black/15 to-black/30'}`} />
           {/* active accent line */}
@@ -299,10 +305,15 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           {/* label */}
           <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
             <div className="flex items-center gap-3 mb-1.5">
-              <span className="text-[12px] font-bold tracking-[0.25em]" style={{ color: item.color }}>
-                {item.num}
+              {/* 모바일은 번호 제거, 얇은 폰트로 좌측 정렬 (대표 지시 2026-07-15) */}
+              {!isMobile && (
+                <span className="text-[12px] font-bold tracking-[0.25em]" style={{ color: item.color }}>
+                  {item.num}
+                </span>
+              )}
+              <span className={isMobile ? 'text-[15px] font-normal text-white/80 tracking-wide truncate' : 'text-[13px] font-semibold text-white/75 tracking-wide truncate'}>
+                {item.kr}
               </span>
-              <span className="text-[13px] font-semibold text-white/75 tracking-wide truncate">{item.kr}</span>
             </div>
             <h3
               className="text-white leading-none whitespace-nowrap"
@@ -310,7 +321,13 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 800,
                 letterSpacing: '-0.03em',
-                fontSize: active ? 'clamp(1.6rem, 2.8vw, 2.6rem)' : 'clamp(1.1rem, 1.55vw, 1.5rem)',
+                fontSize: active
+                  ? isMobile
+                    ? '1.9rem'
+                    : 'clamp(1.6rem, 2.8vw, 2.6rem)'
+                  : isMobile
+                    ? '1.35rem'
+                    : 'clamp(1.1rem, 1.55vw, 1.5rem)',
                 transition: 'font-size 0.5s cubic-bezier(0.16,1,0.3,1)',
               }}
             >
@@ -391,15 +408,9 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
   const contPointer = useTransform(scrollYProgress, (v) => (v > 0.36 ? 'auto' : 'none'));
 
-  // ── 모바일 전용 스크럽 (푸터 LET'S BE TOGETHER 방식, 인트로 블록 단독) ──
-  const mw1Op = useTransform(sp, [0.06, 0.22], [0, 1]);
-  const mw1X = useTransform(sp, [0.06, 0.22], ['-8%', '0%']);
-  const mw2Op = useTransform(sp, [0.18, 0.34], [0, 1]);
-  const mw2X = useTransform(sp, [0.18, 0.34], ['8%', '0%']);
-  const mw3Op = useTransform(sp, [0.30, 0.48], [0, 1]);
-  const mw3Y = useTransform(sp, [0.30, 0.48], ['8%', '0%']);
-  const mOutOp = useTransform(sp, [0.72, 0.94], [1, 0]);
-  const mOutY = useTransform(sp, [0.72, 0.94], ['0%', '-6%']);
+  // ── 모바일: 키비주얼 글씨는 켜자마자 바로 등장(마운트 스태거), 스크롤은 퇴장만 스크럽 ──
+  const mOutOp = useTransform(sp, [0.35, 0.75], [1, 0]);
+  const mOutY = useTransform(sp, [0.35, 0.75], ['0%', '-6%']);
 
   // 푸터 LET'S TOGETHER처럼 화면을 꽉 채우는 스케일 (대표 지시 2026-07-13)
   const bigWord: React.CSSProperties = {
@@ -427,22 +438,44 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
     };
     return (
       <>
-        {/* 스크롤 스크럽 인트로 — 글씨가 좌/우/아래에서 (LET'S BE TOGETHER 방식) */}
-        <div ref={ref} style={{ height: '190vh' }} className="relative bg-black">
+        {/* 키비주얼 — 켜자마자 글씨 등장(좌/우/아래 스태거), 스크롤 시 퇴장 스크럽 */}
+        <div ref={ref} style={{ height: '150vh' }} className="relative bg-black">
           <div
             className="sticky top-0 h-[100svh] overflow-hidden flex flex-col justify-center"
             style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
           >
             <motion.div style={{ opacity: mOutOp, y: mOutY }}>
-              <motion.p style={{ opacity: mw1Op, x: mw1X }} className="text-[11px] tracking-[0.5em] uppercase font-bold mb-6">
+              <motion.p
+                initial={{ opacity: 0, x: '-8%' }}
+                animate={{ opacity: 1, x: '0%' }}
+                transition={{ duration: 0.6, delay: 0.1, ease: NADAUN_EASE as any }}
+                className="text-[11px] tracking-[0.5em] uppercase font-bold mb-6"
+              >
                 <span style={{ color: '#FFB800' }}>What We Do</span>
               </motion.p>
-              <motion.span style={{ ...mWord, opacity: mw1Op, x: mw1X }}>하나의</motion.span>
-              <motion.span style={{ ...mWord, opacity: mw2Op, x: mw2X }}>
+              <motion.span
+                initial={{ opacity: 0, x: '-8%' }}
+                animate={{ opacity: 1, x: '0%' }}
+                transition={{ duration: 0.65, delay: 0.15, ease: NADAUN_EASE as any }}
+                style={mWord}
+              >
+                하나의
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0, x: '8%' }}
+                animate={{ opacity: 1, x: '0%' }}
+                transition={{ duration: 0.65, delay: 0.3, ease: NADAUN_EASE as any }}
+                style={mWord}
+              >
                 컬렉티브<span style={{ color: '#FFB800' }}>,</span>
               </motion.span>
-              <motion.span style={{ ...mWord, opacity: mw3Op, y: mw3Y, color: '#ffffff' }}>
-                모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
+              <motion.span
+                initial={{ opacity: 0, y: '8%' }}
+                animate={{ opacity: 1, y: '0%' }}
+                transition={{ duration: 0.65, delay: 0.45, ease: NADAUN_EASE as any }}
+                style={{ ...mWord, color: '#ffffff' }}
+              >
+                브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
               </motion.span>
             </motion.div>
           </div>
@@ -461,7 +494,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
                 className="text-white font-extrabold"
                 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '19px', letterSpacing: '-0.03em' }}
               >
-                하나의 컬렉티브, 모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
+                하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
               </h2>
             </div>
             <Tiles activeId={activeId} setActiveId={setActiveId} onOverlay={onOverlay} />
@@ -491,7 +524,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           </div>
           {/* 3행: 아래에서 (TOGETHER. 방식) */}
           <motion.span style={{ ...bigWord, opacity: w3Op, y: w3Y }}>
-            모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
+            브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
           </motion.span>
         </motion.div>
 
@@ -502,7 +535,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
             style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
           >
             <h2 className="text-white font-extrabold leading-[0.95]" style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(1.5rem, 2.6vw, 2.3rem)', letterSpacing: '-0.03em' }}>
-              하나의 컬렉티브, 모든 브랜드 경험<span style={{ color: '#FFB800' }}>.</span>
+              하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
             </h2>
           </div>
 
