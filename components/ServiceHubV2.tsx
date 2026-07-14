@@ -390,13 +390,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   const sp = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
 
-  // ── 인트로 대형 워드 — 푸터 LET'S BE TOGETHER 방식 (좌/우/아래 슬라이드, 대표 지시 2026-07-13) ──
-  const w1Op = useTransform(sp, [0.02, 0.12], [0, 1]);
-  const w1X = useTransform(sp, [0.02, 0.12], ['-8%', '0%']);
-  const w2Op = useTransform(sp, [0.10, 0.20], [0, 1]);
-  const w2X = useTransform(sp, [0.10, 0.20], ['8%', '0%']);
-  const w3Op = useTransform(sp, [0.18, 0.30], [0, 1]);
-  const w3Y = useTransform(sp, [0.18, 0.30], ['8%', '0%']);
+  // ── 인트로 대형 워드 — 시작 시 자동 등장(스태거), 스크롤은 퇴장만 (대표 지시 2026-07-15) ──
   const introOp = useTransform(sp, [0.30, 0.40], [1, 0]);
   const introBlurN = useTransform(sp, [0.30, 0.40], [0, 12]);
   const introFilter = useMotionTemplate`blur(${introBlurN}px)`;
@@ -512,18 +506,40 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
           className="absolute inset-0 z-10 flex flex-col justify-center pointer-events-none"
           style={{ opacity: introOp, filter: introFilter, paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
         >
-          <motion.p style={{ opacity: w1Op, x: w1X }} className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8">
+          <motion.p
+            initial={{ opacity: 0, x: '-8%' }}
+            animate={{ opacity: 1, x: '0%' }}
+            transition={{ duration: 0.6, delay: 0.1, ease: NADAUN_EASE as any }}
+            className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8"
+          >
             <span style={{ color: '#FFB800' }}>What We Do</span>
           </motion.p>
-          {/* 1행: 왼쪽에서 / 2행: 오른쪽에서 — 한 줄 배치 (푸터 LET'S BE 방식) */}
+          {/* 1행: 왼쪽에서 / 2행: 오른쪽에서 — 한 줄 배치 (푸터 LET'S BE 방식, 자동 등장) */}
           <div className="flex flex-row items-baseline gap-x-[0.45em] whitespace-nowrap">
-            <motion.span style={{ ...bigWord, color: 'rgba(255,255,255,0.92)', opacity: w1Op, x: w1X }}>하나의</motion.span>
-            <motion.span style={{ ...bigWord, color: 'rgba(255,255,255,0.92)', opacity: w2Op, x: w2X }}>
+            <motion.span
+              initial={{ opacity: 0, x: '-8%' }}
+              animate={{ opacity: 1, x: '0%' }}
+              transition={{ duration: 0.65, delay: 0.15, ease: NADAUN_EASE as any }}
+              style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
+            >
+              하나의
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, x: '8%' }}
+              animate={{ opacity: 1, x: '0%' }}
+              transition={{ duration: 0.65, delay: 0.3, ease: NADAUN_EASE as any }}
+              style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
+            >
               컬렉티브<span style={{ color: '#FFB800' }}>,</span>
             </motion.span>
           </div>
-          {/* 3행: 아래에서 (TOGETHER. 방식) */}
-          <motion.span style={{ ...bigWord, opacity: w3Op, y: w3Y }}>
+          {/* 3행: 아래에서 (TOGETHER. 방식, 자동 등장) */}
+          <motion.span
+            initial={{ opacity: 0, y: '8%' }}
+            animate={{ opacity: 1, y: '0%' }}
+            transition={{ duration: 0.65, delay: 0.45, ease: NADAUN_EASE as any }}
+            style={bigWord}
+          >
             브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
           </motion.span>
         </motion.div>
