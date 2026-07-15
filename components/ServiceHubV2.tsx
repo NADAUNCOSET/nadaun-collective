@@ -249,7 +249,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
       raf = requestAnimationFrame(() => {
         const mid = window.innerHeight / 2;
         let bestIdx = -1;
-        let bestDist = window.innerHeight * 0.5; // 중앙 근처만 판정 (오실레이션 방지)
+        let bestDist = window.innerHeight * 0.32; // 중앙 아주 근처만 판정 — 타일에 오래 머묾
         tileRefs.current.forEach((el, i) => {
           if (!el) return;
           const r = el.getBoundingClientRect();
@@ -445,7 +445,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
       const next = cur + Math.sign(t - cur);
       curIdxRef.current = next;
       setActiveId(ITEMS[next].id);
-      stepTimerRef.current = window.setTimeout(step, 300);
+      stepTimerRef.current = window.setTimeout(step, 380);
     };
     step();
   };
@@ -470,24 +470,24 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
   }, []);
 
   // ── 인트로 대형 워드 — 시작 시 자동 등장(스태거), 스크롤은 퇴장만 (대표 지시 2026-07-15) ──
-  const introOp = useTransform(sp, [0.30, 0.40], [1, 0]);
-  const introBlurN = useTransform(sp, [0.30, 0.40], [0, 12]);
+  const introOp = useTransform(sp, [0.15, 0.24], [1, 0]);
+  const introBlurN = useTransform(sp, [0.15, 0.24], [0, 12]);
   const introFilter = useMotionTemplate`blur(${introBlurN}px)`;
 
   // ── 콘텐츠(타일 세션) — 인트로 뒤에 디졸브로 등장 ──
-  const contOp = useTransform(sp, [0.38, 0.50], [0, 1]);
-  const contY = useTransform(sp, [0.38, 0.52], [90, 0]);
-  const contBlurN = useTransform(sp, [0.38, 0.50], [10, 0]);
+  const contOp = useTransform(sp, [0.22, 0.32], [0, 1]);
+  const contY = useTransform(sp, [0.22, 0.34], [90, 0]);
+  const contBlurN = useTransform(sp, [0.22, 0.32], [10, 0]);
   const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
-  const contPointer = useTransform(scrollYProgress, (v) => (v > 0.36 ? 'auto' : 'none'));
+  const contPointer = useTransform(scrollYProgress, (v) => (v > 0.20 ? 'auto' : 'none'));
 
   // ── PC: 타일 세션에서 계속 스크롤하면 모먼트부터 차례대로 선택 (안정적·편안한 전환) ──
   // 선택 판정은 스프링 지연 없는 원시 진행도로 — 빠른 스크롤에도 마지막 타일 보장
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     if (isMobile) return;
-    if (v < 0.48) return;
-    // 마지막 타일은 0.77~1.0 구간 전체를 차지 — 충분히 보고 지나가는 여운
-    const seg = Math.min(ITEMS.length - 1, Math.floor(((v - 0.48) / 0.34) * ITEMS.length));
+    if (v < 0.32) return;
+    // 타일당 스크롤 ~42vh + 마지막 타일 ~95vh 여운
+    const seg = Math.min(ITEMS.length - 1, Math.floor(((v - 0.32) / 0.56) * ITEMS.length));
     goToward(seg); // 건너뛰지 않고 한 칸씩
   });
 
@@ -496,7 +496,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
   const mOutY = useTransform(sp, [0.35, 0.75], ['0%', '-6%']);
 
   // ── 컬러 진행띠 — PC: 스크롤에 1:1 연속으로 흐름 (transform만 사용, GPU 경량) ──
-  const barX = useTransform(sp, [0.48, 0.82], ['0%', `${(ITEMS.length - 1) * 100}%`], { clamp: true });
+  const barX = useTransform(sp, [0.32, 0.88], ['0%', `${(ITEMS.length - 1) * 100}%`], { clamp: true });
   const activeIdx = Math.max(0, ITEMS.findIndex((x) => x.id === activeId));
   const activeColor = ITEMS[activeIdx].color;
 
@@ -604,7 +604,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
   }
 
   return (
-    <div ref={ref} style={{ height: '400vh' }} className="relative bg-black">
+    <div ref={ref} style={{ height: '550vh' }} className="relative bg-black">
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
         {/* ── 인트로 대형 타이포 ── */}
         <motion.div
