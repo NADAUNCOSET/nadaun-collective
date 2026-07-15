@@ -237,41 +237,8 @@ const LinkWord: React.FC<{ link: LinkChip; index: number; color: string; onOverl
   );
 };
 
-const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onOverlay: (id: string) => void; onCenter?: (idx: number) => void }> = ({ activeId, setActiveId, onOverlay, onCenter }) => {
-  // 모바일: 화면 가운데 오는 타일이 스크롤 따라 차례대로 선택 (센터 스파이)
+const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onOverlay: (id: string) => void }> = ({ activeId, setActiveId, onOverlay }) => {
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const lastRef = useRef<string>('');
-  useEffect(() => {
-    if (!isMobile) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const mid = window.innerHeight / 2;
-        let bestIdx = -1;
-        let bestDist = window.innerHeight * 0.26; // 중앙 아주 근처만 판정 — 타일에 오래 머묾
-        tileRefs.current.forEach((el, i) => {
-          if (!el) return;
-          const r = el.getBoundingClientRect();
-          const d = Math.abs((r.top + r.bottom) / 2 - mid);
-          if (d < bestDist) {
-            bestDist = d;
-            bestIdx = i;
-          }
-        });
-        if (bestIdx >= 0 && ITEMS[bestIdx].id !== lastRef.current) {
-          lastRef.current = ITEMS[bestIdx].id;
-          if (onCenter) onCenter(bestIdx); // 체이서 경유 — 한 칸씩 지나감
-          else setActiveId(ITEMS[bestIdx].id);
-        }
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, [setActiveId, onCenter]);
 
   return (
   <div
@@ -284,7 +251,13 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
         <motion.div
           key={item.id}
           ref={(el) => { tileRefs.current[ti] = el; }}
-          onClick={() => setActiveId(item.id)}
+          onClick={() => {
+            setActiveId(item.id);
+            if (isMobile) {
+              const el = tileRefs.current[ti];
+              window.setTimeout(() => el?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320);
+            }
+          }}
           animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '24vh') : '58vh' }}
           transition={isMobile ? { duration: 0.6, ease: NADAUN_EASE as any } : { type: 'spring', stiffness: 65, damping: 23, restDelta: 0.0005 }}
           className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 flex-grow"
@@ -470,24 +443,24 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
   }, []);
 
   // ── 인트로 대형 워드 — 시작 시 자동 등장(스태거), 스크롤은 퇴장만 (대표 지시 2026-07-15) ──
-  const introOp = useTransform(sp, [0.15, 0.24], [1, 0]);
-  const introBlurN = useTransform(sp, [0.15, 0.24], [0, 12]);
+  const introOp = useTransform(sp, [0.12, 0.20], [1, 0]);
+  const introBlurN = useTransform(sp, [0.12, 0.20], [0, 12]);
   const introFilter = useMotionTemplate`blur(${introBlurN}px)`;
 
   // ── 콘텐츠(타일 세션) — 인트로 뒤에 디졸브로 등장 ──
-  const contOp = useTransform(sp, [0.22, 0.32], [0, 1]);
-  const contY = useTransform(sp, [0.22, 0.34], [90, 0]);
-  const contBlurN = useTransform(sp, [0.22, 0.32], [10, 0]);
+  const contOp = useTransform(sp, [0.18, 0.28], [0, 1]);
+  const contY = useTransform(sp, [0.18, 0.30], [90, 0]);
+  const contBlurN = useTransform(sp, [0.18, 0.28], [10, 0]);
   const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
-  const contPointer = useTransform(scrollYProgress, (v) => (v > 0.20 ? 'auto' : 'none'));
+  const contPointer = useTransform(scrollYProgress, (v) => (v > 0.16 ? 'auto' : 'none'));
 
   // ── PC: 타일 세션에서 계속 스크롤하면 모먼트부터 차례대로 선택 (안정적·편안한 전환) ──
   // 선택 판정은 스프링 지연 없는 원시 진행도로 — 빠른 스크롤에도 마지막 타일 보장
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     if (isMobile) return;
-    if (v < 0.32) return;
-    // 타일당 스크롤 ~42vh + 마지막 타일 ~95vh 여운
-    const seg = Math.min(ITEMS.length - 1, Math.floor(((v - 0.32) / 0.56) * ITEMS.length));
+    if (v < 0.28) return;
+    // 타일당 스크롤 ~60vh + 마지막 타일 ~130vh 여운
+    const seg = Math.min(ITEMS.length - 1, Math.floor(((v - 0.28) / 0.60) * ITEMS.length));
     goToward(seg); // 건너뛰지 않고 한 칸씩
   });
 
@@ -581,7 +554,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
                 하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
               </h2>
             </div>
-            <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} onCenter={goToward} />
+            <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} />
           </motion.div>
         </section>
       </>
@@ -589,7 +562,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
   }
 
   return (
-    <div ref={ref} style={{ height: '550vh' }} className="relative bg-black">
+    <div ref={ref} style={{ height: '700vh' }} className="relative bg-black">
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
         {/* ── 인트로 대형 타이포 ── */}
         <motion.div
@@ -645,7 +618,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
             </h2>
           </div>
 
-          <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} onCenter={goToward} />
+          <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} />
 
           <div
             className="mt-5 flex items-center justify-between"
