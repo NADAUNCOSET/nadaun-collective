@@ -495,6 +495,11 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
   const mOutOp = useTransform(sp, [0.35, 0.75], [1, 0]);
   const mOutY = useTransform(sp, [0.35, 0.75], ['0%', '-6%']);
 
+  // ── 컬러 진행띠 — PC: 스크롤에 1:1 연속으로 흐름 (transform만 사용, GPU 경량) ──
+  const barX = useTransform(sp, [0.48, 0.82], ['0%', `${(ITEMS.length - 1) * 100}%`], { clamp: true });
+  const activeIdx = Math.max(0, ITEMS.findIndex((x) => x.id === activeId));
+  const activeColor = ITEMS[activeIdx].color;
+
   // 푸터 LET'S TOGETHER처럼 화면을 꽉 채우는 스케일 (대표 지시 2026-07-13)
   const bigWord: React.CSSProperties = {
     fontFamily: 'Manrope, sans-serif',
@@ -572,13 +577,24 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
             viewport={{ once: true, margin: '-8%' }}
             transition={{ duration: 0.65, ease: NADAUN_EASE as any }}
           >
-            <div className="mb-5" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
+            <div className="mb-4" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
               <h2
                 className="text-white font-extrabold"
                 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '19px', letterSpacing: '-0.03em' }}
               >
                 하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
               </h2>
+            </div>
+            {/* 컬러 진행띠 — 상단 고정, 선택 타일 따라 스프링 이동 (transform만, 경량) */}
+            <div className="sticky top-[72px] z-30 mb-4" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
+              <div className="relative h-[3px] rounded-full bg-white/10 overflow-hidden">
+                <motion.div
+                  className="absolute top-0 bottom-0 rounded-full"
+                  style={{ width: `${100 / ITEMS.length}%` }}
+                  animate={{ x: `${activeIdx * 100}%`, backgroundColor: activeColor }}
+                  transition={{ type: 'spring', stiffness: 65, damping: 23 }}
+                />
+              </div>
             </div>
             <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} onCenter={goToward} />
           </motion.div>
@@ -642,6 +658,18 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
             <h2 className="text-white font-extrabold leading-[0.95]" style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(1.5rem, 2.6vw, 2.3rem)', letterSpacing: '-0.03em' }}>
               하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
             </h2>
+          </div>
+
+          {/* 컬러 진행띠 — 스크롤 따라 연속으로 흐르며 현재 사업 컬러로 물듦 */}
+          <div className="mb-3" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
+            <div className="relative h-[3px] rounded-full bg-white/10 overflow-hidden">
+              <motion.div
+                className="absolute top-0 bottom-0 rounded-full"
+                style={{ width: `${100 / ITEMS.length}%`, x: barX }}
+                animate={{ backgroundColor: activeColor }}
+                transition={{ duration: 0.5, ease: NADAUN_EASE as any }}
+              />
+            </div>
           </div>
 
           <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} onCenter={goToward} />
