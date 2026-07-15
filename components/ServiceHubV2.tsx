@@ -249,7 +249,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
       raf = requestAnimationFrame(() => {
         const mid = window.innerHeight / 2;
         let bestIdx = -1;
-        let bestDist = window.innerHeight * 0.32; // 중앙 아주 근처만 판정 — 타일에 오래 머묾
+        let bestDist = window.innerHeight * 0.26; // 중앙 아주 근처만 판정 — 타일에 오래 머묾
         tileRefs.current.forEach((el, i) => {
           if (!el) return;
           const r = el.getBoundingClientRect();
@@ -285,7 +285,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           key={item.id}
           ref={(el) => { tileRefs.current[ti] = el; }}
           onClick={() => setActiveId(item.id)}
-          animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '17vh') : '58vh' }}
+          animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '24vh') : '58vh' }}
           transition={isMobile ? { duration: 0.6, ease: NADAUN_EASE as any } : { type: 'spring', stiffness: 65, damping: 23, restDelta: 0.0005 }}
           className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 flex-grow"
           style={{ ['--ac' as any]: item.color }}
@@ -445,7 +445,7 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = 
       const next = cur + Math.sign(t - cur);
       curIdxRef.current = next;
       setActiveId(ITEMS[next].id);
-      stepTimerRef.current = window.setTimeout(step, 380);
+      stepTimerRef.current = window.setTimeout(step, isMobile ? 540 : 380);
     };
     step();
   };
