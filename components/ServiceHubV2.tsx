@@ -87,13 +87,21 @@ const ITEMS: HubItem[] = [
     links: [{ label: 'AI LAB', overlay: 'ai-lab' }],
   },
   {
-    id: 'influencer',
+    id: 'wedding',
     num: '05',
-    title: 'INFLUENCER',
-    kr: '뷰티 인플루언서',
-    desc: '뷰티 인플루언서 협찬 · 광고 · 제작 — 새로운 서비스를 준비하고 있습니다',
-    color: '#FF4D9D',
-    links: [],
+    title: 'NADAUN WEDDING',
+    kr: '웨딩 스냅 · 필름',
+    desc: '가장 나다운 순간 — 웨딩 스냅 · 본식 촬영, 두 사람다운 장면을 그대로 기록',
+    color: '#E8C48E',
+    rolling: [
+      { src: 'https://media.nadaun.co/wedding/gallery/02.jpg', name: '스튜디오' },
+      { src: 'https://media.nadaun.co/wedding/gallery/05.jpg', name: '가든' },
+      { src: 'https://media.nadaun.co/wedding/gallery/12.jpg', name: '스카이', pos: 'center 30%' },
+      { src: 'https://media.nadaun.co/wedding/gallery/25.jpg', name: '골든아워', pos: 'center' },
+      { src: 'https://media.nadaun.co/wedding/gallery/22.jpg', name: '포레스트', pos: 'center' },
+      { src: 'https://media.nadaun.co/wedding/gallery/27.jpg', name: '론 스냅', pos: 'center' },
+    ],
+    links: [{ label: 'WEDDING', url: 'https://wedding.nadaun.co' }],
   },
   {
     id: 'space',
@@ -168,45 +176,83 @@ const RollingImages: React.FC<{ items: RollingItem[]; active: boolean; color: st
   );
 };
 
-/** 포폴 영상 플레이리스트 — 선택된 타일에서만 재생, 3.2초마다 다음 영상의 랜덤 구간으로 (짧게 짧게) */
+/** 포폴 영상 플레이리스트 — 선택된 타일에서만 재생, 3.2초마다 다음 영상의 랜덤 구간으로 (짧게 짧게)
+ *  더블버퍼 A/B: <video> 2개를 상시 마운트하고 하나가 재생/노출되는 동안 다른 하나는 다음 영상을 백그라운드에서 미리 재생·버퍼링.
+ *  전환은 opacity swap만 → 모바일에서도 검은 컷 없이 매끄럽게 이어짐. */
 const TileVideo: React.FC<{ srcs: string[]; active: boolean }> = ({ srcs, active }) => {
-  const [idx, setIdx] = useState(0);
-  const ref = useRef<HTMLVideoElement>(null);
+  const [visible, setVisible] = useState<0 | 1>(0);
+  const [slots, setSlots] = useState<[number, number]>(() => [0, srcs.length > 1 ? 1 : 0]);
+  const refA = useRef<HTMLVideoElement>(null);
+  const refB = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
-    const v = ref.current;
-    if (v) {
-      if (active) v.play().catch(() => {});
-      else v.pause();
+    const va = refA.current, vb = refB.current;
+    if (!va || !vb) return;
+    if (active) {
+      va.play().catch(() => {});
+      vb.play().catch(() => {});
+    } else {
+      va.pause();
+      vb.pause();
     }
-    if (!active) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % srcs.length), 3200);
-    return () => clearInterval(t);
-  }, [active, srcs.length, idx]);
+  }, [active]);
+
+  useEffect(() => {
+    if (!active || srcs.length <= 1) return;
+    const t = window.setInterval(() => {
+      setVisible((cur) => (cur === 0 ? 1 : 0));
+    }, 3200);
+    return () => window.clearInterval(t);
+  }, [active, srcs.length]);
+
+  useEffect(() => {
+    if (srcs.length <= 1) return;
+    setSlots(([a, b]) => {
+      if (visible === 0) {
+        const next = (a + 1) % srcs.length;
+        return next === b ? [a, b] : [a, next];
+      }
+      const next = (b + 1) % srcs.length;
+      return next === a ? [a, b] : [next, b];
+    });
+  }, [visible, srcs.length]);
+
+  const onMeta = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const v = e.currentTarget;
+    if (v.duration && isFinite(v.duration)) {
+      v.currentTime = v.duration * (0.1 + Math.random() * 0.6);
+    }
+    if (active) v.play().catch(() => {});
+  };
+
+  const preload = active ? 'auto' : 'metadata';
+
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <AnimatePresence initial={false}>
-        <motion.video
-          key={idx}
-          ref={ref}
-          src={srcs[idx]}
-          muted
-          loop
-          playsInline
-          preload={active ? 'auto' : 'metadata'}
-          onLoadedMetadata={(e) => {
-            const v = e.currentTarget;
-            if (v.duration && isFinite(v.duration)) {
-              v.currentTime = v.duration * (0.1 + Math.random() * 0.6);
-            }
-            if (active) v.play().catch(() => {});
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.45, ease: NADAUN_EASE as any }}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </AnimatePresence>
+      <motion.video
+        ref={refA}
+        src={srcs[slots[0]]}
+        muted
+        loop
+        playsInline
+        preload={preload}
+        onLoadedMetadata={onMeta}
+        animate={{ opacity: visible === 0 ? 1 : 0 }}
+        transition={{ duration: 0.5, ease: NADAUN_EASE as any }}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <motion.video
+        ref={refB}
+        src={srcs[slots[1]]}
+        muted
+        loop
+        playsInline
+        preload={preload}
+        onLoadedMetadata={onMeta}
+        animate={{ opacity: visible === 1 ? 1 : 0 }}
+        transition={{ duration: 0.5, ease: NADAUN_EASE as any }}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
     </div>
   );
 };
