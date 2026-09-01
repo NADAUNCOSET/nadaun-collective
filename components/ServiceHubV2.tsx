@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring, useTransform, useMotionTemplate, useMotionValueEvent } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 type LinkChip = { label: string; url?: string; overlay?: string };
@@ -442,246 +442,24 @@ interface ServiceHubV2Props {
   introFinished?: boolean;
 }
 
-const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, introFinished = true }) => {
+const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   const [activeId, setActiveId] = useState<string>('moment');
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  const sp = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.0005 });
 
-  // ── 체이서: 목표 타일까지 한 칸씩 순서대로 따라감 — 빠른 스크롤에도 모든 타일이 지나가는 느낌 ──
-  const curIdxRef = useRef(0);
-  const targetIdxRef = useRef(0);
-  const stepTimerRef = useRef<number | null>(null);
-  const stepToward = () => {
-    if (stepTimerRef.current !== null) return;
-    const step = () => {
-      const cur = curIdxRef.current;
-      const t = targetIdxRef.current;
-      if (cur === t) {
-        stepTimerRef.current = null;
-        return;
-      }
-      const next = cur + Math.sign(t - cur);
-      curIdxRef.current = next;
-      setActiveId(ITEMS[next].id);
-      stepTimerRef.current = window.setTimeout(step, isMobile ? 540 : 380);
-    };
-    step();
-  };
-  const goToward = (target: number) => {
-    targetIdxRef.current = target;
-    stepToward();
-  };
-  // 클릭/탭 직접 선택 — 체이서 중단 후 즉시 이동
   const selectTile = (id: string) => {
-    const i = ITEMS.findIndex((x) => x.id === id);
-    if (i < 0) return;
-    if (stepTimerRef.current !== null) {
-      clearTimeout(stepTimerRef.current);
-      stepTimerRef.current = null;
-    }
-    curIdxRef.current = i;
-    targetIdxRef.current = i;
     setActiveId(id);
   };
-  useEffect(() => () => {
-    if (stepTimerRef.current !== null) clearTimeout(stepTimerRef.current);
-  }, []);
-
-  // ── 인트로 대형 워드 — 시작 시 자동 등장(스태거), 스크롤은 퇴장만 (대표 지시 2026-07-15) ──
-  const introOp = useTransform(sp, [0.12, 0.20], [1, 0]);
-  const introBlurN = useTransform(sp, [0.12, 0.20], [0, 12]);
-  const introFilter = useMotionTemplate`blur(${introBlurN}px)`;
-
-  // ── 콘텐츠(타일 세션) — 인트로 뒤에 디졸브로 등장 ──
-  const contOp = useTransform(sp, [0.18, 0.28], [0, 1]);
-  const contY = useTransform(sp, [0.18, 0.30], [90, 0]);
-  const contBlurN = useTransform(sp, [0.18, 0.28], [10, 0]);
-  const contFilter = useMotionTemplate`blur(${contBlurN}px)`;
-  const contPointer = useTransform(scrollYProgress, (v) => (v > 0.16 ? 'auto' : 'none'));
-
-  // ── PC: 타일 세션에서 계속 스크롤하면 모먼트부터 차례대로 선택 (안정적·편안한 전환) ──
-  // 선택 판정은 스프링 지연 없는 원시 진행도로 — 빠른 스크롤에도 마지막 타일 보장
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    if (isMobile) return;
-    if (v < 0.28) return;
-    // 타일당 스크롤 ~60vh + 마지막 타일 ~130vh 여운
-    const seg = Math.min(ITEMS.length - 1, Math.floor(((v - 0.28) / 0.60) * ITEMS.length));
-    goToward(seg); // 건너뛰지 않고 한 칸씩
-  });
-
-  // ── 모바일: 키비주얼 글씨는 켜자마자 바로 등장(마운트 스태거), 스크롤은 퇴장만 스크럽 ──
-  const mOutOp = useTransform(sp, [0.35, 0.75], [1, 0]);
-  const mOutY = useTransform(sp, [0.35, 0.75], ['0%', '-6%']);
-
-
-  // 푸터 LET'S TOGETHER처럼 화면을 꽉 채우는 스케일 (대표 지시 2026-07-13)
-  const bigWord: React.CSSProperties = {
-    fontFamily: 'Manrope, sans-serif',
-    fontWeight: 900,
-    fontSize: 'clamp(3rem, 11vw, 11rem)',
-    letterSpacing: '-0.045em',
-    lineHeight: 0.94,
-    color: '#fff',
-    display: 'block',
-    whiteSpace: 'nowrap',
-  };
-
-  // 모바일 = 인트로 스크롤텔링(푸터 방식) → 타일 세션 일반 플로우
-  if (isMobile) {
-    const mWord: React.CSSProperties = {
-      fontFamily: 'Manrope, sans-serif',
-      fontWeight: 900,
-      fontSize: 'clamp(2.4rem, 12vw, 4.2rem)',
-      letterSpacing: '-0.045em',
-      lineHeight: 0.95,
-      whiteSpace: 'nowrap',
-      color: 'rgba(255,255,255,0.92)',
-      display: 'block',
-    };
-    return (
-      <>
-        {/* 키비주얼 — 켜자마자 글씨 등장(좌/우/아래 스태거), 스크롤 시 퇴장 스크럽 */}
-        <div ref={ref} style={{ height: '150vh' }} className="relative bg-black">
-          <div
-            className="sticky top-0 h-[100svh] overflow-hidden flex flex-col justify-center"
-            style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
-          >
-            <motion.div style={{ opacity: mOutOp, y: mOutY }}>
-              <motion.p
-                initial={{ opacity: 0, x: '-12%' }}
-                animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
-                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.1 }}
-                className="text-[11px] tracking-[0.5em] uppercase font-bold mb-6"
-              >
-                <span style={{ color: '#FFB800' }}>What We Do</span>
-              </motion.p>
-              <motion.span
-                initial={{ opacity: 0, x: '-12%' }}
-                animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
-                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.2 }}
-                style={mWord}
-              >
-                하나의
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0, x: '12%' }}
-                animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '12%' }}
-                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.45 }}
-                style={mWord}
-              >
-                컬렉티브<span style={{ color: '#FFB800' }}>,</span>
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0, y: '14%' }}
-                animate={introFinished ? { opacity: 1, y: '0%' } : { opacity: 0, y: '14%' }}
-                transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.7 }}
-                style={{ ...mWord, color: '#ffffff' }}
-              >
-                브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
-              </motion.span>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* 타일 세션 */}
-        <section className="relative bg-black min-h-[100svh] flex flex-col justify-center py-8 overflow-hidden">
-          <motion.div
-            initial={{ opacity: 0, y: 48 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-8%' }}
-            transition={{ duration: 0.65, ease: NADAUN_EASE as any }}
-          >
-            <div className="mb-4" style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}>
-              <h2
-                className="text-white font-extrabold"
-                style={{ fontFamily: 'Manrope, sans-serif', fontSize: '19px', letterSpacing: '-0.03em' }}
-              >
-                하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
-              </h2>
-            </div>
-            <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} />
-          </motion.div>
-        </section>
-      </>
-    );
-  }
 
   return (
-    <div ref={ref} style={{ height: '700vh' }} className="relative bg-black">
-      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
-        {/* ── 인트로 대형 타이포 ── */}
-        <motion.div
-          className="absolute inset-0 z-10 flex flex-col justify-center pointer-events-none"
-          style={{ opacity: introOp, filter: introFilter, paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
-        >
-          <motion.p
-            initial={{ opacity: 0, x: '-12%' }}
-            animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
-            transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.1 }}
-            className="text-[12px] tracking-[0.5em] uppercase font-bold mb-8"
-          >
-            <span style={{ color: '#FFB800' }}>What We Do</span>
-          </motion.p>
-          {/* 1행: 왼쪽에서 / 2행: 오른쪽에서 — 한 줄 배치 (푸터 LET'S BE 방식, 자동 등장) */}
-          <div className="flex flex-row items-baseline gap-x-[0.45em] whitespace-nowrap">
-            <motion.span
-              initial={{ opacity: 0, x: '-12%' }}
-              animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '-12%' }}
-              transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.2 }}
-              style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
-            >
-              하나의
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, x: '12%' }}
-              animate={introFinished ? { opacity: 1, x: '0%' } : { opacity: 0, x: '12%' }}
-              transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.45 }}
-              style={{ ...bigWord, color: 'rgba(255,255,255,0.92)' }}
-            >
-              컬렉티브<span style={{ color: '#FFB800' }}>,</span>
-            </motion.span>
-          </div>
-          {/* 3행: 아래에서 (TOGETHER. 방식, 자동 등장) */}
-          <motion.span
-            initial={{ opacity: 0, y: '14%' }}
-            animate={introFinished ? { opacity: 1, y: '0%' } : { opacity: 0, y: '14%' }}
-            transition={{ type: 'spring', stiffness: 55, damping: 20, delay: 0.7 }}
-            style={bigWord}
-          >
-            브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
-          </motion.span>
-        </motion.div>
-
-        {/* ── 타일 세션 ── */}
-        <motion.div style={{ opacity: contOp, y: contY, filter: contFilter, pointerEvents: contPointer as any }} className="relative z-20 flex flex-col justify-center">
-          <div
-            className="mb-5 flex items-end justify-between"
-            style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
-          >
-            <h2 className="text-white font-extrabold leading-[0.95]" style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(1.5rem, 2.6vw, 2.3rem)', letterSpacing: '-0.03em' }}>
-              하나의 컬렉티브, 브랜드의 A to Z<span style={{ color: '#FFB800' }}>.</span>
-            </h2>
-          </div>
-
-          <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} />
-
-          <div
-            className="mt-5 flex items-center justify-between"
-            style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
-          >
-            <p className="text-white/35 text-[14px] tracking-wide">공간 인프라부터 사진·영상, 글로벌 에이전시, 온·오프라인 종합 마케팅까지.</p>
-            <motion.span
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-white/25 text-[10px] tracking-[0.4em] uppercase"
-            >
-              Scroll
-            </motion.span>
-          </div>
-        </motion.div>
-      </div>
-    </div>
+    <section className="relative min-h-[100svh] bg-black flex items-center overflow-hidden pt-[88px] pb-8 md:pt-[96px] md:pb-10">
+      <motion.div
+        className="w-full"
+        initial={{ opacity: 0, y: 32 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: NADAUN_EASE as any }}
+      >
+        <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} />
+      </motion.div>
+    </section>
   );
 };
 
