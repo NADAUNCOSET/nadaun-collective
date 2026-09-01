@@ -15,6 +15,7 @@ import VideoReel from './components/VideoReel';
 import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
 import ImmersiveCreativeOverlay from './components/ImmersiveCreativeOverlay';
 import GlobalNetworkOverlay from './components/GlobalNetworkOverlay';
+import PortfolioOverlay from './components/PortfolioOverlay';
 import { motion, useScroll, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 
 const App: React.FC = () => {
@@ -103,6 +104,7 @@ const App: React.FC = () => {
           onContactClick={() => setActiveOverlay('contact')}
         />
         <ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />
+        <PortfolioOverlay isOpen={activeOverlay === 'portfolio'} onClose={closeOverlay} />
         <IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
           onClose={closeOverlay}

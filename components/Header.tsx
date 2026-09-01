@@ -7,6 +7,7 @@ const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
 const navItems = [
   { label: 'ABOUT', id: 'about' },
   { label: 'BUSINESS', id: 'business' },
+  { label: 'PORTFOLIO', id: 'portfolio' },
   { label: 'INSIGHTS', id: 'insights' },
 ];
 
@@ -65,9 +66,9 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
           </motion.a>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-12">
+          <div className="hidden md:flex items-center gap-10">
             <motion.nav 
-              className="flex items-center space-x-12"
+              className="flex items-center space-x-10"
               initial={{ opacity: 0 }}
               animate={introFinished ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.234, delay: 0.096 }}
