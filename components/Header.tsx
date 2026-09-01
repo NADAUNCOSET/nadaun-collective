@@ -7,13 +7,8 @@ const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
 const navItems = [
   { label: 'ABOUT', id: 'about' },
   { label: 'BUSINESS', id: 'business' },
+  { label: 'PORTFOLIO', id: 'portfolio', accent: true },
   { label: 'INSIGHTS', id: 'insights' },
-];
-
-const mobileNavItems = [
-  ...navItems.slice(0, 2),
-  { label: 'PORTFOLIO', id: 'portfolio' },
-  ...navItems.slice(2),
 ];
 
 interface HeaderProps {
@@ -52,26 +47,17 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
           className="flex justify-between items-center w-full transition-[padding] duration-300 ease-out"
           style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
         >
-          {/* Logo + primary portfolio entry */}
-          <motion.div
-            className="flex items-center gap-7 z-50 relative"
+          {/* Logo Section */}
+          <motion.a
+            href="#"
+            className="flex items-center gap-2 z-50 relative cursor-pointer select-none"
             initial={IS_MOBILE ? { opacity: 0 } : { y: 100 }}
             animate={introFinished ? { y: 0, opacity: 1 } : IS_MOBILE ? { opacity: 0 } : { y: 100 }}
             transition={{ duration: IS_MOBILE ? 0.4 : 0.281, ease: [0.22, 1, 0.36, 1], delay: 0.032 }}
           >
-            <a href="#" className="flex items-center gap-2 cursor-pointer select-none">
-              <span className="text-2xl md:text-3xl font-extrabold text-white leading-none tracking-tight">NADAUN</span>
-              <span className="text-2xl md:text-3xl font-light leading-none tracking-tight" style={{ color: '#FFB800' }}>COLLECTIVE</span>
-            </a>
-            <button
-              type="button"
-              onClick={(e) => handleItemClick('portfolio', e)}
-              className="hidden md:block relative text-sm font-bold tracking-[0.2em] text-white/75 hover:text-[#FFB800] transition-colors group"
-            >
-              PORTFOLIO
-              <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-[#FFB800] scale-x-0 group-hover:scale-x-100 transition-transform origin-right group-hover:origin-left duration-300" />
-            </button>
-          </motion.div>
+            <span className="text-2xl md:text-3xl font-extrabold text-white leading-none tracking-tight">NADAUN</span>
+            <span className="text-2xl md:text-3xl font-light leading-none tracking-tight" style={{ color: '#FFB800' }}>COLLECTIVE</span>
+          </motion.a>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-10">
@@ -85,7 +71,9 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
                 <button 
                   key={item.label} 
                   onClick={(e) => handleItemClick(item.id, e)}
-                  className="text-lg font-bold tracking-widest text-white hover:text-[#FFB800] transition-colors relative group cursor-pointer"
+                  className={`text-lg font-bold tracking-widest transition-colors relative group cursor-pointer ${
+                    item.accent ? 'text-[#FFB800] hover:text-white' : 'text-white hover:text-[#FFB800]'
+                  }`}
                 >
                   {item.label}
                   <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-[#FFB800] scale-x-0 group-hover:scale-x-100 transition-transform origin-right group-hover:origin-left duration-300"></span>
@@ -128,11 +116,13 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished 
             className="fixed inset-0 bg-black z-40 flex flex-col justify-center items-center"
           >
             <div className="flex flex-col space-y-8 text-center">
-              {mobileNavItems.map((item) => (
+              {navItems.map((item) => (
                 <button
                   key={item.label}
                   onClick={(e) => handleItemClick(item.id, e)}
-                  className="text-5xl font-bold tracking-tighter text-white hover:text-[#FFB800] transition-colors flex items-center justify-center gap-4 group cursor-pointer"
+                  className={`text-5xl font-bold tracking-tighter transition-colors flex items-center justify-center gap-4 group cursor-pointer ${
+                    item.accent ? 'text-[#FFB800] hover:text-white' : 'text-white hover:text-[#FFB800]'
+                  }`}
                 >
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute left-8"><ArrowRight /></span>
                   {item.label}
