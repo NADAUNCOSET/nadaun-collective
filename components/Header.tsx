@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
 const navItems = [
-  { label: 'ABOUT', id: 'about' }, { label: 'BUSINESS', id: 'business' },
+  { label: 'ABOUT', id: 'about' },
   { label: 'PORTFOLIO', id: 'portfolio' }, { label: 'INSIGHTS', id: 'insights' },
 ];
 interface HeaderProps { onNavClick: (id: string) => void; show?: boolean; introFinished?: boolean; activeSection?:string|null; onHome?:()=>void; }

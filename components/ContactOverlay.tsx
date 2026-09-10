@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface ContactOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  initialType?: 'signage' | 'solution';
 }
 
 const SECTION_H = 'min-h-[85vh]';
@@ -53,9 +54,9 @@ const BigQ: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </p>
 );
 
-const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
+const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose, initialType }) => {
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent'>('idle');
-  const [inquiryTypes, setInquiryTypes] = useState({ production: false, promotion: false });
+  const [inquiryTypes, setInquiryTypes] = useState({ production: false, promotion: false, signage: initialType === 'signage', solution: initialType === 'solution' });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,11 +70,13 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
       const types = [
         inquiryTypes.production && '광고 제작',
         inquiryTypes.promotion && '광고 홍보',
+        inquiryTypes.signage && '사이니지 제작',
+        inquiryTypes.solution && '올인원 솔루션 제작',
       ].filter(Boolean).join(', ');
       object['문의_분야'] = types;
       // 어느 사이트에서 온 문의인지 표기 (대표 룰 2026-06-13)
       object['출처_사이트'] = 'COLLECTIVE (collective.nadaun.co)';
-      object.subject = '[COLLECTIVE] 나다운 컬렉티브 — 광고 문의';
+      object.subject = '[COLLECTIVE] 나다운 컬렉티브 — 프로젝트 문의';
       object.from_name = 'NADAUN COLLECTIVE 웹사이트';
 
       const res = await fetch('https://api.web3forms.com/submit', {
@@ -91,7 +94,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const toggle = (t: 'production' | 'promotion') =>
+  const toggle = (t: 'production' | 'promotion' | 'signage' | 'solution') =>
     setInquiryTypes(p => ({ ...p, [t]: !p[t] }));
 
   return (
@@ -112,6 +115,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
             </span>
             <button
               onClick={onClose}
+              aria-label="문의 닫기"
               className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
             >
               <X className="w-4 h-4" />
@@ -183,15 +187,19 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                   <SectionReveal>
                     <SectionNum n="03" label="문의 분야" />
                     <BigQ>어떤 도움이<br />필요하신가요?</BigQ>
-                    <div className="flex flex-col sm:flex-row gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {[
                         { key: 'production' as const, label: '광고 제작', items: ['영상 촬영', '사진 촬영', 'TVC · CF', '브랜드 필름', '기업 VCR', '3D · 모션그래픽', '지면 · 앨범', '웹 · 디자인'] },
                         { key: 'promotion' as const, label: '광고 홍보 · 송출', items: ['공영 · 지상파', '종합편성', '케이블 PP', 'IPTV 3사', '위성 · 케이블 SO', '지하철 스크린도어', '옥외 전광판', '택시 · 버스', '해외 · 글로벌', '퍼포먼스 · 바이럴'] },
+                        { key: 'signage' as const, label: '사이니지 제작', items: ['스마트 TV', '현장 설치', '네트워크 관리', '콘텐츠 편성 · 배포', '제작 플로우 자동화'] },
+                        { key: 'solution' as const, label: '올인원 솔루션 제작', items: ['프리프로덕션 자동화', '기획안', '스토리보드 · 콘티', '애니메틱', '샷리스트'] },
                       ].map(({ key, label, items }) => (
                         <button
                           key={key}
                           type="button"
                           onClick={() => toggle(key)}
+                          aria-label={label}
+                          aria-pressed={inquiryTypes[key]}
                           className="flex-1 text-left p-8 border transition-all duration-300 rounded-sm"
                           style={{
                             borderColor: inquiryTypes[key] ? 'rgba(255,184,0,0.6)' : 'rgba(255,255,255,0.10)',
@@ -199,7 +207,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                           }}
                         >
                           <p className="font-black mb-5" style={{
-                            fontSize: 'clamp(1.8rem, 4vw, 3.5rem)',
+                            fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
                             fontFamily: 'Manrope, sans-serif',
                             color: inquiryTypes[key] ? '#FFB800' : 'rgba(255,255,255,0.9)',
                           }}>
@@ -257,6 +265,11 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         />
                       </motion.div>
                     )}
+                    {(['signage','solution'] as const).map(type => inquiryTypes[type] && <motion.div key={type} className="mt-10" initial={{opacity:0,y:-8}} animate={{opacity:1,y:0}} transition={{duration:.32,ease:[.16,1,.3,1]}}>
+                      <label className="block text-sm text-white/70 mb-4" htmlFor={`inquiry-${type}`}>{type==='signage'?'사이니지 제작 — 설치 환경과 운영 구상':'올인원 솔루션 제작 — 필요한 제작 업무'}</label>
+                      <textarea id={`inquiry-${type}`} name={type==='signage'?'사이니지제작_상세':'올인원솔루션제작_상세'} rows={3} placeholder={type==='signage'?'설치 국가·지역, 매장 수, TV 수와 인터넷 환경을 알려주세요.':'팀 구성, 제작 유형과 자동화가 필요한 업무를 알려주세요.'} className="w-full bg-transparent border-b border-white/15 focus:border-white pb-3 text-white font-light outline-none placeholder-white/20 resize-none leading-relaxed" style={{fontSize:'clamp(1.05rem,2.2vw,1.6rem)'}}/>
+                      {type==='signage'&&<p className="mt-3 text-xs text-white/50">제작비 300만 원 · TV 및 설치 인건비 별도</p>}
+                    </motion.div>)}
                   </SectionReveal>
                 </section>
 
@@ -310,7 +323,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                     <div className="mt-16 flex flex-col md:flex-row items-start md:items-center gap-6">
                       <button
                         type="submit"
-                        disabled={formState === 'sending' || (!inquiryTypes.production && !inquiryTypes.promotion)}
+                        disabled={formState === 'sending' || (!Object.values(inquiryTypes).some(Boolean))}
                         className="flex items-center gap-4 group disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <span
@@ -324,7 +337,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                           : <span className="text-white/40 group-hover:text-white/70 group-hover:translate-x-2 transition-all duration-300" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}>→</span>
                         }
                       </button>
-                      {!inquiryTypes.production && !inquiryTypes.promotion && (
+                      {!Object.values(inquiryTypes).some(Boolean) && (
                         <p className="text-white/30 text-sm font-light">문의 분야(03)를 선택해주세요</p>
                       )}
                     </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, X } from 'lucide-react';
 
 type PortfolioOverlayProps = {
@@ -45,6 +45,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) => {
   const [active, setActive] = useState<'video' | 'photo'>('video');
+  const reduce=useReducedMotion();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,16 +60,16 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
     <AnimatePresence>
       {isOpen && (
         <motion.section
-          className="fixed inset-0 z-[100] overflow-y-auto bg-[#1a1a1a] text-white"
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ duration: 0.72, ease }}
+          className="collective-editorial collective-portfolio fixed inset-0 z-[100] overflow-y-auto bg-[#1a1a1a] text-white"
+          initial={reduce?false:{opacity:0}}
+          animate={{opacity:1}}
+          exit={{opacity:0}}
+          transition={{duration:.3,ease}}
           aria-modal="true"
           role="dialog"
           aria-label="NADAUN portfolio"
         >
-          <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-white/15 bg-[#1a1a1a]/90 px-6 backdrop-blur-md md:px-12">
+          <header className="editorial-header sticky top-0 z-30 flex h-[64px] items-center justify-between border-b border-white/15 bg-[#1a1a1a]/90 px-6 backdrop-blur-md md:px-12">
             <div className="flex items-center gap-3">
               <span className="text-sm font-extrabold tracking-[-0.02em]">NADAUN</span>
               <span className="text-sm font-medium tracking-normal text-[#FFB800]">PORTFOLIO</span>
@@ -79,18 +80,17 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
               className="group flex items-center gap-3 text-xs font-bold tracking-normal text-white/70 transition-colors hover:text-[#FFB800]"
               aria-label="포트폴리오 닫기"
             >
-              CLOSE
               <span className="grid h-9 w-9 place-items-center rounded-full border border-white/25 transition-colors group-hover:border-[#FFB800]">
                 <X size={17} />
               </span>
             </button>
           </header>
 
-          <div className="mx-auto flex min-h-[calc(100vh-72px)] max-w-[1800px] flex-col px-6 pb-8 pt-12 md:px-12 md:pb-12 md:pt-16">
-            <div className="mb-10 grid gap-7 md:mb-14 md:grid-cols-12 md:items-end">
+          <div className="editorial-page-content mx-auto flex flex-col">
+            <div className="editorial-intro">
               <div className="md:col-span-8">
                 <motion.p
-                  className="mb-5 text-[11px] font-bold tracking-normal text-[#FFB800]"
+                  className="editorial-kicker mb-5 text-[11px] font-bold tracking-normal text-[#FFB800]"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.28, duration: 0.5, ease }}
@@ -99,22 +99,20 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                 </motion.p>
                 <motion.h1
                   className="font-black leading-[0.84] tracking-[-0.055em]"
-                  style={{ fontSize: 'clamp(4.4rem, 12vw, 11rem)', fontFamily: 'SUIT, Pretendard, sans-serif' }}
-                  initial={{ opacity: 0, y: 36 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.72, ease }}
+                  style={{ fontSize: 'var(--editorial-title)', fontFamily: 'SUIT, Pretendard, sans-serif' }}
+                  initial={false}
                 >
-                  OUR WORK<span className="text-[#FFB800]">.</span>
+                  {['OUR','WORK.'].map((word,index)=><span key={word} className="portfolio-word-mask"><motion.span initial={reduce?false:{y:'105%'}} animate={{y:'0%'}} transition={{type:'spring',stiffness:200,damping:30,delay:.18+index*.09}}>{word}</motion.span></span>)}
                 </motion.h1>
               </div>
               <motion.p
-                className="max-w-sm text-sm font-light leading-7 text-white/55 md:col-span-4 md:justify-self-end md:text-base"
+                className="editorial-body max-w-sm text-sm font-light leading-7 text-white/55 md:col-span-4 md:justify-self-end md:text-base"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                나다운은 장면을 만드는 데서 멈추지 않습니다.<br />
-                브랜드가 기억되는 감각을 설계합니다.
+                브랜드의 이야기를 장면과 이미지로 구현합니다.<br />
+                사진과 영상에 담긴 나다운의 작업을 확인하세요.
               </motion.p>
             </div>
 
@@ -130,7 +128,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                     onMouseEnter={() => setActive(card.id)}
                     onFocus={() => setActive(card.id)}
                     className="group relative min-h-[310px] overflow-hidden bg-[#222] md:min-h-[52vh]"
-                    initial={{ opacity: 0, y: 44 }}
+                    initial={reduce?false:{opacity:0,y:44}}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.34 + index * 0.09, duration: 0.65, ease }}
                   >
@@ -167,16 +165,16 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                         </span>
                       </div>
 
-                      <div>
+                      <motion.div initial={reduce?false:{opacity:0,y:28}} animate={{opacity:1,y:0}} transition={{type:'spring',stiffness:200,damping:30,delay:.54+index*.09}}>
                         <p className="mb-4 text-[10px] font-bold tracking-normal text-[#FFB800] md:text-xs">{card.eyebrow}</p>
                         <h2
                           className="font-black leading-none tracking-[-0.05em]"
-                          style={{ fontSize: 'clamp(3.6rem, 8vw, 8.5rem)', fontFamily: 'SUIT, Pretendard, sans-serif' }}
+                          style={{ fontSize: 'var(--editorial-heading)', fontFamily: 'SUIT, Pretendard, sans-serif' }}
                         >
                           {card.title}
                         </h2>
-                        <p className="mt-4 text-sm font-light text-white/65 md:text-base">{card.description}</p>
-                      </div>
+                        <p className="editorial-body mt-4 text-sm font-light text-white/65 md:text-base">{card.description}</p>
+                      </motion.div>
                     </div>
                   </motion.a>
                 );

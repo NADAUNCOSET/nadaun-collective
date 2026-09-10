@@ -1,14 +1,24 @@
-import React, { useRef, useEffect, useMemo, Suspense } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
+import React, { useRef, useEffect, useMemo, Suspense, createContext, useContext } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, useReducedMotion, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { WORLD_LAND } from './worldGeo';
+import { globeSequence, globeConnection } from './globe-sequence';
 
-const HEADER_H = 57;
+const HEADER_H = 64;
+
+// Images may overlap; an incoming chapter's copy waits until the previous layer is gone.
+const AboutCopyContext=createContext<MotionValue<number>|undefined>(undefined);
+const AboutCopy:React.FC<{children:React.ReactNode;className?:string}>=({children,className})=>{
+  const opacity=useContext(AboutCopyContext);
+  return <motion.div className={className} style={{opacity}}>{children}</motion.div>;
+};
+
 
 // Chapter heights (vh)
-const H1 = 100, H2 = 120, H3 = 220, H4 = 260, H5 = 280; // 스크러빙 대폭 단축 2720→980vh — 짧게 빨리 넘어가게 (대표 룰 2026-06-13)
+const H1 = 100, H2 = 120, H3 = 220, H4 = 260, H5 = 120; // One shared 820vh stage; adjacent assets overlap.
 const TOTAL = H1 + H2 + H3 + H4 + H5;
 
 const C1S = 0,               C1E = H1 / TOTAL;
@@ -18,13 +28,13 @@ const C4S = C3E,             C4E = (H1 + H2 + H3 + H4) / TOTAL;
 const C5S = C4E,             C5E = 1;
 
 const TIMELINE = [
-  { year: '2020', title: '사진 장비\n판매샵' },
-  { year: '2021', title: '기자재\n유통' },
-  { year: '2022', title: '렌탈샵\n확장' },
-  { year: '2023', title: '브랜드 필름\nVCR 제작' },
-  { year: '2024', title: '난컴퍼니\nMCN 설립' },
-  { year: '2025', title: 'TVC 송출\n오프라인 광고' },
-  { year: '2026', title: 'ALL IN ONE\n솔루션', highlight: true },
+  { year: '2020', title: '사진 장비\n판매샵', image:'https://media.nadaun.co/collective/space/07.webp', caption:'Equipment · 촬영 환경' },
+  { year: '2021', title: '나다운 스페이스\n기자재 유통', image:'https://media.nadaun.co/collective/space/03.webp', caption:'Equipment · 스튜디오 구성' },
+  { year: '2022', title: '렌탈샵\n확장', image:'https://media.nadaun.co/collective/space/15.webp', caption:'Rental · 조명 리그' },
+  { year: '2023', title: '브랜드 필름\nVCR 제작', image:'https://media.nadaun.co/video/가로/20231013_GAONCHIPS_FX_최종 AD_1080p.jpg', caption:'2023 · GAONCHIPS' },
+  { year: '2024', title: '난컴퍼니\nMCN 설립', image:'/hero/pepsi-festa.webp', caption:'2024 · PEPSI FESTA' },
+  { year: '2025', title: 'TVC 송출\n오프라인 광고', image:'https://media.nadaun.co/video/가로/20251020 Livernovo v1 15s final_ WEB HIGH AD_1080p.jpg', caption:'2025 · LIVERNOVO' },
+  { year: '2026', title: 'ALL IN ONE\n솔루션', highlight: true, image:'https://media.nadaun.co/allinone/projects/NIKE-OLIVE-BURGUNDY-12-SCENE-MAGAZINE-FILM/01_STILL/S01_HERO-26ec0115fb772ac7.webp', caption:'2026 · ALL IN ONE 콘셉트 프리뷰' },
 ];
 
 const PARTNERS = [
@@ -39,7 +49,7 @@ const PARTNERS = [
 const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> = ({ children, centered }) => (
   <div
     style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
-    className={`flex flex-col ${centered ? 'items-center justify-center text-center' : 'justify-center px-8 md:px-16 lg:px-24'} overflow-hidden`}
+    className={`flex flex-col ${centered ? 'items-center justify-center text-center' : 'justify-center editorial-gutter'} overflow-hidden`}
   >
     {children}
   </div>
@@ -47,39 +57,39 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
 
 // ── Chapter 1 — horizontal word slides (same pattern as BusinessOverlay Ch1) ──
 const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
-  const p = useTransform(g, [C1S, C1E], [0, 1]);
+  const p = useTransform(g, [Math.max(0,C1S-.024), Math.min(1,C1E+.024)], [0, 1]);
 
   // 세 단어가 끊김 없이 부드럽게 이어져 한 화면에 모두 남음 (stagger 겹침, 모두 머무름) 대표 룰 2026-06-13
-  const w1Op = useTransform(p, [0.04, 0.12], [0, 1]);
+  const w1Op = useTransform(p, [0.04, 0.12], [1, 1]);
   const w1Y  = useTransform(p, [0.04, 0.12], ['30px', '0px']);
-  const w2Op = useTransform(p, [0.10, 0.18], [0, 1]);
+  const w2Op = useTransform(p, [0.10, 0.18], [1, 1]);
   const w2Y  = useTransform(p, [0.10, 0.18], ['30px', '0px']);
-  const w3Op = useTransform(p, [0.16, 0.24], [0, 1]);
+  const w3Op = useTransform(p, [0.16, 0.24], [1, 1]);
   const w3Y  = useTransform(p, [0.16, 0.24], ['30px', '0px']);
 
-  const subOp = useTransform(p, [0.24, 0.34], [0, 1]);
+  const subOp = useTransform(p, [0.24, 0.34], [1, 1]);
   const subY  = useTransform(p, [0.24, 0.34], ['20px', '0px']);
 
   // 다음 섹션으로 부드럽게 — 끝에서 위로 디졸브 아웃
   const exitOp = useTransform(p, [0.78, 0.98], [1, 0]);
   const exitY  = useTransform(p, [0.78, 0.98], ['0px', '-50px']);
 
-  const FS = { fontSize: 'clamp(3rem, 11vw, 9rem)' } as const;
+  const FS = { fontSize: 'var(--editorial-title)' } as const;
 
   return (
     <div style={{ height: `${H1}vh` }}>
       <div
         style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
-        className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
+        className="relative overflow-hidden flex flex-col justify-center editorial-gutter"
       >
-        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
+        <p className="editorial-kicker absolute top-8 editorial-edge text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
           NADAUN COLLECTIVE — Since 2020, Seoul
         </p>
 
         <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
           <motion.h1 style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
             className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
-          ><span style={FS}>HIGH-END</span></motion.h1>
+          ><span style={FS}>VISUAL</span></motion.h1>
           <motion.h1 style={{ opacity: w2Op, y: w2Y, color: 'white', willChange: 'transform' }}
             className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
           ><span style={FS}>CONTENT</span></motion.h1>
@@ -87,10 +97,10 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
           ><span style={FS}>SOLUTION.</span></motion.h1>
           <motion.p style={{ opacity: subOp, y: subY }}
-            className="mt-10 text-white/70 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
+            className="editorial-body mt-10 text-white/70 text-lg md:text-2xl font-light leading-relaxed max-w-xl"
           >
-            최첨단 장비와 기술, 정제된 디자인 감각이 결합된<br />
-            하이엔드 콘텐츠 솔루션 그룹
+            스토리텔링을 기반으로 브랜드의 메시지를<br />
+            사진·영상·공간 매체에 구현하는 비주얼 콘텐츠 솔루션
           </motion.p>
         </motion.div>
       </div>
@@ -100,7 +110,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
 // ── Chapter 2 ─────────────────────────────────────────────────────────────────
 const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
-  const p = useTransform(g, [C2S, C2E], [0, 1]);
+  const p = useTransform(g, [Math.max(0,C2S-.024), Math.min(1,C2E+.024)], [0, 1]);
 
   const line1Op = useTransform(p, [0.00, 0.16], [0, 1]);
   const line1Y  = useTransform(p, [0.00, 0.16], ['5%', '0%']);
@@ -118,30 +128,31 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   return (
     <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
-        <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-[13px] tracking-normal uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
+        <AboutCopy><motion.div style={{ opacity: exitOp, y: exitY }}>
+          <p className="editorial-kicker text-[13px] tracking-normal uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
           <motion.h2
-            style={{ opacity: line1Op, y: line1Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
+            style={{ opacity: line1Op, y: line1Y, fontSize: 'var(--editorial-heading)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
-          >올인원</motion.h2>
+          >스토리텔링.</motion.h2>
           <motion.h2
-            style={{ y: line2Y, color: agencyColor, fontSize: 'clamp(4.5rem, 17vw, 14rem)', marginTop: '0.12em' }}
+            style={{ y: line2Y, color: agencyColor, fontSize: 'var(--editorial-heading)', marginTop: '0.12em' }}
             className="font-black tracking-[-0.03em] leading-[0.85] block"
-          >솔루션.</motion.h2>
+          >시각적 구현.</motion.h2>
           <motion.p style={{ opacity: bodyOp, y: bodyY }}
-            className="mt-12 text-white/75 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
+            className="editorial-body mt-12 text-white/75 text-xl md:text-2xl font-light leading-relaxed max-w-2xl"
           >
-            커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
-            단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
+            브랜드의 메시지와 타깃을 분석해 이야기의 구조를 설계합니다.<br />
+            장면의 맥락, 이미지의 질감과 편집의 리듬을 조율하고<br />
+            매체에 적합한 사진·영상과 시각 경험으로 구현합니다.
           </motion.p>
           <motion.div style={{ opacity: pillOp }} className="flex flex-wrap gap-3 mt-10">
-            {['COMMERCE', 'CONTENT', 'DISTRIBUTION', 'AI STRATEGY'].map(tag => (
+            {['COMMERCE', 'CONTENT', 'DISTRIBUTION', 'PRODUCTION SYSTEMS'].map(tag => (
               <span key={tag} className="text-xs font-bold uppercase tracking-normal px-5 py-2.5 border border-white/25 rounded-full text-white/70">
                 {tag}
               </span>
             ))}
           </motion.div>
-        </motion.div>
+        </motion.div></AboutCopy>
       </StickyPanel>
     </div>
   );
@@ -149,7 +160,7 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
 // ── Timeline Slide — separate component so hooks are called at component top ──
 const TimelineSlide: React.FC<{
-  item: { year: string; title: string; highlight?: boolean };
+  item: { year: string; title: string; highlight?: boolean; image:string; caption:string };
   index: number;
   total: number;
   p: MotionValue<number>;
@@ -165,7 +176,7 @@ const TimelineSlide: React.FC<{
     index === total - 1
       ? [Math.max(0, start - fadeLen * 0.5), start + fadeLen, 1, 1]
       : [Math.max(0, start - fadeLen * 0.5), start + fadeLen, end - fadeLen, Math.min(1, end + fadeLen * 0.5)],
-    index === total - 1 ? [0, 1, 1, 1] : [0, 1, 1, 0],
+    index === total - 1 ? [0, 1, 1, 1] : index === 0 ? [1, 1, 1, 0] : [0, 1, 1, 0],
   );
 
   // Line 1 — appears as soon as slide is visible
@@ -177,14 +188,16 @@ const TimelineSlide: React.FC<{
   const l2Op  = useTransform(p, [l2S, l2S + fadeLen * 1.4], [0, 1]);
   const l2Y   = useTransform(p, [l2S, l2S + fadeLen * 1.4], ['32px', '0px']);
 
+  const imageY = useTransform(p,[start,start+seg*.22,end],[48,0,-20]);
+  const imageScale = useTransform(p,[start,start+seg*.22,end],[1.08,1,1.025]);
   const lines = item.title.split('\n');
 
   return (
     <motion.div
       style={{ opacity: op, position: 'absolute', inset: 0 }}
-      className="flex flex-col justify-center px-8 md:px-16 lg:px-24"
+      className="about-history-scene editorial-gutter"
     >
-      <span
+      <AboutCopy className="about-history-copy"><span
         className="text-[11px] tracking-normal uppercase font-bold mb-6 block"
         style={{ color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.35)' }}
       >
@@ -195,7 +208,7 @@ const TimelineSlide: React.FC<{
         <motion.h2
           style={{
             opacity: l1Op, y: l1Y,
-            fontSize: 'clamp(4.2rem, 14vw, 12rem)',
+            fontSize: 'var(--editorial-heading)',
             color: item.highlight ? '#FFB800' : 'white',
           }}
           className="font-black tracking-[-0.03em] leading-[0.88] block"
@@ -204,20 +217,21 @@ const TimelineSlide: React.FC<{
           <motion.h2
             style={{
               opacity: l2Op, y: l2Y,
-              fontSize: 'clamp(4.2rem, 14vw, 12rem)',
+              fontSize: 'var(--editorial-heading)',
               color: item.highlight ? '#FFB800' : 'white',
             }}
             className="font-black tracking-[-0.03em] leading-[0.88] block"
           >{lines[1]}</motion.h2>
         )}
-      </div>
+      </div></AboutCopy>
+      <motion.figure className="about-history-image" style={{y:imageY}}><motion.img src={item.image} alt={item.caption} loading="lazy" decoding="async" style={{scale:imageScale}}/><figcaption>{item.caption}</figcaption></motion.figure>
     </motion.div>
   );
 };
 
 // ── Chapter 3 — One-by-one dissolve timeline with year rail ───────────────────
 const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
-  const p = useTransform(g, [C3S, C3E], [0, 1]);
+  const p = useTransform(g, [C3S+.015, Math.min(1,C3E+.024)], [0, 1]);
   // exitOp delayed so ALL IN ONE 솔루션 (last slide) is fully visible before fade
   const exitOp = useTransform(p, [0.94, 1.00], [1, 0]);
 
@@ -231,8 +245,8 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         <motion.div style={{ opacity: exitOp }} className="absolute inset-0">
 
           {/* ── Year rail at top ── */}
-          <div className="absolute top-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 z-10">
-            <p className="text-[11px] tracking-normal uppercase text-[#FFB800]/60 font-bold mb-4">OUR STORY</p>
+          <AboutCopy className="absolute top-8 editorial-edge right-8 md:right-16 lg:right-24 z-10">
+            <p className="editorial-kicker text-[11px] tracking-normal uppercase text-[#FFB800]/60 font-bold mb-4">OUR STORY</p>
             <div className="relative">
               {/* Track line */}
               <div className="absolute top-[10px] left-0 right-0 h-[1px] bg-white/10" />
@@ -256,7 +270,7 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
                 <div className="w-[12px] h-[12px] rounded-full bg-[#FFB800] shadow-[0_0_10px_rgba(255,184,0,0.8)]" />
               </motion.div>
             </div>
-          </div>
+          </AboutCopy>
 
           {/* Dissolving slides — stacked absolute, centered vertically */}
           <div className="absolute inset-0 pt-28">
@@ -292,10 +306,11 @@ function latLonToVec3(lat: number, lon: number, r = 1): THREE.Vector3 {
   );
 }
 
-// 11 global cities — IP CONNECT network endpoints
+// 12 global cities — IP CONNECT network endpoints
 const GLOBE_CITIES = [
   { name: 'TOKYO',     lat: 35.6762,  lon: 139.6503  },
   { name: 'BEIJING',   lat: 39.9042,  lon: 116.4074  },
+  { name: 'HONG KONG', lat: 22.3193, lon: 114.1694 },
   { name: 'SINGAPORE', lat:  1.3521,  lon: 103.8198  },
   { name: 'SYDNEY',    lat: -33.8688, lon: 151.2093  },
   { name: 'MUMBAI',    lat: 19.0760,  lon: 72.8777   },
@@ -417,7 +432,7 @@ function buildArc(from: THREE.Vector3, to: THREE.Vector3, segments = 56): Float3
   const sinO = Math.sin(omega) || 1e-6;
   const out = new Float32Array((segments + 1) * 3);
   const dist = omega / Math.PI;                 // 0..1 angular distance
-  const lift = 0.14 + dist * 0.42;              // farther city → higher arc
+  const lift = 0.06 + dist * 0.20;              // farther city → higher arc
   for (let i = 0; i <= segments; i++) {
     const t = i / segments;
     const s1 = Math.sin((1 - t) * omega) / sinO;
@@ -426,57 +441,37 @@ function buildArc(from: THREE.Vector3, to: THREE.Vector3, segments = 56): Float3
     const y = a.y * s1 + b.y * s2;
     const z = a.z * s1 + b.z * s2;
     const v = new THREE.Vector3(x, y, z).normalize();
-    const r = 1 + Math.sin(Math.PI * t) * lift;
+    const r = 1.014 + Math.sin(Math.PI * t) * lift;
     v.multiplyScalar(r);
     out[i * 3] = v.x; out[i * 3 + 1] = v.y; out[i * 3 + 2] = v.z;
   }
   return out;
 }
 
-// Atmosphere — fresnel rim glow (gold/blue) for the "from space" look
-const AtmosphereGlow: React.FC = () => {
-  const mat = useMemo(() => new THREE.ShaderMaterial({
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    side: THREE.BackSide,
-    depthWrite: false,
-    uniforms: {
-      uInner: { value: new THREE.Color('#4a86e8') },
-      uOuter: { value: new THREE.Color('#bcd8ff') },
-    },
-    vertexShader: `
-      varying vec3 vN; varying vec3 vP;
-      void main(){ vN = normalize(normalMatrix * normal);
-        vec4 mv = modelViewMatrix * vec4(position,1.0); vP = mv.xyz;
-        gl_Position = projectionMatrix * mv; }
-    `,
-    fragmentShader: `
-      varying vec3 vN; varying vec3 vP;
-      uniform vec3 uInner; uniform vec3 uOuter;
-      void main(){
-        vec3 V = normalize(-vP);
-        float f = pow(1.0 - max(dot(vN, V), 0.0), 3.4);
-        vec3 c = mix(uInner, uOuter, clamp(f, 0.0, 1.0));
-        gl_FragColor = vec4(c, f * 0.9);
-      }
-    `,
-  }), []);
-  return (
-    <mesh scale={1.11}>
-      <sphereGeometry args={[1, 48, 48]} />
-      <primitive object={mat} attach="material" />
-    </mesh>
-  );
+// Network-first globe: clean silhouette, with no atmosphere band.
+const CITY_LABELS:Record<string,{text:string;x:number;y:number}> = {
+  'TOKYO':{text:'JAPAN · TOKYO',x:14,y:-6},
+  'BEIJING':{text:'CHINA · BEIJING',x:-112,y:-36},
+  'HONG KONG':{text:'HONG KONG',x:-98,y:22},
+  'DUBAI':{text:'UAE · DUBAI',x:-90,y:12},
+  'NEW YORK':{text:'USA · NEW YORK',x:14,y:-24},
+  'L.A.':{text:'USA · LOS ANGELES',x:-132,y:12},
 };
-
 const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ progressRef }) => {
   const groupRef = useRef<THREE.Group>(null);
+  const earthRef = useRef<THREE.Mesh>(null);
+  const cityLabelRefs = useRef<(HTMLDivElement|null)[]>([]);
+  const reduce = useReducedMotion();
   const cloudRef = useRef<THREE.Mesh>(null);
   const cloudMatRef = useRef<THREE.MeshStandardMaterial | null>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
   const arcRefs = useRef<(THREE.BufferGeometry | null)[]>([]);
   const arcMatRefs = useRef<(THREE.LineBasicMaterial | null)[]>([]);
-  const { camera } = useThree();
+  const cityMarkerRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const spinQuaternion = useMemo(() => new THREE.Quaternion(), []);
+  const northAxis = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const cityPositions = useMemo(() => GLOBE_CITIES.map(city => latLonToVec3(city.lat, city.lon, 1.018)), []);
+  const { camera, size } = useThree();
 
   const [dayMap, cloudMap] = useLoader(THREE.TextureLoader, [
     '/earth_day_8k.jpg', '/earth_clouds.png',
@@ -516,45 +511,47 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
     const g = groupRef.current;
     if (!g) return;
 
-    const de = easeOutExpo(clamp01(p / 0.45));
+    const phase = globeSequence(p);
+    const de = reduce ? 1 : easeOutExpo(phase.descent);
     g.quaternion.slerpQuaternions(qStart, qSeoul, de);
+    spinQuaternion.setFromAxisAngle(northAxis, (reduce ? 0 : phase.turn) * Math.PI * 2);
+    g.quaternion.multiply(spinQuaternion);
 
-    let camZ: number, camY: number;
-    if (p < 0.45) {
-      camZ = lerp(5.2, 2.25, de);
-      camY = lerp(1.25, 0.02, de);
-    } else if (p < 0.62) {
-      const t = easeInOut(clamp01((p - 0.45) / 0.17));
-      camZ = lerp(2.25, 2.15, t);
-      camY = 0.02;
-    } else {
-      const t = easeInOut(clamp01((p - 0.62) / 0.38));
-      camZ = lerp(2.15, 3.7, t);
-      camY = lerp(0.02, 0.3, t);
-    }
+    // Seoul close-up opens into the complete network before the full turn.
+    const pullback = reduce ? 1 : easeInOut(phase.pullback);
+    const networkDistance = Math.max(4.4, 1.3 / Math.tan(42 * Math.PI / 360) / Math.max(.25, size.width / size.height));
+    const camZ = lerp(lerp(5.2, 2.25, de), networkDistance, pullback);
+    const camY = lerp(lerp(1.25, 0.02, de), 0.24, pullback);
     camera.position.set(0, camY, camZ);
     camera.lookAt(0, 0, 0);
 
     // clouds part as we descend toward Korea
-    if (cloudRef.current) cloudRef.current.rotation.y += 0.0003;
+    if (cloudRef.current) cloudRef.current.rotation.y = p * 0.06;
     if (cloudMatRef.current) cloudMatRef.current.opacity = 0.34 * (1 - de);
 
     if (pulseRef.current) {
-      const beat = 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 2.2);
+      const beat = reduce ? 0 : 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 2.2);
       const sc = 1 + beat * 1.8;
       pulseRef.current.scale.set(sc, sc, sc);
-      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - beat) * 0.6 * clamp01((p - 0.2) / 0.12);
+      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - beat) * 0.6 * clamp01((p - 0.06) / 0.08);
     }
 
     arcs.forEach((_, i) => {
       const geo = arcRefs.current[i];
       const mat = arcMatRefs.current[i];
       if (!geo || !mat) return;
-      const start = 0.64 + i * 0.018;
-      const prog = clamp01((p - start) / 0.12);
+      const { trace, arrival } = globeConnection(reduce ? .46 : p, i);
       const total = arcs[i].length / 3;
-      geo.setDrawRange(0, Math.max(0, Math.floor(total * prog)));
-      mat.opacity = 0.9 * clamp01((p - start) / 0.05);
+      geo.setDrawRange(0, Math.floor(total * trace));
+      mat.opacity = 0.9 * clamp01(trace * 4);
+      const label = cityLabelRefs.current[i];
+      if(label)label.style.opacity=String(arrival);
+      const marker = cityMarkerRefs.current[i];
+      if (marker) {
+        marker.visible = arrival > 0;
+        marker.scale.setScalar(0.3 + easeOutExpo(arrival) * 0.7);
+        (marker.material as THREE.MeshBasicMaterial).opacity = arrival;
+      }
     });
   });
 
@@ -572,11 +569,10 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
       <directionalLight position={[0.2, 0.35, 1.5]} intensity={1.5} color="#fff6e8" />
       <ambientLight intensity={1.15} />
 
-      <AtmosphereGlow />
 
       {/* globe */}
       <group ref={groupRef}>
-        <mesh>
+        <mesh ref={earthRef}>
           <sphereGeometry args={[1, 96, 96]} />
           <meshStandardMaterial map={dayMap} roughness={1} metalness={0} />
         </mesh>
@@ -599,6 +595,21 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
           </mesh>
         </group>
 
+        {/* A destination appears only once its Seoul route reaches the city. */}
+        {cityPositions.map((position, i) => (
+          <mesh key={GLOBE_CITIES[i].name} position={position} visible={false}
+            ref={mesh => { cityMarkerRefs.current[i] = mesh; }}>
+            <sphereGeometry args={[0.014, 12, 12]} />
+            <meshBasicMaterial color="#F5F4F0" transparent opacity={0} />
+          </mesh>
+        ))}
+
+        {cityPositions.map((position,i) => {
+          const label=CITY_LABELS[GLOBE_CITIES[i].name];
+          return label ? <Html key={`label-${i}`} position={position} occlude={[earthRef]} zIndexRange={[2,0]} style={{pointerEvents:'none'}}>
+            <div ref={element=>{cityLabelRefs.current[i]=element;}} className="globe-city-label" style={{opacity:0,transform:`translate(${label.x}px,${label.y}px)`}}>{label.text}</div>
+          </Html> : null;
+        })}
         {/* IP CONNECT arcs */}
         {arcs.map((arc, i) => (
           <line key={i}>
@@ -620,15 +631,19 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
 };
 
 const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
-  const p = useTransform(g, [C4S, C4E], [0, 1]);
+  const p = useTransform(g, [Math.max(0,C4S-.024), Math.min(1,C4E+.024)], [0, 1]);
   const progressRef = useRef(0);
   useMotionValueEvent(p, 'change', (v) => { progressRef.current = v; });
 
-  const headOp = useTransform(p, [0.00, 0.08, 0.36, 0.52], [0, 1, 1, 0]);
-  const koreaLabelOp = useTransform(p, [0.20, 0.32, 0.50, 0.60], [0, 1, 1, 0]);
-  const koreaLabelY = useTransform(p, [0.20, 0.32], ['18px', '0px']);
-  const titleOp = useTransform(p, [0.50, 0.60, 0.86, 0.94], [0, 1, 1, 0]);
-  const exitOp = useTransform(p, [0.90, 0.99], [1, 0]);
+  const headOp = useTransform(p, [0.00, 0.06, 0.14, 0.22], [0, 1, 1, 0]);
+  const koreaLabelOp = useTransform(p, [0.05, 0.10, 0.16, 0.23], [0, 1, 1, 0]);
+  const koreaLabelY = useTransform(p, [0.05, 0.10], ['18px', '0px']);
+  const titleOp = useTransform(p, [0.80, 0.92, 0.97, 1], [0, 1, 1, 0]);
+  const titleY = useTransform(p, [0.80, 0.92], ['32px', '0px']);
+  const reduce = useReducedMotion();
+  const globeScale = useTransform(p, [0.80, 0.92], [1, reduce ? 1 : 1.65]);
+  const globeOpacity = useTransform(p, [0.80, 0.92], [1, 0]);
+  const exitOp = useTransform(p, [0.97, 1], [1, 0]);
 
   return (
     <div style={{ height: `${H4}vh` }}>
@@ -636,6 +651,7 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)`, opacity: exitOp }}
         className="relative overflow-hidden bg-[#04060d]"
       >
+        <motion.div className="absolute inset-0" style={{ opacity:globeOpacity, scale:globeScale }}>
         <Canvas
           className="absolute inset-0"
           style={{ pointerEvents: 'none' }}
@@ -647,35 +663,36 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             <RealGlobe progressRef={progressRef} />
           </Suspense>
         </Canvas>
-
-        {/* Descent target label — 대한민국 / KOREA */}
-        <motion.div style={{ opacity: koreaLabelOp, y: koreaLabelY }}
-          className="absolute inset-x-0 top-[57%] flex flex-col items-center text-center pointer-events-none">
-          <p className="text-[11px] md:text-[13px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">KOREA</p>
-          <h2 className="font-black text-white tracking-[-0.02em] leading-none"
-            style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)' }}>대한민국</h2>
-          <p className="mt-3 text-white/55 text-[11px] md:text-xs tracking-normal font-light">SEOUL · 37.5°N 127.0°E</p>
         </motion.div>
 
+        {/* Descent target label — 대한민국 / KOREA */}
+        <AboutCopy className="absolute inset-x-0 top-[57%] pointer-events-none"><motion.div style={{ opacity: koreaLabelOp, y: koreaLabelY }}
+          className="flex flex-col items-center text-center">
+          <p className="editorial-kicker text-[11px] md:text-[13px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">KOREA</p>
+          <h2 className="font-black text-white tracking-[-0.02em] leading-none"
+            style={{ fontSize: 'var(--editorial-heading)' }}>대한민국</h2>
+          <p className="editorial-kicker mt-3 text-white/55 text-[11px] md:text-xs tracking-normal font-light">SEOUL · 37.5°N 127.0°E</p>
+        </motion.div></AboutCopy>
+
         {/* DOM overlay text */}
-        <div className="absolute inset-0 flex flex-col justify-start px-8 md:px-16 lg:px-24 pt-[14vh] pb-10 pointer-events-none">
+        <AboutCopy className="absolute inset-0 flex flex-col justify-start editorial-gutter pt-[14vh] pb-10 pointer-events-none">
           <motion.p style={{ opacity: headOp }}
-            className="text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
+            className="editorial-kicker text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
             IP CONNECT — GLOBAL
           </motion.p>
 
-          <motion.div style={{ opacity: titleOp }} className="mb-2">
-            <p className="text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-5">SEOUL · KOREA</p>
+          <motion.div style={{ opacity: titleOp, y:titleY }} className="mb-2">
+            <p className="editorial-kicker text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-5">SEOUL · KOREA</p>
             <h2 className="font-black tracking-[-0.03em] leading-[0.86] text-white block"
-              style={{ fontSize: 'clamp(3.5rem, 12vw, 10rem)' }}>IP</h2>
+              style={{ fontSize: 'var(--editorial-heading)' }}>IP</h2>
             <h2 className="font-black tracking-[-0.03em] leading-[0.86] block"
-              style={{ fontSize: 'clamp(3.5rem, 12vw, 10rem)', color: '#FFB800' }}>CONNECT.</h2>
-            <p className="mt-6 text-white/65 text-base md:text-xl leading-relaxed max-w-2xl font-light">
-              핵심 IP부터 글로벌 에이전시 네트워크까지 — 서울에서 세계 11개 도시로,<br className="hidden md:block" />
-              모든 것을 하나로 연결하는 올인원 파트너.
+              style={{ fontSize: 'var(--editorial-heading)', color: '#FFB800' }}>CONNECT.</h2>
+            <p className="editorial-body mt-6 text-white/65 text-base md:text-xl leading-relaxed max-w-2xl font-light">
+              서울과 세계 주요 도시를 잇는 글로벌 에이전시 네트워크.<br className="hidden md:block" />
+              브랜드에 적합한 인물과 콘텐츠, 현지 실행 역량을 연결합니다.
             </p>
           </motion.div>
-        </div>
+        </AboutCopy>
       </motion.div>
     </div>
   );
@@ -683,68 +700,26 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
 // (방송채널·BTL·해외 데이터는 Business 메뉴 GLOBAL NETWORK로 이동 — 대표 룰 2026-06-13)
 
-// ── Chapter 5 — word slides → channels → 4 BTL image slides → CTA ────────────
-const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
-  const p = useTransform(g, [C5S, C5E], [0, 1]);
-  // phrase 빠르게 등장·짧게 유지 후 바로 문의하기로 (채널·BTL은 Business GLOBAL NETWORK로 이동) 대표 룰 2026-06-13
-  const phraseOp = useTransform(p, [0.02, 0.10, 0.42, 0.52], [0, 1, 1, 0]);
-  const l1Y = useTransform(p, [0.02, 0.12], ['10%', '0%']);
-  const l2Op = useTransform(p, [0.08, 0.18], [0, 1]);
-  const l2Y = useTransform(p, [0.08, 0.18], ['12%', '0%']);
+// ── Final scene: direct content handoff, without an empty title interstitial.
+const Chapter5: React.FC<{g:MotionValue<number>;onContactClick?:()=>void}> = ({g,onContactClick}) => {
+  const p=useTransform(g,[C5S-.024,C5E],[0,1]);
+  const opacity=useTransform(p,[0,.12],[0,1]);
+  const y=useTransform(p,[0,.12],[32,0]);
+  const imageScale=useTransform(p,[0,.7],[1.08,1]);
+  return <div style={{height:`${H5}vh`}}><StickyPanel>
+    <motion.div className="about-final-scene" style={{opacity,y}}>
+      <AboutCopy><h2 style={{fontSize:'var(--editorial-heading)',lineHeight:1.12}}>브랜드가 만나는<br/>모든 접점.</h2><p className="editorial-body text-white/65 mt-6 mb-8 max-w-xl">콘텐츠의 제작 기준과 매체별 실행 계획을 함께 설계합니다. 광고 영상·사진 제작, 방송·옥외 송출, 매장 사이니지와 제작 운영 시스템을 프로젝트에 맞게 구성합니다.</p><button onClick={onContactClick} className="lab-link">프로젝트 문의 <span aria-hidden="true">↗</span></button></AboutCopy>
+      <figure><motion.img src="https://media.nadaun.co/collective/btl/01-subway.webp" alt="지하철 스크린도어 광고 매체" loading="lazy" decoding="async" style={{scale:imageScale}}/></figure>
+    </motion.div>
+  </StickyPanel></div>;
+};
 
-  // ── CTA: 프로젝트 문의하기 — 중앙 정렬, phrase 후 등장·유지 ──
-  const s3Op = useTransform(p, [0.52, 0.64], [0, 1]);
-  const s3Y  = useTransform(p, [0.52, 0.64], ['4%', '0%']);
-
-  return (
-    <div style={{ height: `${H5}vh` }}>
-      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
-           className="relative overflow-hidden">
-
-        {/* Fixed context label */}
-        <div className="absolute top-8 left-8 md:left-16 lg:left-24 z-10 pointer-events-none">
-          <p className="text-[11px] tracking-normal uppercase text-[#FFB800]/55 font-bold">
-            THROUGH THE LINE — TTL CAMPAIGN
-          </p>
-        </div>
-
-        {/* ── INTRO PHRASE — one screen, quick reveal ── */}
-        <motion.div style={{ opacity: phraseOp }}
-          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24 will-change-transform">
-          <motion.h2 style={{ y: l1Y, fontSize: 'clamp(3rem, 11vw, 9.5rem)', lineHeight: 0.92, letterSpacing: '-0.04em', fontWeight: 900 }}
-            className="text-white block">
-            TVC 제작부터
-          </motion.h2>
-          <motion.h2 style={{ opacity: l2Op, y: l2Y, fontSize: 'clamp(3rem, 11vw, 9.5rem)', lineHeight: 0.92, letterSpacing: '-0.04em', fontWeight: 900, color: '#FFB800' }}
-            className="block mt-1">
-            전국 송출까지.
-          </motion.h2>
-        </motion.div>
-
-        {/* 채널·BTL·해외 광고매체는 Business 메뉴 GLOBAL NETWORK로 이동 (대표 룰 2026-06-13) */}
-
-        {/* ── CTA: 프로젝트 문의하기 — 중앙 정렬 ── */}
-        <motion.div style={{ opacity: s3Op, y: s3Y }}
-          className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-4">
-            팬클럽 광고 · 해외 광고 · 공항 · 일본 · 동남아 · 미국 · 유럽
-          </p>
-          <h2 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 10vw, 9rem)', letterSpacing: '-0.04em' }}>
-            프로젝트<br />문의하기
-          </h2>
-          <p className="text-white/45 font-light max-w-lg mb-10" style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.4rem)' }}>
-            기획부터 하이엔드 제작, AI 테크 솔루션, 글로벌 마케팅까지 —<br className="hidden md:block" />
-            단 하나의 파트너로 모든 것을 완성합니다.
-          </p>
-          <button onClick={onContactClick}
-            className="self-start flex items-center gap-3 bg-[#FFB800] text-black font-black px-10 py-5 rounded-full hover:scale-105 transition-transform text-base tracking-normal">
-            문의하기 →
-          </button>
-        </motion.div>
-
-      </div>
-    </div>
-  );
+const AboutLayer:React.FC<{g:MotionValue<number>;start:number;end:number;children:React.ReactNode}> = ({g,start,end,children}) => {
+  const opacity=useTransform(g,[Math.max(0,start-.024),Math.max(.001,start+.006),Math.min(.999,end-.012),Math.min(1,end+.024)],[start===0?1:0,1,1,end===1?1:0]);
+  const visibility=useTransform(g,v=>v>=start-.024&&v<=end+.024?'visible':'hidden');
+  const pointerEvents=useTransform(g,v=>v>=start&&v<=end?'auto':'none');
+  const copyArrival=useTransform(g,v=>start===0?1:clamp01((v-start-.025)/.020));
+  return <motion.div className="about-stage-layer" style={{opacity,visibility,pointerEvents}}><AboutCopyContext.Provider value={copyArrival}>{children}</AboutCopyContext.Provider></motion.div>;
 };
 
 // ── Main overlay ──────────────────────────────────────────────────────────────
@@ -785,7 +760,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] bg-[#070707] text-white flex flex-col overflow-hidden"
+          className="collective-editorial collective-about fixed inset-0 z-[100] bg-[#070707] text-white flex flex-col overflow-hidden"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
@@ -796,11 +771,11 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
             style={{ scaleX }}
           />
           <div
-            className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
+            className="editorial-header shrink-0 flex items-center justify-between border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
           >
             <span className="text-xs font-bold tracking-normal text-[#FFB800] uppercase">About</span>
-            <button onClick={onClose}
+            <button onClick={onClose} aria-label="어바웃 닫기"
               className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
             >
               <X className="w-4 h-4" />
@@ -812,11 +787,13 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Chapter1 g={scaleX} />
-            <Chapter2 g={scaleX} />
-            <Chapter3 g={scaleX} />
-            <Chapter4 g={scaleX} />
-            <Chapter5 g={scaleX} onContactClick={onContactClick} />
+            <div className="about-scroll-track" style={{height:`${TOTAL}vh`}}><div className="about-stage">
+              <AboutLayer g={scaleX} start={C1S} end={C1E}><Chapter1 g={scaleX}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C2S} end={C2E}><Chapter2 g={scaleX}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C3S} end={C3E}><Chapter3 g={scaleX}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C4S} end={C4E}><Chapter4 g={scaleX}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C5S} end={C5E}><Chapter5 g={scaleX} onContactClick={onContactClick}/></AboutLayer>
+            </div></div>
           </div>
         </motion.div>
       )}

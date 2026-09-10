@@ -38,7 +38,7 @@
 .lab-signage-visual figure { position:relative; overflow:hidden; height:clamp(320px,48vw,640px); }
 .lab-signage-visual img { width:100%; height:100%; object-fit:cover; transition:transform .8s cubic-bezier(.16,1,.3,1); }
 .lab-signage-visual:hover img { transform:scale(1.02); }
-.lab-signage-types { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px 24px; border-bottom:1px solid #ffffff24; padding:24px 0; font-size:clamp(18px,2vw,30px); font-family:'Cormorant Garamond',Georgia,serif; }
+.lab-signage-types { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px 24px; border-bottom:1px solid #ffffff24; padding:24px 0; font-size:clamp(18px,2vw,30px); font-family:SUIT,Pretendard,sans-serif; }
 .lab-signage-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
 .lab-signage-grid h3 { font-size:24px; margin-bottom:20px; }
 .lab-final .lab-link { margin-top:40px; }
@@ -80,3 +80,12 @@
 }
 @media(max-height:620px) and (min-width:640px) { .lab-opening h1 { font-size:44px; margin-bottom:20px; } .lab-lead { font-size:14px; } .lab-statement h2 { font-size:36px; } .lab-statement > p:last-child { margin-top:20px; font-size:14px; } }
 @media(prefers-reduced-motion:reduce) { .lab-page * { transition:none!important; } }
+
+.lab-signage-offer { display:grid; grid-template-columns:1.1fr 1fr; gap:64px; margin-top:56px; padding:32px; background:#ffffff06; border-top:1px solid #ffffff26; }
+.lab-signage-offer .lab-eyebrow { margin-bottom:16px; color:var(--lab-muted); }
+.lab-signage-price { font-size:clamp(44px,5vw,72px); line-height:1; font-weight:800; letter-spacing:-.035em; }
+.lab-signage-price span { font-size:.4em; margin-left:8px; }
+.lab-signage-exclusion { margin-top:20px; font-size:14px; color:var(--lab-muted); }
+.lab-signage-offer h3 { font-size:28px; line-height:1.25; margin-bottom:20px; }
+.lab-signage-offer h3 + p { font-size:15px; line-height:1.9; color:var(--lab-muted); }
+@media(max-width:639px) { .lab-signage-offer { grid-template-columns:1fr; gap:32px; padding:24px; margin-top:32px; } .lab-signage-offer h3 { font-size:24px; } .lab-signage-offer h3 + p { font-size:14px; } }

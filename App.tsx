@@ -1,13 +1,14 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import Header from './components/Header';
 import './components/navigation-shell.css';
+import './components/editorial-system.css';
 import Hero from './components/Hero';
 import Clients from './components/Clients';
 import Footer from './components/Footer';
+const StarloginOverlay = lazy(() => import('./components/StarloginOverlay'));
 const AboutOverlay = lazy(() => import('./components/AboutOverlay'));
 const AiInnovationLabOverlay = lazy(() => import('./components/AiInnovationLabOverlay'));
 const ContactOverlay = lazy(() => import('./components/ContactOverlay'));
-const BusinessOverlay = lazy(() => import('./components/BusinessOverlay'));
 const InsightsOverlay = lazy(() => import('./components/InsightsOverlay'));
 import Intro from './components/Intro';
 import ServiceHub from './components/ServiceHub';
@@ -30,12 +31,14 @@ const App: React.FC = () => {
   const cursorY = useSpring(rawCursorY, { stiffness: 300, damping: 26, mass: 0.5 });
 
   const [introFinished, setIntroFinished] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [hubRevealStarted, setHubRevealStarted] = useState(false);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
+  const [inquiryPreset, setInquiryPreset] = useState<'signage'|'solution'|undefined>();
+  const [labSection, setLabSection] = useState<'overview'|'production'|'signage'>('overview');
   // 기본 2안(이미지 타일). 1안 리스트 비교는 ?hub=1 로만 접근 (검수용)
   const [hubVersion] = useState<1 | 2>(() =>
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('hub') === '1' ? 1 : 2
   );
-  const [bizFromBack, setBizFromBack] = useState(false); // 상세 새창 백버튼 → 도메인으로 복귀
 
   useEffect(() => {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
@@ -75,15 +78,22 @@ const App: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [activeOverlay]);
 
-  const handleNavClick = (id: string) => { if (id === 'business') setBizFromBack(false); setActiveOverlay(id); };
-  const backToDomains = () => { setBizFromBack(true); setActiveOverlay('business'); };
+  const openLab = (section:'overview'|'production'|'signage') => { setLabSection(section); setActiveOverlay('ai-lab'); };
+  const handleNavClick = (id: string) => {
+    if(id==='contact')setInquiryPreset(undefined);
+    if(id==='production-solution'){openLab('production');return;}
+    if(id==='digital-signage'){openLab('signage');return;}
+    if(id==='ai-lab')setLabSection('overview');
+    setActiveOverlay(id);
+  };
+  const backToHub = () => setActiveOverlay(null);
   const closeOverlay = () => setActiveOverlay(null);
 
   return (
     <div className="collective-shell bg-[var(--nadaun-bg)] min-h-screen text-white selection:bg-[#FFB800] selection:text-black" data-custom-cursor={cursorVisible}>
 
       <AnimatePresence mode="sync">
-        {!introFinished && <Intro onComplete={() => setIntroFinished(true)} />}
+        {!introFinished && <Intro onReveal={() => setHubRevealStarted(true)} onComplete={() => setIntroFinished(true)} />}
       </AnimatePresence>
 
       <div className="relative z-0">
@@ -114,43 +124,34 @@ const App: React.FC = () => {
 
         {/* Fetch each detail view only when requested. */}
         <div className="collective-overlays"><Suspense fallback={<div className="fixed inset-0 z-[100] grid place-items-center bg-[#1a1a1a]" role="status"><span className="text-sm text-white/60">Loading…</span><button type="button" onClick={closeOverlay} className="absolute top-4 right-4 w-11 h-11" aria-label="닫기">×</button></div>}>
-        {activeOverlay === 'about' && (<AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />)}
-        {activeOverlay === 'ai-lab' && (<AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToDomains} onContactClick={() => setActiveOverlay('contact')} />)}
-        {activeOverlay === 'business' && (<BusinessOverlay
-          isOpen={activeOverlay === 'business'}
-          startAtDomains={bizFromBack}
-          onClose={closeOverlay}
-          onAiLabClick={() => setActiveOverlay('ai-lab')}
-          onIntegratedClick={() => setActiveOverlay('integrated-solution')}
-          onCreativeClick={() => setActiveOverlay('immersive-creative')}
-          onGlobalClick={() => setActiveOverlay('global-network')}
-          onContactClick={() => setActiveOverlay('contact')}
-        />)}
+        {activeOverlay === 'starlogin' && <StarloginOverlay onClose={closeOverlay} onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}/>}
+        {activeOverlay === 'about' && (<AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}} />)}
+        {activeOverlay === 'ai-lab' && (<AiInnovationLabOverlay initialSection={labSection} isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToHub} onContactClick={() => {setInquiryPreset(labSection==='signage'?'signage':labSection==='production'?'solution':undefined);setActiveOverlay('contact');}} />)}
         {activeOverlay === 'insights' && (<InsightsOverlay
           isOpen={activeOverlay === 'insights'}
           onClose={closeOverlay}
-          onContactClick={() => setActiveOverlay('contact')}
+          onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}
         />)}
-        {activeOverlay === 'contact' && (<ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />)}
+        {activeOverlay === 'contact' && (<ContactOverlay initialType={inquiryPreset} isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />)}
         {activeOverlay === 'portfolio' && (<PortfolioOverlay isOpen={activeOverlay === 'portfolio'} onClose={closeOverlay} />)}
         {activeOverlay === 'integrated-solution' && (<IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
           onClose={closeOverlay}
-          onBack={backToDomains}
-          onContactClick={() => setActiveOverlay('contact')}
+          onBack={backToHub}
+          onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}
         />)}
         {activeOverlay === 'immersive-creative' && (<ImmersiveCreativeOverlay
           isOpen={activeOverlay === 'immersive-creative'}
           onClose={closeOverlay}
-          onBack={backToDomains}
-          onContactClick={() => setActiveOverlay('contact')}
+          onBack={backToHub}
+          onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}
           onGlobalClick={() => setActiveOverlay('global-network')}
         />)}
         {activeOverlay === 'global-network' && (<GlobalNetworkOverlay
           isOpen={activeOverlay === 'global-network'}
           onClose={closeOverlay}
-          onBack={backToDomains}
-          onContactClick={() => setActiveOverlay('contact')}
+          onBack={backToHub}
+          onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}
         />)}
 
         </Suspense></div>
@@ -158,9 +159,9 @@ const App: React.FC = () => {
         <main>
           <div className="relative">
             {hubVersion === 1 ? (
-              <ServiceHub onOverlay={(id) => setActiveOverlay(id)} />
+              <ServiceHub onOverlay={handleNavClick} />
             ) : (
-              <ServiceHubV2 onOverlay={(id) => setActiveOverlay(id)} introFinished={introFinished} />
+              <ServiceHubV2 onOverlay={handleNavClick} introFinished={introFinished} revealStarted={hubRevealStarted || introFinished} />
             )}
           </div>
           <Hero />
@@ -168,7 +169,7 @@ const App: React.FC = () => {
           <Clients />
         </main>
 
-        <Footer onContactClick={() => setActiveOverlay('contact')} />
+        <Footer onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}} />
       </div>
     </div>
   );

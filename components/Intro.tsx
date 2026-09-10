@@ -3,12 +3,13 @@ import { motion, AnimatePresence, useMotionValue, useMotionTemplate, animate } f
 
 interface IntroProps {
   onComplete: () => void;
+  onReveal?: () => void;
 }
 
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-const Intro: React.FC<IntroProps> = ({ onComplete }) => {
+const Intro: React.FC<IntroProps> = ({ onComplete, onReveal }) => {
   const [stage, setStage] = useState(0);
 
   const maskRadius = useMotionValue(0);
@@ -23,6 +24,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
         // 모바일: 골드 글로우 위 로고 부드러운 페이드 인 → 홀드 → 페이드 아웃 (튐 없음)
         await wait(120); if (cancelled) return; setStage(2);
         await wait(1250); if (cancelled) return;
+        onReveal?.();
         animate(fade, 0, { duration: 0.85, ease: [0.16, 1, 0.3, 1], onComplete: () => { if (!cancelled) onComplete(); } });
         return;
       }
@@ -32,6 +34,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
       await wait(480); if (cancelled) return; setStage(2);
       await wait(620); if (cancelled) return; setStage(3);
       await wait(560); if (cancelled) return; setStage(4);
+      onReveal?.();
       animate(maskRadius, 150, {
         duration: 0.9,
         ease: [0.16, 1, 0.3, 1],

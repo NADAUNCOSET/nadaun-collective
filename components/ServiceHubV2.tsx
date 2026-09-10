@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 type LinkChip = { label: string; url?: string; overlay?: string };
@@ -41,54 +41,37 @@ const ITEMS: HubItem[] = [
     ],
   },
   {
-    id: 'starlogin',
+    id: 'space',
     num: '02',
-    title: 'STARLOGIN',
-    kr: '국내 · 글로벌 에이전시',
-    desc: '국내 · 글로벌 에이전시, IP 컨설팅, 글로벌 유통 · 제작 — 브랜드를 세계와 연결',
-    color: '#FF6B35',
+    title: 'NADAUN SPACE',
+    kr: '해외 소싱 · 장비 제작 · 판매 · 렌탈',
+    desc: '해외 제품 소싱과 장비 제작, 판매 · 렌탈을 운영합니다. 촬영 환경과 사용 목적에 맞는 장비 및 스튜디오 구성을 제안합니다.',
+    color: '#00C2FF',
     rolling: [
-      { src: '/starlogin/aespa.jpg', name: 'aespa' },
-      { src: '/starlogin/ive.jpg', name: 'IVE' },
-      { src: '/starlogin/txt.jpg', name: 'TOMORROW X TOGETHER' },
-      { src: '/starlogin/lesserafim.jpg', name: 'LE SSERAFIM' },
-      { src: '/starlogin/babymonster.jpg', name: 'BABYMONSTER' },
-      { src: '/starlogin/straykids.jpg', name: 'Stray Kids' },
-      { src: '/starlogin/blackpink.jpg', name: 'BLACKPINK' },
-      { src: '/starlogin/zb1.jpg', name: 'ZEROBASEONE' },
-    ],
-    links: [{ label: 'GLOBAL AGENCY', url: 'https://starlogin.com' }],
-  },
-  {
-    id: 'marketing',
-    num: '03',
-    title: 'MARKETING',
-    kr: '종합 마케팅',
-    desc: '온라인 · 오프라인, 국내 · 국외 풀퍼널 캠페인 설계와 집행',
-    color: '#FFB800',
-    rolling: [
-      { src: 'https://media.nadaun.co/collective/btl/01-subway.webp', name: '지하철 스크린도어' },
-      { src: 'https://media.nadaun.co/collective/btl/03-taxi.webp', name: '택시 미디어' },
-      { src: 'https://media.nadaun.co/collective/btl/04-bus.webp', name: '버스 외부광고' },
+      { src: 'https://media.nadaun.co/collective/space/07.webp', name: '다크 세트', pos: 'center' },
+      { src: 'https://media.nadaun.co/collective/space/15.webp', name: '조명 리그', pos: 'center 45%' },
+      { src: 'https://media.nadaun.co/collective/space/03.webp', name: '호리존 현장', pos: 'center 55%' },
+      { src: 'https://media.nadaun.co/collective/space/02.webp', name: '모니터링 현장', pos: 'center 45%' },
+      { src: 'https://media.nadaun.co/collective/space/16.webp', name: '로케이션 세팅', pos: 'center' },
+      { src: 'https://media.nadaun.co/collective/space/09.webp', name: '야외 로케이션', pos: 'center' },
     ],
     links: [
-      { label: '통합 솔루션', overlay: 'integrated-solution' },
-      { label: '미디어 · 매체', overlay: 'global-network' },
+      { label: '자사몰', url: 'https://www.rainbowbene.com/' },
+      { label: '스토어', url: 'https://smartstore.naver.com/rainbowbene' },
+      { label: '블로그', url: 'https://blog.naver.com/nadaunstudio' },
+      { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
     ],
   },
   {
-    id: 'ailab',
-    num: '04',
-    title: 'AI LAB',
-    kr: '제작 시스템 · 사이니지 플랫폼',
-    desc: '광고 제작 운영 시스템과 글로벌 매장용 사이니지 플랫폼을 개발합니다. 촬영·연출의 전문성으로 작품의 완성도와 운영의 정밀함을 높입니다.',
-    color: '#00FF94',
-    img: 'https://media.nadaun.co/collective/btl/02-outdoor.webp',
-    links: [{ label: 'AI LAB', overlay: 'ai-lab' }],
+    id: 'signage', num: '03', title: 'DIGITAL SIGNAGE',
+    kr: '사이니지 제작 · 플랫폼',
+    desc: '스마트 TV 기반 사이니지. 설치와 네트워크를 관리하고 사진 · 영상 제작 플로우와 온라인 운영을 자동화합니다. 제작비 300만 원, TV · 설치 인건비 별도.',
+    color: '#F5F4F0', img: 'https://media.nadaun.co/collective/btl/02-outdoor.webp',
+    links: [{ label: '사이니지 플랫폼', overlay: 'digital-signage' }],
   },
   {
     id: 'wedding',
-    num: '05',
+    num: '04',
     title: 'NADAUN WEDDING',
     kr: '웨딩 스냅 · 필름',
     desc: '가장 나다운 순간 — 웨딩 스냅 · 본식 촬영, 두 사람다운 장면을 그대로 기록',
@@ -104,25 +87,46 @@ const ITEMS: HubItem[] = [
     links: [{ label: 'WEDDING', url: 'https://wedding.nadaun.co' }],
   },
   {
-    id: 'space',
+    id: 'production', num: '05', title: 'ALL IN ONE SOLUTION',
+    kr: '프리제작 솔루션',
+    desc: '기획안 · 스토리보드 · 콘티 · 애니메틱 · 샷리스트를 연결하는 프리프로덕션 자동화 시스템.',
+    color: '#F5F4F0', img: 'https://media.nadaun.co/allinone/projects/NIKE-OLIVE-BURGUNDY-12-SCENE-MAGAZINE-FILM/01_STILL/S01_HERO-26ec0115fb772ac7.webp',
+    links: [{ label: '프리제작 솔루션', overlay: 'production-solution' }],
+  },
+  {
+    id: 'starlogin',
     num: '06',
-    title: 'NADAUN SPACE',
-    kr: '스튜디오 · 장비 구매 · 렌탈',
-    desc: '스튜디오 장비 구매 및 렌탈 — 모든 창작의 시작이 되는 공간 인프라',
-    color: '#00C2FF',
+    title: 'STARLOGIN',
+    kr: '국내 · 글로벌 에이전시',
+    desc: '국내외 아티스트와 인플루언서, 유튜버 · 셀럽 · 왕홍의 협업을 기획합니다. 브랜드와 크리에이터의 적합성을 검토하고 캠페인 목적에 맞게 연결합니다.',
+    color: '#FF6B35',
     rolling: [
-      { src: 'https://media.nadaun.co/collective/space/07.webp', name: '다크 세트', pos: 'center' },
-      { src: 'https://media.nadaun.co/collective/space/15.webp', name: '조명 리그', pos: 'center 45%' },
-      { src: 'https://media.nadaun.co/collective/space/03.webp', name: '호리존 현장', pos: 'center 55%' },
-      { src: 'https://media.nadaun.co/collective/space/02.webp', name: '모니터링 현장', pos: 'center 45%' },
-      { src: 'https://media.nadaun.co/collective/space/16.webp', name: '로케이션 세팅', pos: 'center' },
-      { src: 'https://media.nadaun.co/collective/space/09.webp', name: '야외 로케이션', pos: 'center' },
+      { src: '/starlogin/aespa.jpg', name: 'aespa' },
+      { src: '/starlogin/ive.jpg', name: 'IVE' },
+      { src: '/starlogin/txt.jpg', name: 'TOMORROW X TOGETHER' },
+      { src: '/starlogin/lesserafim.jpg', name: 'LE SSERAFIM' },
+      { src: '/starlogin/babymonster.jpg', name: 'BABYMONSTER' },
+      { src: '/starlogin/straykids.jpg', name: 'Stray Kids' },
+      { src: '/starlogin/blackpink.jpg', name: 'BLACKPINK' },
+      { src: '/starlogin/zb1.jpg', name: 'ZEROBASEONE' },
+    ],
+    links: [{ label: 'GLOBAL AGENCY', overlay: 'starlogin' }],
+  },
+  {
+    id: 'marketing',
+    num: '07',
+    title: 'MARKETING',
+    kr: '온라인 · 오프라인 광고대행 · 마케팅',
+    desc: '브랜드 전략과 캠페인 기획, 디지털 · 방송 · 옥외 광고, 광고 협찬 · PPL · 언론홍보를 통합 운영합니다.',
+    color: '#FFB800',
+    rolling: [
+      { src: 'https://media.nadaun.co/collective/btl/01-subway.webp', name: '지하철 스크린도어' },
+      { src: 'https://media.nadaun.co/collective/btl/03-taxi.webp', name: '택시 미디어' },
+      { src: 'https://media.nadaun.co/collective/btl/04-bus.webp', name: '버스 외부광고' },
     ],
     links: [
-      { label: '자사몰', url: 'https://www.rainbowbene.com/' },
-      { label: '스토어', url: 'https://smartstore.naver.com/rainbowbene' },
-      { label: '블로그', url: 'https://blog.naver.com/nadaunstudio' },
-      { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
+      { label: '통합 솔루션', overlay: 'integrated-solution' },
+      { label: '미디어 · 매체', overlay: 'global-network' },
     ],
   },
 ];
@@ -283,8 +287,9 @@ const LinkWord: React.FC<{ link: LinkChip; index: number; color: string; onOverl
   );
 };
 
-const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onOverlay: (id: string) => void }> = ({ activeId, setActiveId, onOverlay }) => {
+const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onOverlay: (id: string) => void; revealStarted: boolean }> = ({ activeId, setActiveId, onOverlay, revealStarted }) => {
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const reduce = useReducedMotion();
 
   return (
   <div
@@ -304,8 +309,18 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
               window.setTimeout(() => el?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320);
             }
           }}
+          data-hub-tile={item.id}
+          initial={reduce ? false : { opacity:0, y:isMobile ? -72 : -180, scale:.96 }}
+          whileInView={revealStarted ? { opacity:1, y:0, scale:1 } : undefined}
+          viewport={{ once:true, amount:.12 }}
           animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '24vh') : '58vh' }}
-          transition={isMobile ? { duration: 0.6, ease: NADAUN_EASE as any } : { type: 'spring', stiffness: 65, damping: 23, restDelta: 0.0005 }}
+          transition={reduce ? { duration:0 } : {
+            flexGrow:{ type:'spring', stiffness:65, damping:23, restDelta:.0005 },
+            height:{ duration:.6, ease:NADAUN_EASE },
+            y:{ duration:.95, delay:isMobile ? .08 : ti * .105, ease:NADAUN_EASE },
+            scale:{ duration:.95, delay:isMobile ? .08 : ti * .105, ease:NADAUN_EASE },
+            opacity:{ duration:.4, delay:isMobile ? .08 : ti * .105, ease:NADAUN_EASE },
+          }}
           className="group relative overflow-hidden cursor-pointer basis-auto lg:basis-0 min-w-0 flex-grow"
           style={{ ['--ac' as any]: item.color }}
         >
@@ -359,7 +374,12 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
           />
 
           {/* label */}
-          <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
+          <motion.div className="absolute inset-x-0 bottom-0 p-4 md:p-5"
+            initial={reduce ? false : { opacity:0, y:18 }}
+            whileInView={revealStarted ? { opacity:1, y:0 } : undefined}
+            viewport={{ once:true, amount:.1 }}
+            transition={reduce ? { duration:0 } : { duration:.6, delay:.28 + (isMobile ? 0 : ti * .105), ease:NADAUN_EASE }}
+          >
             <div className="flex items-center gap-3 mb-1.5">
               {/* 모바일은 번호 제거, 얇은 폰트로 좌측 정렬 (대표 지시 2026-07-15) */}
               {!isMobile && (
@@ -429,7 +449,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </motion.div>
       );
     })}
@@ -440,9 +460,10 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
 interface ServiceHubV2Props {
   onOverlay: (id: string) => void;
   introFinished?: boolean;
+  revealStarted?: boolean;
 }
 
-const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
+const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, revealStarted = true }) => {
   const [activeId, setActiveId] = useState<string>('moment');
 
   const selectTile = (id: string) => {
@@ -450,15 +471,10 @@ const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay }) => {
   };
 
   return (
-    <section className="relative min-h-[100svh] bg-black flex items-center overflow-hidden pt-[88px] pb-8 md:pt-[96px] md:pb-10">
-      <motion.div
-        className="w-full"
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.65, ease: NADAUN_EASE as any }}
-      >
-        <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} />
-      </motion.div>
+    <section data-hub-reveal={revealStarted} className="relative min-h-[100svh] bg-[var(--nadaun-bg)] flex items-center overflow-hidden pt-[88px] pb-8 md:pt-[96px] md:pb-10">
+      <div className="w-full">
+        <Tiles activeId={activeId} setActiveId={selectTile} onOverlay={onOverlay} revealStarted={revealStarted} />
+      </div>
     </section>
   );
 };

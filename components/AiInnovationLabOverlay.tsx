@@ -15,12 +15,13 @@ const STAGES = [
   { n:'06', title:'제작 운영과 검수', output:'Production management', body:'담당자, 일정, 작업 상태와 결과물을 프로젝트 단위로 관리합니다. 선택된 소스와 편집 인계 정보를 연결하고, 현장 체크리스트와 납품 항목을 대조해 누락을 확인합니다.' },
 ];
 const SIGNAGE = [
-  ['콘텐츠 운영', '브랜드 필름, 프로모션, 메뉴와 공간 안내를 노출 목적에 맞게 구성합니다. 매체 규격과 시청 거리, 체류 시간에 따라 화면의 정보량과 영상 리듬을 설계합니다.'],
-  ['플랫폼 개발', '다점포 운영, 지점별 콘텐츠 편성, 가로·세로 디스플레이와 재생 환경을 고려해 관리 화면과 플레이어를 개발합니다. 배포 방식과 운영 권한은 고객사의 조직 및 인프라 요건에 맞춰 설계합니다.'],
-  ['글로벌 공급', 'F&B, 리테일, 호텔, 쇼룸과 기업 공간을 대상으로 사이니지 플랫폼을 개발·납품합니다. 국가별 언어, 지점 운영 방식과 현지 설치 환경을 반영해 도입 범위를 구성합니다.'],
+  ['현장 설치', '스마트 TV와 현장 설치기사 1명을 기본 구성으로 사이니지 환경을 구축합니다. 매장의 화면 배치와 인터넷 연결 환경을 확인하고, 나다운이 설치 및 초기 구동을 관리합니다.'],
+  ['온라인 네트워크 관리', '설치 이후에도 나다운이 네트워크와 콘텐츠 운영 환경을 관리합니다. 지점별 사진·영상 편성, 업데이트와 배포를 온라인으로 연결해 여러 매장의 운영을 일관되게 관리할 수 있도록 설계합니다.'],
+  ['사진·영상 제작 플로우 자동화', '콘텐츠 제작 정보와 매장별 편성·배포 흐름을 연결해 반복 운영을 자동화합니다. 브랜드 검토와 제작 판단은 유지하면서, 매체 규격별 준비와 전달 과정에 드는 부담을 줄입니다.'],
 ];
-interface Props { isOpen:boolean; onClose:()=>void; onBack?:()=>void; onContactClick?:()=>void; }
-export default function AiInnovationLabOverlay({isOpen,onClose,onBack,onContactClick}:Props) {
+
+interface Props { isOpen:boolean; onClose:()=>void; onBack?:()=>void; onContactClick?:()=>void; initialSection?:'overview'|'production'|'signage'; }
+export default function AiInnovationLabOverlay({isOpen,onClose,onBack,onContactClick,initialSection='overview'}:Props) {
   const reduce=useReducedMotion();
   const scrollRef=useRef<HTMLElement>(null);
   const {scrollYProgress}=useScroll({container:scrollRef});
@@ -29,6 +30,7 @@ export default function AiInnovationLabOverlay({isOpen,onClose,onBack,onContactC
     const target=container?.querySelector<HTMLElement>(`#${id}`);
     if(container&&target)container.scrollTo({top:target.getBoundingClientRect().top-container.getBoundingClientRect().top+container.scrollTop-80,behavior:reduce?'auto':'smooth'});
   };
+  useEffect(()=>{if(isOpen)scrollRef.current?.scrollTo({top:0,behavior:'auto'});},[isOpen,initialSection]);
   useEffect(()=>{
     if(!isOpen)return;
     const key=(event:KeyboardEvent)=>{if(event.key==='Escape')onClose();};
@@ -37,31 +39,34 @@ export default function AiInnovationLabOverlay({isOpen,onClose,onBack,onContactC
   },[isOpen,onClose]);
   if(!isOpen)return null;
   return <InsightsScrollContext.Provider value={scrollRef}>
-    <motion.section ref={scrollRef} role="dialog" aria-modal="false" aria-label="NADAUN Lab" className="lab-page fixed inset-0 z-[105] overflow-y-auto overflow-x-hidden" initial={reduce?false:{y:'100%'}} animate={{y:0}} transition={{duration:.4,ease:[.16,1,.3,1]}}>
+    <motion.section ref={scrollRef} role="dialog" aria-modal="false" aria-label={initialSection==='signage'?'NADAUN Digital Signage':initialSection==='production'?'ALL IN ONE SOLUTION':'NADAUN Lab'} className="lab-page fixed inset-0 z-[105] overflow-y-auto overflow-x-hidden" initial={reduce?false:{y:'100%'}} animate={{y:0}} transition={{duration:.4,ease:[.16,1,.3,1]}}>
       <header className="lab-header">
         <motion.div className="lab-progress" aria-hidden="true" style={{scaleX:scrollYProgress}}/>
-        <span className="lab-wordmark">NADAUN COLLECTIVE — LAB</span>
-        <nav aria-label="Lab sections"><button onClick={()=>jump('lab-workspace')}>Production</button><button onClick={()=>jump('lab-signage')}>Signage</button></nav>
-        {onBack&&<button className="lab-icon" onClick={onBack} aria-label="사업영역으로 돌아가기"><ArrowLeft size={19}/></button>}
+        <span className="lab-wordmark">{initialSection==='signage'?'DIGITAL SIGNAGE':initialSection==='production'?'ALL IN ONE SOLUTION':'NADAUN COLLECTIVE — LAB'}</span>
+        {initialSection==='overview'&&<nav aria-label="Lab sections"><button onClick={()=>jump('lab-workspace')}>Production</button><button onClick={()=>jump('lab-signage')}>Signage</button></nav>}
+        {onBack&&<button className="lab-icon" onClick={onBack} aria-label="메인으로 돌아가기"><ArrowLeft size={19}/></button>}
         <button className="lab-icon" onClick={onClose} aria-label="랩 닫기"><X size={20}/></button>
       </header>
       <div className="lab-content">
-        <ScrollStory intro={<div className="lab-opening">
+        {initialSection==='overview'&&<ScrollStory intro={<div className="lab-opening">
           <div><p className="lab-eyebrow">Creative engineering</p><h1><SceneLine visible>정교한 제작.</SceneLine><SceneLine>명료한 운영<span className="lab-gold">.</span></SceneLine></h1><p className="lab-lead">나다운은 촬영과 연출의 전문성을 소프트웨어로 확장합니다. 작품의 사실감과 미적 완성도를 높이고, 복잡한 제작 업무를 일관된 기준으로 운영하는 시스템을 만듭니다.</p></div>
           <figure className="lab-hero-image"><img src="/hero/royal-salute.webp" alt="나다운이 촬영한 로얄살루트 제품과 전시 공간" width="667" height="1000" decoding="async"/><figcaption>NADAUN Photography · Royal Salute</figcaption></figure>
-        </div>} impact={<div className="lab-statement"><p className="lab-eyebrow">Our standard</p><h2>빛과 질감.<br/>움직임과 리듬.<br/><span className="lab-gold">판단의 기준은 작품.</span></h2><p>기술은 연출 의도를 정확하게 구현하기 위한 제작 수단입니다. 실사 촬영의 빛, 재질과 공간감을 기준으로 시각화와 후반 작업을 정교하게 다듬습니다. 화면의 설득력과 브랜드에 적합한 미감을 최종 판단의 기준으로 삼습니다.</p></div>}/>
+        </div>} impact={<div className="lab-statement"><p className="lab-eyebrow">Our standard</p><h2>빛과 질감.<br/>움직임과 리듬.<br/><span className="lab-gold">판단의 기준은 작품.</span></h2><p>기술은 연출 의도를 정확하게 구현하기 위한 제작 수단입니다. 실사 촬영의 빛, 재질과 공간감을 기준으로 시각화와 후반 작업을 정교하게 다듬습니다. 화면의 설득력과 브랜드에 적합한 미감을 최종 판단의 기준으로 삼습니다.</p></div>}/>}
 
-        <section id="lab-workspace" className="lab-section">
-          <ScrollReveal><p className="lab-eyebrow">Production platform</p><div className="lab-section-heading"><h2>ALL IN ONE<br/>SOLUTION<span className="lab-gold">.</span></h2><div><p className="lab-lead">나다운의 광고 제작 운영 시스템.</p><p>온라인·오프라인 광고의 기획 문서와 촬영 준비 정보를 동일한 프로젝트 안에서 관리합니다. 기획안, 콘티, 애니메틱과 샷리스트가 컷 단위로 연결되어, 검토 과정의 결정이 제작 현장에 정확하게 전달됩니다.</p><a className="lab-link" href={WORKSPACE} target="_blank" rel="noopener noreferrer">워크스페이스 열기 <ArrowUpRight size={18}/></a><p className="lab-access">운영 워크스페이스 · 승인된 계정으로 접속</p></div></div></ScrollReveal>
+        {initialSection!=='signage'&&<section id="lab-workspace" className="lab-section">
+          <ScrollReveal><p className="lab-eyebrow">Production platform</p><div className="lab-section-heading"><h2>ALL IN ONE<br/>SOLUTION<span className="lab-gold">.</span></h2><div><p className="lab-lead">나다운의 프리프로덕션 자동화 시스템.</p><p>온라인·오프라인 광고 제작에 필요한 기획 문서와 촬영 준비 정보를 한 프로젝트에서 연결합니다. 기획안, 스토리보드·콘티, 애니메틱, 샷리스트의 반복 입력과 문서 정리를 자동화해 준비 시간을 줄입니다. 연출과 제작의 판단은 팀이 맡고, 확정된 컷과 수정 이력은 후속 작업의 기준으로 관리합니다.</p><a className="lab-link" href={WORKSPACE} target="_blank" rel="noopener noreferrer">워크스페이스 열기 <ArrowUpRight size={18}/></a><p className="lab-access">운영 워크스페이스 · 승인된 계정으로 접속</p></div></div></ScrollReveal>
+          <ScrollReveal className="lab-signage-visual"><figure><img src="https://media.nadaun.co/allinone/projects/NIKE-OLIVE-BURGUNDY-12-SCENE-MAGAZINE-FILM/01_STILL/S01_HERO-26ec0115fb772ac7.webp" alt="올인원 솔루션의 나이키 올리브·버건디 광고 프리뷰" width="1376" height="768" decoding="async"/><figcaption>ALL IN ONE SOLUTION · NIKE 콘셉트 프리뷰</figcaption></figure></ScrollReveal>
           <div className="lab-stages">{STAGES.map(stage=><ScrollReveal key={stage.n} className="lab-stage"><span className="lab-stage-number">{stage.n}</span><div><h3>{stage.title}</h3><p className="lab-output">{stage.output}</p></div><p>{stage.body}</p></ScrollReveal>)}</div>
           <ScrollReveal className="lab-operating"><h3>문서의 정합성이<br/>실행의 속도를 만듭니다.</h3><p>자료를 반복해서 옮기거나 서로 다른 버전의 문서를 대조하는 부담을 줄입니다. 팀은 확정된 컷, 담당 업무와 준비 상태를 같은 맥락에서 확인하고, 수정이 필요한 지점을 빠르게 판단할 수 있습니다. 제작의 속도는 명확한 의사결정과 안정적인 정보 전달에서 만들어집니다.</p></ScrollReveal>
-        </section>
+        </section>}
 
-        <section id="lab-signage" className="lab-section">
-          <ScrollReveal><p className="lab-eyebrow">Digital signage</p><div className="lab-section-heading"><h2>공간에 맞춘<br/>미디어 운영<span className="lab-gold">.</span></h2><div><p className="lab-lead">브랜드 콘텐츠가 매장에서 작동하는 방식까지 설계합니다.</p><p>전 세계 F&B 및 다양한 상업 공간에 적용할 수 있는 사이니지 플랫폼을 개발·납품합니다. 콘텐츠 제작 역량과 플레이어 개발 경험을 결합해, 브랜드 표현과 현장 운영이 함께 고려된 디스플레이 환경을 구축합니다.</p></div></div></ScrollReveal>
-          <ScrollReveal className="lab-signage-visual"><figure><img src="/hero/pepsi-festa.webp" alt="펩시 페스타의 대형 무대 디스플레이와 브랜드 콘텐츠" width="1000" height="667" loading="lazy" decoding="async"/><figcaption>NADAUN Work · Pepsi Festa</figcaption></figure><div className="lab-signage-types"><span>F&B</span><span>Retail</span><span>Hospitality</span><span>Brand spaces</span></div></ScrollReveal>
+        {initialSection!=='production'&&<section id="lab-signage" className="lab-section">
+          <ScrollReveal><p className="lab-eyebrow">Digital signage</p><div className="lab-section-heading"><h2>사이니지 제작.<br/>공간을 위한 미디어<span className="lab-gold">.</span></h2><div><p className="lab-lead">스마트 TV와 설치기사 1명. 간결한 현장 구축.</p><p>국내외 F&B·리테일·호텔과 브랜드 공간에 적용하는 사이니지 플랫폼을 제작·공급합니다. 스마트 TV와 현장 설치기사 1명을 기본 구성으로, 나다운이 설치와 네트워크를 관리합니다. 사진·영상 제작 플로우, 콘텐츠 편성과 배포를 온라인 운영 환경에 연결해 반복 업무를 자동화합니다.</p></div></div></ScrollReveal>
+          <ScrollReveal className="lab-signage-offer"><div><p className="lab-eyebrow">제작비</p><p className="lab-signage-price">300<span>만 원</span></p><p className="lab-signage-exclusion">TV · 설치 인건비 별도</p></div><div><h3>설치와 네트워크.<br/>제작과 운영의 연결.</h3><p>스마트 TV 기반의 현장 구축과 온라인 콘텐츠 운영을 함께 설계합니다. 도입 매장, 설치 환경과 제작 범위를 확인해 구체적인 실행 구성을 안내합니다.</p><button className="lab-link" onClick={()=>{onClose();onContactClick?.();}}>사이니지 도입 문의 <ArrowUpRight size={18}/></button></div></ScrollReveal>
+          <ScrollReveal className="lab-signage-visual"><figure><img src="/hero/pepsi-festa.webp" alt="펩시 페스타의 대형 무대 디스플레이와 브랜드 콘텐츠" width="1000" height="667" loading="lazy" decoding="async"/><figcaption>콘텐츠 제작 사례 · Pepsi Festa</figcaption></figure><div className="lab-signage-types"><span>F&B</span><span>Retail</span><span>Hospitality</span><span>Brand spaces</span></div></ScrollReveal>
+          <ScrollReveal><a className="lab-link" href="https://video.nadaun.co/?category=SIGNAGE" target="_blank" rel="noopener noreferrer">사이니지 콘텐츠 보기 <ArrowUpRight size={18}/></a><p className="lab-access">Photo Looping · Video Looping — 매체용 콘텐츠 사례</p></ScrollReveal>
           <div className="lab-signage-grid">{SIGNAGE.map(([title,body])=><ScrollReveal key={title}><h3>{title}</h3><p>{body}</p></ScrollReveal>)}</div>
-        </section>
+        </section>}
 
         <section className="lab-section lab-final"><ScrollReveal><p className="lab-eyebrow">Work with NADAUN</p><h2>제작과 운영의<br/>기준을 설계합니다.</h2><button className="lab-link" onClick={()=>{onClose();onContactClick?.();}}>프로젝트 문의하기 <ArrowUpRight size={20}/></button></ScrollReveal></section>
       </div>
