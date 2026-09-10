@@ -70,7 +70,7 @@ const MediaCard: React.FC<{ item: { label: string; spec: string; img: string }; 
     <img src={item.img} alt={item.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
     <div className="absolute bottom-0 left-0 p-5 md:p-7">
-      <p className="text-[10px] md:text-[11px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-2">{tag}</p>
+      <p className="text-[10px] md:text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">{tag}</p>
       <p className="font-black text-white leading-none mb-2" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3.6rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
       <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.8rem, 1.3vw, 1.05rem)' }}>{item.spec}</p>
     </div>
@@ -89,7 +89,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
           {/* 우상단: 사업영역(백) + X(홈) 나란히 */}
           <div className="fixed top-7 right-7 md:top-10 md:right-10 z-[130] flex items-center gap-2 md:gap-3">
             <button onClick={onBack}
-              className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all">
+              className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-normal uppercase text-white/70 hover:text-[#FFB800] transition-all">
               <ArrowLeft size={16} /> 사업영역
             </button>
             <button onClick={onClose}
@@ -102,7 +102,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
           <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-9" />
             <FadeIn>
-              <p className="text-xs md:text-sm tracking-[0.55em] uppercase text-[#FFB800] font-bold mb-9">03 — GLOBAL NETWORK</p>
+              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-9">03 — GLOBAL NETWORK</p>
             </FadeIn>
             <h2 className="font-black tracking-[-0.045em] leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 11rem)' }}>
               <WordSlide text="전국에서" /><br />
@@ -116,7 +116,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
             </FadeIn>
             <motion.div animate={{ y: [0, 14, 0], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.0, ease: 'easeInOut' }}
               className="absolute bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-              <span className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-bold">Scroll</span>
+              <span className="text-[10px] tracking-normal text-gray-500 uppercase font-bold">Scroll</span>
               <ChevronDown className="text-gray-500 w-5 h-5" />
             </motion.div>
           </section>
@@ -124,7 +124,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
           {/* 1. 전국 방송 송출 */}
           <section className="min-h-screen flex flex-col justify-center py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-7xl mx-auto w-full">
             <FadeIn>
-              <p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">NATIONWIDE BROADCAST</p>
+              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">NATIONWIDE BROADCAST</p>
               <h3 className="font-black text-white leading-[0.9] mb-4" style={{ fontSize: 'clamp(2.8rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}>전국 방송 송출</h3>
               <p className="text-white/45 text-base md:text-xl font-light mb-12">공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성 — 모든 송출 채널</p>
             </FadeIn>
@@ -132,7 +132,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
               {BROADCAST.map((grp, i) => (
                 <FadeIn key={grp.cat} delay={0.04 * i}>
                   <div className="border-l-2 border-[#FFB800]/40 pl-5">
-                    <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800] font-bold mb-2">{grp.cat}</p>
+                    <p className="text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">{grp.cat}</p>
                     <p className="font-black leading-tight text-white/90" style={{ fontSize: 'clamp(1.4rem, 2.8vw, 2.6rem)', letterSpacing: '-0.01em' }}>{grp.items.join(' · ')}</p>
                   </div>
                 </FadeIn>
@@ -143,7 +143,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
           {/* 2. 오프라인 BTL */}
           <section className="min-h-screen flex flex-col justify-center py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-7xl mx-auto w-full">
             <FadeIn>
-              <p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">OFFLINE BTL</p>
+              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">OFFLINE BTL</p>
               <h3 className="font-black text-white leading-[0.9] mb-4" style={{ fontSize: 'clamp(2.8rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}>오프라인 매체</h3>
               <p className="text-white/45 text-base md:text-xl font-light mb-12">지하철 · 옥외 전광판 · 택시 · 버스 — 전국 BTL 집행</p>
             </FadeIn>
@@ -157,7 +157,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
           {/* 3. 해외 광고 */}
           <section className="min-h-screen flex flex-col justify-center py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-7xl mx-auto w-full">
             <FadeIn>
-              <p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">OVERSEAS</p>
+              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">OVERSEAS</p>
               <h3 className="font-black text-white leading-[0.9] mb-4" style={{ fontSize: 'clamp(2.8rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}>해외 광고</h3>
               <p className="text-white/45 text-base md:text-xl font-light mb-12">일본 · 중국 · 동남아 · 미국 · 유럽 · 글로벌 팬덤</p>
             </FadeIn>
@@ -175,7 +175,7 @@ const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onC
                 전국·전세계<br /><span className="text-[#FFB800]">어디든.</span>
               </h3>
               <button onClick={() => { onClose(); onContactClick(); }}
-                className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 group text-lg md:text-xl">
+                className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-normal uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 group text-lg md:text-xl">
                 광고 문의하기 <ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform duration-500" />
               </button>
             </FadeIn>

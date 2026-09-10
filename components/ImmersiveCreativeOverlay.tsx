@@ -75,7 +75,7 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
           {/* 우상단: 사업영역(백) + X(홈) 나란히 */}
           <div className="fixed top-7 right-7 md:top-10 md:right-10 z-[130] flex items-center gap-2 md:gap-3">
             <button onClick={onBack}
-              className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all">
+              className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-normal uppercase text-white/70 hover:text-[#FFB800] transition-all">
               <ArrowLeft size={16} /> 사업영역
             </button>
             <button onClick={onClose}
@@ -88,7 +88,7 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
           <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-9" />
             <FadeIn>
-              <p className="text-xs md:text-sm tracking-[0.55em] uppercase text-[#FFB800] font-bold mb-9">02 — IMMERSIVE CREATIVE</p>
+              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-9">02 — IMMERSIVE CREATIVE</p>
             </FadeIn>
             <h2 className="font-black tracking-[-0.045em] leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 11rem)' }}>
               <WordSlide text="IMMERSIVE" /><br />
@@ -102,14 +102,14 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
             </FadeIn>
             <motion.div animate={{ y: [0, 14, 0], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.0, ease: 'easeInOut' }}
               className="absolute bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-              <span className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-bold">Process</span>
+              <span className="text-[10px] tracking-normal text-gray-500 uppercase font-bold">Process</span>
               <ChevronDown className="text-gray-500 w-5 h-5" />
             </motion.div>
           </section>
 
           {/* 제작 영역 — 사진·영상·지면·앨범 등 전 항목 */}
           <section className="py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-6xl mx-auto w-full">
-            <FadeIn><p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-3">WHAT WE PRODUCE</p></FadeIn>
+            <FadeIn><p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">WHAT WE PRODUCE</p></FadeIn>
             <FadeIn delay={0.05}><h3 className="font-black leading-[0.9] mb-12" style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', letterSpacing: '-0.03em' }}>제작 영역</h3></FadeIn>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
               {PRODUCE.map((p, i) => (
@@ -126,7 +126,7 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
           {/* Production process */}
           <section className="py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-6xl mx-auto w-full">
             <FadeIn>
-              <p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-14">PRODUCTION PROCESS</p>
+              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-14">PRODUCTION PROCESS</p>
             </FadeIn>
             <div className="flex flex-col">
               {PROCESS.map((step, i) => (
@@ -140,11 +140,11 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
                       {step.num === '06' && (
                         <div className="mt-7 flex flex-wrap gap-3">
                           <a href="https://photo.nadaun.co" target="_blank" rel="noopener noreferrer"
-                            className="text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full border border-[#FFB800]/40 text-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-colors">사진 포트폴리오 →</a>
+                            className="text-xs md:text-sm font-bold uppercase tracking-normal px-5 py-3 rounded-full border border-[#FFB800]/40 text-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-colors">사진 포트폴리오 →</a>
                           <a href="https://video.nadaun.co" target="_blank" rel="noopener noreferrer"
-                            className="text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full border border-[#FFB800]/40 text-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-colors">영상 포트폴리오 →</a>
+                            className="text-xs md:text-sm font-bold uppercase tracking-normal px-5 py-3 rounded-full border border-[#FFB800]/40 text-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-colors">영상 포트폴리오 →</a>
                           <button onClick={() => { onClose(); onGlobalClick(); }}
-                            className="text-xs md:text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full border border-white/30 text-white hover:bg-white hover:text-black transition-colors">GLOBAL NETWORK →</button>
+                            className="text-xs md:text-sm font-bold uppercase tracking-normal px-5 py-3 rounded-full border border-white/30 text-white hover:bg-white hover:text-black transition-colors">GLOBAL NETWORK →</button>
                         </div>
                       )}
                     </div>
@@ -161,7 +161,7 @@ const ImmersiveCreativeOverlay: React.FC<ImmersiveCreativeOverlayProps> = ({ isO
                 상상을<br /><span className="text-[#FFB800]">현실로.</span>
               </h3>
               <button onClick={() => { onClose(); onContactClick(); }}
-                className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 group text-lg md:text-xl">
+                className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-normal uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 group text-lg md:text-xl">
                 제작 문의하기 <ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform duration-500" />
               </button>
             </FadeIn>

@@ -165,7 +165,7 @@ const RollingImages: React.FC<{ items: RollingItem[]; active: boolean; color: st
             animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
             exit={{ opacity: 0, y: -8, filter: BLUR(6) }}
             transition={{ duration: 0.4, ease: NADAUN_EASE as any }}
-            className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider bg-black/55 ${isMobile ? '' : 'backdrop-blur-sm'}`}
+            className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold tracking-normal bg-black/55 ${isMobile ? '' : 'backdrop-blur-sm'}`}
             style={{ color, fontFamily: 'Manrope, sans-serif' }}
           >
             {items[idx].name}
@@ -363,11 +363,11 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
             <div className="flex items-center gap-3 mb-1.5">
               {/* 모바일은 번호 제거, 얇은 폰트로 좌측 정렬 (대표 지시 2026-07-15) */}
               {!isMobile && (
-                <span className="text-[12px] font-bold tracking-[0.25em] text-white/40">
+                <span className="text-[12px] font-bold tracking-normal text-white/40">
                   {item.num}
                 </span>
               )}
-              <span className={isMobile ? 'text-[15px] font-normal text-white/80 tracking-wide truncate' : 'text-[13px] font-semibold text-white/75 tracking-wide truncate'}>
+              <span className={isMobile ? 'text-[15px] font-normal text-white/80 tracking-normal truncate' : 'text-[13px] font-semibold text-white/75 tracking-normal truncate'}>
                 {item.kr}
               </span>
             </div>
@@ -419,7 +419,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                         initial={{ opacity: 0, y: 12, filter: BLUR(8) }}
                         animate={{ opacity: 1, y: 0, filter: BLUR(0) }}
                         transition={{ duration: 0.5, delay: 0.2, ease: NADAUN_EASE as any }}
-                        className="inline-block rounded-full border px-4 py-1.5 text-[13px] font-bold tracking-wider"
+                        className="inline-block rounded-full border px-4 py-1.5 text-[13px] font-bold tracking-normal"
                         style={{ borderColor: `${item.color}66`, color: item.color }}
                       >
                         COMING SOON

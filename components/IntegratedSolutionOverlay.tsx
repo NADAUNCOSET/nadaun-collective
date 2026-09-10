@@ -91,7 +91,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
             {onBack && (
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all"
+                className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-normal uppercase text-white/70 hover:text-[#FFB800] transition-all"
               >
                 <ArrowLeft size={16} /> 사업영역
               </button>
@@ -105,7 +105,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
           <section className="min-h-screen flex flex-col justify-center relative" style={PAD}>
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-8" />
             <FadeIn>
-              <p className="text-[11px] md:text-xs tracking-[0.55em] uppercase text-[#FFB800] font-bold mb-8">01 — INTEGRATED SOLUTION</p>
+              <p className="text-[11px] md:text-xs tracking-normal uppercase text-[#FFB800] font-bold mb-8">01 — INTEGRATED SOLUTION</p>
             </FadeIn>
             <h2 className="leading-[0.86] mb-10 text-white" style={{ ...DISPLAY, fontWeight: 900, fontSize: 'clamp(3.2rem, 11vw, 10rem)' }}>
               <WordSlide text="INTEGRATED" />
@@ -125,7 +125,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
               transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
               className="absolute bottom-14 flex items-center gap-3"
             >
-              <span className="text-[10px] tracking-[0.4em] text-white/35 uppercase font-bold">Scroll to Explore</span>
+              <span className="text-[10px] tracking-normal text-white/35 uppercase font-bold">Scroll to Explore</span>
               <ChevronDown className="text-white/35 w-4 h-4" />
             </motion.div>
           </section>
@@ -147,9 +147,9 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
                 <div className="lg:col-span-5">
                   <FadeIn>
                     <div className="flex items-center gap-4 mb-7">
-                      <span className="text-[14px] font-bold tracking-[0.25em] text-[#FFB800]">0{index + 1}</span>
+                      <span className="text-[14px] font-bold tracking-normal text-[#FFB800]">0{index + 1}</span>
                       <span className="h-px w-12 bg-[#FFB800]/50" />
-                      <span className="text-[14px] font-bold tracking-[0.3em] uppercase text-white/50">{service.subtitle}</span>
+                      <span className="text-[14px] font-bold tracking-normal uppercase text-white/50">{service.subtitle}</span>
                     </div>
                     <h3 className="text-white leading-[0.95] mb-6" style={{ ...DISPLAY, fontSize: 'clamp(2.6rem, 5.4vw, 4.8rem)' }}>
                       {service.title.split(' ').map((w, i) => (
@@ -175,7 +175,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
                         <div className="group relative flex items-center justify-between py-6 border-b border-white/10 transition-all duration-300 hover:pl-5 cursor-default">
                           <span className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#FFB800] origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-500" />
                           <div className="flex items-baseline gap-7">
-                            <span className="text-[13px] font-bold tracking-[0.2em] text-white/30 group-hover:text-[#FFB800] transition-colors duration-300">
+                            <span className="text-[13px] font-bold tracking-normal text-white/30 group-hover:text-[#FFB800] transition-colors duration-300">
                               {String(idx + 1).padStart(2, '0')}
                             </span>
                             <span className="text-xl md:text-2xl font-semibold text-white/85 group-hover:text-white transition-colors duration-300 tracking-tight">
@@ -195,7 +195,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
           {/* CTA — 좌측 정렬, 메인과 동일 톤 */}
           <section className="min-h-screen flex flex-col justify-center relative border-t border-white/[0.07]" style={PAD}>
             <FadeIn>
-              <p className="text-[11px] tracking-[0.45em] uppercase font-bold mb-8" style={{ color: '#FFB800' }}>
+              <p className="text-[11px] tracking-normal uppercase font-bold mb-8" style={{ color: '#FFB800' }}>
                 Contact
               </p>
               <h3 className="text-white mb-8 leading-[0.9]" style={{ ...DISPLAY, fontWeight: 900, fontSize: 'clamp(3rem, 9vw, 8rem)' }}>
@@ -209,7 +209,7 @@ const IntegratedSolutionOverlay: React.FC<IntegratedSolutionOverlayProps> = ({ i
                   onClose();
                   onContactClick();
                 }}
-                className="bg-[#FFB800] text-black px-10 py-5 rounded-full font-bold tracking-widest uppercase hover:bg-white transition-all duration-500 flex items-center gap-4 group text-base md:text-lg w-fit"
+                className="bg-[#FFB800] text-black px-10 py-5 rounded-full font-bold tracking-normal uppercase hover:bg-white transition-all duration-500 flex items-center gap-4 group text-base md:text-lg w-fit"
               >
                 광고 문의하기
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-500" />

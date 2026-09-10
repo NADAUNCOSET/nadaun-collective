@@ -1,234 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronDown } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowUpRight, X } from 'lucide-react';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-// ── 송출영상 풀스크린 배경 (LIVERNOVO 송출분) — R2, 무음 순환 ──
-const VideoBg: React.FC = () => {
-  const [vids, setVids] = useState<{ src: string }[]>([]);
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    fetch('/livernovo-videos.json')
-      .then(r => r.json())
-      .then((m: any[]) => {
-        const list = (Array.isArray(m) ? m : []).filter(x => x && x.src && String(x.project || '').includes('livernovo'));
-        if (list.length) setVids(list);
-      })
-      .catch(() => {});
-  }, []);
-  if (!vids.length) return null;
-  const cur = vids[idx % vids.length];
-  return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-      <video key={cur.src} src={cur.src} autoPlay muted playsInline preload="auto"
-        onEnded={() => setIdx(i => (i + 1) % vids.length)}
-        onError={() => setIdx(i => (i + 1) % vids.length)}
-        className="w-full h-full object-cover" style={{ opacity: 0.4 }} />
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(7,7,7,0.62) 0%, rgba(7,7,7,0.38) 45%, rgba(7,7,7,0.78) 100%)' }} />
-    </div>
-  );
-};
-
-// 단어별 좌→오 슬라이드 (문장 완성)
-const WordSlide: React.FC<{ text: string; className?: string; style?: React.CSSProperties; delay?: number; stagger?: number }> = ({ text, className, style, delay = 0, stagger = 0.09 }) => (
-  <span className={`inline-flex flex-wrap justify-center ${className ?? ''}`}>
-    {text.split(' ').map((w, i) => (
-      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
-        <motion.span className="inline-block"
-          initial={{ x: '-40%', opacity: 0 }}
-          whileInView={{ x: '0%', opacity: 1 }}
-          viewport={{ once: false, margin: '-10%' }}
-          transition={{ duration: 0.7, delay: delay + i * stagger, ease: EASE }}
-          style={style}>
-          {w}&nbsp;
-        </motion.span>
-      </span>
-    ))}
-  </span>
-);
-
-const FadeIn: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className = '' }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 44, filter: 'blur(10px)' }}
-    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-    viewport={{ once: false, margin: '-12%' }}
-    transition={{ duration: 0.6, delay, ease: EASE }}
-    className={className}
-  >
-    {children}
-  </motion.div>
-);
-
-const KPIS = [
-  { value: '4,190만+', label: '총 도달 IMPRESSION', sub: 'PP + IPTV + 케이블 + 재핑 전 매체 합산', accent: true },
-  { value: '416%', label: 'PP 계약 대비 달성', sub: '계약 311회 → 실송출 1,296회', accent: true },
-  { value: '1,206만', label: 'IPTV 노출', sub: 'KT · LG · SK 3사 통합' },
-  { value: '2,984만', label: '재핑 도달 가구', sub: '딜라이브 전국 케이블' },
+const LIVERNOVO_POSTER = 'https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20251020%20Livernovo%20v1%2015s%20final_%20WEB%20HIGH%20AD_1080p.jpg';
+const PP = [
+  { channel:'JTBC4', count:336 }, { channel:'OCN Movies2', count:243 },
+  { channel:'OCN Movies', count:230 }, { channel:'OCN', count:227 },
+  { channel:'JTBC', count:130 }, { channel:'tvN', count:130 },
+];
+const IPTV = [{ channel:'KT LiveAD', impressions:'468만' }, { channel:'LG ART', impressions:'396만' }, { channel:'SK SBA', impressions:'342만' }];
+const WORK = [
+  { name:'ROYAL SALUTE', type:'Brand photography', src:'/hero/royal-salute.webp', alt:'로얄살루트 제품 전시 사진', href:'https://photo.nadaun.co' },
+  { name:'PEPSI FESTA', type:'Live experience', src:'/hero/pepsi-festa.webp', alt:'펩시 페스타 무대와 브랜드 그래픽', href:'https://video.nadaun.co' },
+  { name:'HD HYUNDAI', type:'Corporate communication', src:'/hero/hd-hyundai.webp', alt:'HD현대 신년 행사 공간과 무대', href:'https://photo.nadaun.co' },
+  { name:'LIVERNOVO', type:'TVC & media', src:LIVERNOVO_POSTER, alt:'리버노보 광고 영상 스틸', href:'https://video.nadaun.co' },
+];
+const PROCESS = [
+  { number:'01', title:'비즈니스 과제의 정의', en:'Strategy', body:'제품의 구매 이유, 고객의 의사결정 과정, 캠페인의 역할을 먼저 정리합니다. 브랜드 인지와 구매 전환의 목표를 구분하고, 타깃·메시지·콘텐츠·매체가 같은 방향을 향하도록 실행 기준을 세웁니다.', detail:'과제 정의 · 타깃 · 메시지 구조 · KPI 설계' },
+  { number:'02', title:'채널을 고려한 제작', en:'Creative', body:'사진의 제품 정보와 인물 표현, 영상의 서사와 리듬을 하나의 브랜드 언어로 연결합니다. 기획 단계부터 지면·방송·디지털의 규격과 노출 환경을 반영해 촬영, 편집, 그래픽, 소재별 버전을 설계합니다.', detail:'사진 · 브랜드 필름 · TVC · 채널별 소재' },
+  { number:'03', title:'매체 집행과 성과 해석', en:'Media', body:'타깃과 캠페인 목적에 맞춰 매체, 편성, 소재 운영을 조합합니다. 집행 후에는 계약 대비 송출과 매체별 노출을 확인하고, 도달·반응·매출을 서로 다른 성과 단계로 구분해 다음 실행에 반영합니다.', detail:'미디어 플랜 · 소재 운영 · 집행 검수 · 리포팅' },
 ];
 
-const PP_BREAKDOWN = [
-  { ch: 'JTBC4', n: 336 }, { ch: 'OCN Movies2', n: 243 }, { ch: 'OCN Movies', n: 230 },
-  { ch: 'OCN', n: 227 }, { ch: 'JTBC', n: 130 }, { ch: 'tvN', n: 130 },
-];
-const PP_MAX = 336;
-
-const IPTV3 = [
-  { ch: 'KT LiveAD', n: '468만', pct: 39 },
-  { ch: 'LG ART', n: '396만', pct: 33 },
-  { ch: 'SK SBA', n: '342만', pct: 28 },
-];
-
-interface InsightsOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onContactClick?: () => void;
+function Reveal({ children, className='' }: { children:React.ReactNode; className?:string }) {
+  const reduce=useReducedMotion();
+  return <motion.div className={className} initial={reduce ? false : {opacity:0,y:24}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.08}} transition={{duration:.5,ease:EASE}}>{children}</motion.div>;
 }
 
-const InsightsOverlay: React.FC<InsightsOverlayProps> = ({ isOpen, onClose, onContactClick }) => {
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-[105] bg-[#070707] text-white overflow-y-auto overflow-x-hidden scroll-smooth"
-          style={{ scrollbarWidth: 'none' }}
-          initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <VideoBg />
-
-          <button onClick={onClose}
-            className="fixed top-7 right-7 md:top-10 md:right-10 z-[130] p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md">
-            <X size={22} className="text-white group-hover:text-[#FFB800] transition-colors" />
-          </button>
-
-          <div className="relative z-10">
-
-            {/* Intro */}
-            <section className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-              <FadeIn>
-                <p className="text-xs md:text-sm tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-8">LIVERNOVO CAMPAIGN · 2025.10 — 11</p>
-              </FadeIn>
-              <h2 className="font-black tracking-tighter leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 12rem)' }}>
-                <WordSlide text="총 4,190만+" /><br />
-                <WordSlide text="도달했습니다." delay={0.3} style={{ color: '#FFB800' }} />
-              </h2>
-              <FadeIn delay={0.5}>
-                <p className="text-gray-300 text-lg md:text-2xl max-w-3xl mx-auto font-light leading-relaxed break-keep">
-                  PP · IPTV 3사 · 케이블 · 재핑까지 — 한 달간 전국 전 매체로 송출한<br className="hidden md:block" />
-                  <span className="text-white font-medium">Livernovo TVC 캠페인</span> 실측 결과입니다.
-                </p>
-              </FadeIn>
-              <motion.div animate={{ y: [0, 14, 0], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut' }}
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                <span className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-bold">Results</span>
-                <ChevronDown className="text-gray-500 w-5 h-5" />
-              </motion.div>
-            </section>
-
-            {/* KPI */}
-            <section className="min-h-screen flex flex-col items-center justify-center text-center py-28 px-6 border-t border-white/5">
-              <FadeIn><p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">CAMPAIGN RESULTS</p></FadeIn>
-              <FadeIn delay={0.05}><h3 className="font-black leading-[0.9] mb-16" style={{ fontSize: 'clamp(2.4rem, 6vw, 5rem)', letterSpacing: '-0.03em' }}>핵심 성과</h3></FadeIn>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 max-w-5xl w-full">
-                {KPIS.map((k, i) => (
-                  <FadeIn key={k.label} delay={0.08 * i}>
-                    <div className="flex flex-col items-center text-center border-t border-white/10 pt-8">
-                      <span className="font-black tabular-nums leading-none mb-4" style={{ fontSize: 'clamp(3.2rem, 10vw, 7rem)', letterSpacing: '-0.04em', color: k.accent ? '#FFB800' : '#fff' }}>{k.value}</span>
-                      <span className="text-[11px] md:text-xs tracking-[0.3em] uppercase text-white/55 font-bold mb-2">{k.label}</span>
-                      <span className="text-white/40 text-sm font-light">{k.sub}</span>
-                    </div>
-                  </FadeIn>
-                ))}
-              </div>
-            </section>
-
-            {/* PP 채널별 송출 */}
-            <section className="min-h-screen flex flex-col items-center justify-center py-28 px-6 border-t border-white/5">
-              <FadeIn className="text-center"><p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">PP BROADCAST · 1,296회</p></FadeIn>
-              <FadeIn delay={0.05} className="text-center"><h3 className="font-black leading-[0.9] mb-3" style={{ fontSize: 'clamp(2.4rem, 6vw, 5rem)', letterSpacing: '-0.03em' }}>채널별 송출</h3></FadeIn>
-              <FadeIn delay={0.1} className="text-center"><p className="text-white/40 text-sm md:text-base font-light mb-14">JTBC · JTBC4 · tvN · OCN 계열 — 계약 311회 대비 4.2배 송출</p></FadeIn>
-              <div className="flex flex-col gap-5 md:gap-6 max-w-3xl w-full">
-                {PP_BREAKDOWN.map((c, i) => (
-                  <FadeIn key={c.ch} delay={0.05 * i}>
-                    <div className="flex items-center gap-4 md:gap-6">
-                      <span className="font-bold text-white/80 w-28 md:w-40 shrink-0 text-right" style={{ fontSize: 'clamp(0.95rem, 2vw, 1.4rem)' }}>{c.ch}</span>
-                      <div className="flex-1 h-9 md:h-11 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div className="h-full rounded-full bg-gradient-to-r from-[#FFB800]/70 to-[#FFB800]"
-                          initial={{ width: 0 }} whileInView={{ width: `${(c.n / PP_MAX) * 100}%` }} viewport={{ once: false, margin: '-10%' }}
-                          transition={{ duration: 0.9, delay: 0.05 * i, ease: EASE }} />
-                      </div>
-                      <span className="font-black tabular-nums text-white w-16 md:w-24 shrink-0" style={{ fontSize: 'clamp(1.1rem, 2.4vw, 1.9rem)' }}>{c.n}회</span>
-                    </div>
-                  </FadeIn>
-                ))}
-              </div>
-            </section>
-
-            {/* IPTV 3사 */}
-            <section className="min-h-screen flex flex-col items-center justify-center text-center py-28 px-6 border-t border-white/5">
-              <FadeIn><p className="text-xs md:text-sm tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">IPTV · 1,206만 노출</p></FadeIn>
-              <FadeIn delay={0.05}><h3 className="font-black leading-[0.9] mb-14" style={{ fontSize: 'clamp(2.4rem, 6vw, 5rem)', letterSpacing: '-0.03em' }}>IPTV 3사 통합</h3></FadeIn>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 max-w-4xl w-full">
-                {IPTV3.map((p, i) => (
-                  <FadeIn key={p.ch} delay={0.08 * i}>
-                    <div className="flex flex-col items-center border-t border-white/10 pt-8">
-                      <span className="font-black tabular-nums leading-none mb-3" style={{ fontSize: 'clamp(2.6rem, 7vw, 5rem)', letterSpacing: '-0.04em', color: '#fff' }}>{p.n}</span>
-                      <span className="text-[11px] tracking-[0.3em] uppercase text-[#FFB800]/70 font-bold mb-1">{p.ch}</span>
-                      <span className="text-white/35 text-sm font-light">노출 {p.pct}%</span>
-                    </div>
-                  </FadeIn>
-                ))}
-              </div>
-            </section>
-
-            {/* 집행 정보 */}
-            <section className="min-h-screen flex flex-col items-center justify-center text-center py-28 px-6 border-t border-white/5">
-              <FadeIn>
-                <h3 className="font-black leading-[0.9] mb-16" style={{ fontSize: 'clamp(2.4rem, 6vw, 5rem)', letterSpacing: '-0.03em' }}>
-                  <WordSlide text="전국 전 매체," /><br /><WordSlide text="한 번에." delay={0.25} style={{ color: '#FFB800' }} />
-                </h3>
-              </FadeIn>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl w-full">
-                {[
-                  { k: '집행 기간', v: '31일', s: '2025.10.22 — 11.21' },
-                  { k: '매체', v: '4종', s: 'PP · IPTV · 케이블 · 재핑' },
-                  { k: '소재', v: '2편', s: 'Livernovo 남 / 여 15초' },
-                  { k: '케이블 송출', v: '322회', s: '심포니 (계약 262)' },
-                ].map((x, i) => (
-                  <FadeIn key={x.k} delay={0.06 * i}>
-                    <div className="flex flex-col items-center">
-                      <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 font-bold mb-3">{x.k}</span>
-                      <span className="font-black text-white tabular-nums leading-none mb-2" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3.2rem)' }}>{x.v}</span>
-                      <span className="text-white/35 text-xs font-light">{x.s}</span>
-                    </div>
-                  </FadeIn>
-                ))}
-              </div>
-              <FadeIn delay={0.3}>
-                <p className="mt-20 text-white/25 text-xs tracking-widest uppercase">NADAUN COLLECTIVE · Livernovo TVC 캠페인 실측 (2025.11.25 집계)</p>
-              </FadeIn>
-            </section>
-
-            {/* CTA — 마지막은 문의하기로 */}
-            <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 border-t border-white/5 bg-gradient-to-b from-transparent to-[#FFB800]/8">
-              <FadeIn>
-                <p className="text-xs md:text-sm tracking-[0.5em] uppercase text-[#FFB800] font-bold mb-9">NEXT CAMPAIGN</p>
-                <h3 className="font-black text-white mb-12 tracking-tighter leading-[0.9]" style={{ fontSize: 'clamp(3rem, 9vw, 8rem)' }}>
-                  <WordSlide text="다음 성과의" /><br /><WordSlide text="주인공은?" delay={0.22} style={{ color: '#FFB800' }} />
-                </h3>
-                <button onClick={() => { onClose(); onContactClick?.(); }}
-                  className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 text-lg md:text-xl">
-                  프로젝트 문의하기 →
-                </button>
-              </FadeIn>
-            </section>
-
+interface InsightsOverlayProps { isOpen:boolean; onClose:()=>void; onContactClick?:()=>void; }
+export default function InsightsOverlay({isOpen,onClose,onContactClick}:InsightsOverlayProps) {
+  const reduce=useReducedMotion();
+  useEffect(() => {
+    if(!isOpen) return;
+    const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')onClose();};
+    window.addEventListener('keydown',handleKey);
+    return ()=>window.removeEventListener('keydown',handleKey);
+  },[isOpen,onClose]);
+  if(!isOpen)return null;
+  return <motion.section role="dialog" aria-modal="true" aria-label="NADAUN Insights" className="fixed inset-0 z-[105] overflow-y-auto overflow-x-hidden bg-[var(--nadaun-bg)] text-[var(--nadaun-text)]" initial={reduce ? false : {y:'100%'}} animate={{y:0}} transition={{duration:.4,ease:EASE}}>
+    <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/10 bg-[var(--nadaun-bg)] px-6 md:px-12">
+      <span className="text-xs font-medium">NADAUN COLLECTIVE — INSIGHTS</span>
+      <button onClick={onClose} type="button" aria-label="인사이트 닫기" className="grid h-11 w-11 place-items-center text-white/70 transition-colors hover:text-[#FBB200]"><X size={20} strokeWidth={1.5}/></button>
+    </div>
+    <div className="mx-auto max-w-[1680px] px-6 md:px-12 lg:px-20">
+      <section className="grid min-h-[78svh] items-center gap-12 py-16 lg:grid-cols-2 lg:gap-20 lg:py-24">
+        <Reveal>
+          <p className="mb-8 text-xs font-medium text-[#FBB200]">Creative · Media · Business</p>
+          <h1 className="mb-10 font-black leading-[1.06] tracking-[-0.045em]" style={{fontFamily:'SUIT, Pretendard, sans-serif',fontSize:'clamp(3.4rem,6.7vw,7.2rem)'}}>콘텐츠에서<br/>매출까지<span className="text-[#FBB200]">.</span></h1>
+          <p className="max-w-lg text-base leading-8 text-white/65 md:text-lg">크리에이티브의 완성도를 비즈니스의 성과로 연결합니다. 사진·영상 제작부터 매체 설계와 집행까지, 브랜드 메시지와 고객 접점을 하나의 실행 구조로 설계합니다.</p>
+        </Reveal>
+        <div className="grid grid-cols-5 items-start gap-3 md:gap-4">
+          <img src="/hero/royal-salute.webp" alt="로얄살루트 제품 촬영" width="667" height="1000" className="col-span-2 mt-14 w-full" decoding="async"/>
+          <div className="col-span-3 space-y-3 md:space-y-4">
+            <img src="/hero/pepsi-festa.webp" alt="펩시 페스타 무대" width="1000" height="667" className="w-full" decoding="async"/>
+            <img src={LIVERNOVO_POSTER} alt="리버노보 TVC 영상 스틸" width="1920" height="1080" className="w-full" decoding="async"/>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
+        </div>
+      </section>
 
-export default InsightsOverlay;
+      <section className="border-y border-white/15 py-16 md:py-24">
+        <Reveal className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+          <div><p className="mb-6 text-xs text-white/50">Business impact</p><p className="font-black leading-none tracking-[-0.055em]" style={{fontSize:'clamp(4rem,10vw,10rem)'}}>3,000<span className="ml-2 text-[.33em] tracking-tight">억 원</span><span className="text-[#FBB200]">+</span></p><p className="mt-6 text-base text-white/70">사진·영상·매체 프로젝트의 누적 매출 성과</p></div>
+          <div className="max-w-lg"><h2 className="mb-5 text-2xl font-bold leading-snug tracking-tight md:text-3xl">브랜드가 보여야 할 장면과<br/>고객이 선택할 이유를 연결합니다.</h2><p className="text-sm leading-7 text-white/55 md:text-base">콘텐츠는 고객 접점에서 역할을 수행해야 합니다. 제품의 차별성을 보여주는 사진, 메시지의 맥락을 전달하는 영상, 적절한 시점에 도달하는 매체를 연결해 비즈니스의 실행력을 높입니다.</p></div>
+        </Reveal>
+      </section>
+
+      <section className="py-20 md:py-28">
+        <Reveal><p className="mb-5 text-xs text-white/50">How we work</p><h2 className="mb-12 text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">전략과 제작,<br/>집행의 기준을 하나로.</h2></Reveal>
+        <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">{PROCESS.map(item=><Reveal key={item.number} className="border-t border-white/15 pt-6"><p className="mb-8 text-xs text-[#FBB200]">{item.number} — {item.en}</p><h3 className="mb-5 text-2xl font-bold tracking-tight">{item.title}</h3><p className="text-sm leading-7 text-white/60 md:text-base">{item.body}</p><p className="mt-8 text-xs leading-6 text-white/40">{item.detail}</p></Reveal>)}</div>
+      </section>
+
+      <section className="border-t border-white/15 py-20 md:py-28">
+        <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-6"><div><p className="mb-5 text-xs text-white/50">Selected work</p><h2 className="text-4xl font-extrabold tracking-tight md:text-6xl">실행의 장면들.</h2></div><p className="max-w-md text-sm leading-7 text-white/55">제품, 브랜드 경험, 기업 커뮤니케이션, 방송 광고까지.<br/>목적과 접점에 따라 제작의 언어를 조율합니다.</p></Reveal>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6">{WORK.map((work,i)=><a key={work.name} href={work.href} target="_blank" rel="noreferrer" className={'group block '+(i%2?'md:mt-16':'')}><div className="aspect-[4/3] overflow-hidden bg-white/5"><img src={work.src} alt={work.alt} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"/></div><div className="mt-4 flex items-center justify-between gap-2"><h3 className="text-xs font-semibold md:text-sm">{work.name}</h3><ArrowUpRight size={17} className="shrink-0 text-white/40"/></div><p className="mt-2 text-xs text-white/45">{work.type}</p></a>)}</div>
+      </section>
+
+      <section className="border-t border-white/15 py-20 md:py-28">
+        <Reveal><p className="mb-5 text-xs text-[#FBB200]">Media case study · 2025.10.22 — 11.21</p><h2 className="mb-6 text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">LIVERNOVO<br/>TVC 캠페인.</h2><p className="mb-12 max-w-2xl text-base leading-8 text-white/60">남·여 15초 소재 2편을 PP, IPTV 3사, 케이블과 재핑 매체에 집행했습니다. 계약 대비 송출 이행과 매체별 집계 결과를 구분해 캠페인의 실행 성과를 확인합니다.</p></Reveal>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">{[
+          {n:'1,296',unit:'회',label:'PP 실제 송출',detail:'계약 311회 대비 416.7% 달성'},
+          {n:'1,206',unit:'만',label:'IPTV 광고 노출',detail:'KT · LG · SK 3사 합산'},
+          {n:'2,984',unit:'만 가구',label:'재핑 도달 가구',detail:'딜라이브 케이블 집계'},
+          {n:'322',unit:'회',label:'케이블 송출',detail:'심포니 · 계약 262회'},
+        ].map(k=><Reveal key={k.label} className="border-t border-white/15 pt-6"><p className="font-bold leading-none tracking-[-0.04em]" style={{fontSize:'clamp(2.3rem,4.3vw,4.6rem)'}}>{k.n}<span className="ml-1 text-[.3em] tracking-normal text-white/50">{k.unit}</span></p><p className="mt-5 text-sm font-medium">{k.label}</p><p className="mt-2 text-xs leading-6 text-white/45">{k.detail}</p></Reveal>)}</div>
+        <div className="mt-16 grid gap-14 lg:grid-cols-2 lg:gap-20">
+          <div><h3 className="mb-8 text-lg font-semibold">PP 채널별 송출</h3><div className="space-y-5">{PP.map(row=><div key={row.channel} className="grid grid-cols-[100px_1fr_56px] items-center gap-4 text-sm"><span className="text-white/65">{row.channel}</span><div className="h-1.5 bg-white/10"><div className="h-full bg-[#FBB200]" style={{width:(row.count/336*100)+'%'}}/></div><span className="text-right tabular-nums">{row.count}회</span></div>)}</div></div>
+          <div><h3 className="mb-6 text-lg font-semibold">IPTV 사업자별 광고 노출</h3>{IPTV.map(row=><div key={row.channel} className="flex items-center justify-between border-b border-white/10 py-5 text-sm"><span className="text-white/65">{row.channel}</span><span className="text-2xl font-semibold tabular-nums">{row.impressions}</span></div>)}</div>
+        </div>
+        <p className="mt-12 max-w-4xl text-xs leading-6 text-white/45">집계 기준: LIVERNOVO 캠페인 운영 리포트, 2025.11.25. 노출 건수와 도달 가구는 집계 단위가 다르므로 합산하지 않습니다. 매체 간 중복을 제거한 순도달 또는 구매 전환을 의미하지 않으며, 상단의 누적 매출 성과와 별도의 지표입니다.</p>
+      </section>
+
+      <section className="border-t border-white/15 py-20 md:py-28">
+        <Reveal className="grid gap-10 lg:grid-cols-2 lg:gap-20"><div><p className="mb-5 text-xs text-white/50">Measurement principles</p><h2 className="text-3xl font-bold leading-tight tracking-tight md:text-5xl">좋은 리포트는<br/>지표의 경계를<br/>명확히 합니다.</h2></div><div className="space-y-8">{[
+          ['집행 이행','계약 편수, 실제 송출, 기간과 소재를 대조해 계획이 어떻게 실행되었는지 확인합니다.'],
+          ['미디어 성과','노출과 도달의 정의, 집계 단위, 중복 처리 범위를 명시해 서로 다른 매체를 해석합니다.'],
+          ['비즈니스 성과','매출·전환 데이터의 측정 기간과 귀속 기준을 정한 뒤 콘텐츠와 매체의 기여를 검토합니다. 노출 수만으로 매출 효과를 단정하지 않습니다.'],
+        ].map(([title,body])=><div key={title} className="border-t border-white/15 pt-5"><h3 className="mb-3 text-lg font-semibold">{title}</h3><p className="text-sm leading-7 text-white/60 md:text-base">{body}</p></div>)}</div></Reveal>
+      </section>
+      <section className="border-t border-white/15 py-20 md:py-28"><p className="mb-6 text-xs text-white/50">Next project</p><h2 className="mb-10 text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">다음 비즈니스 과제,<br/>함께 설계하겠습니다.</h2><button type="button" onClick={()=>{onClose();onContactClick?.();}} className="inline-flex min-h-11 items-center gap-4 border-b border-white/40 pb-3 text-lg font-semibold transition-colors hover:text-[#FBB200]">프로젝트 문의하기 <ArrowUpRight size={20}/></button></section>
+    </div>
+  </motion.section>;
+}

@@ -39,7 +39,7 @@ const BigSelect: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = ({ ch
 );
 
 const SectionNum: React.FC<{ n: string; label: string }> = ({ n, label }) => (
-  <p className="text-[11px] tracking-[0.45em] uppercase text-white/30 font-light mb-8">
+  <p className="text-[11px] tracking-normal uppercase text-white/30 font-light mb-8">
     {n} — {label}
   </p>
 );
@@ -107,7 +107,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
         >
           {/* Header */}
           <div className="sticky top-0 left-0 right-0 h-[57px] flex items-center justify-between px-8 md:px-16 border-b border-white/8 bg-black/95 backdrop-blur-md z-10">
-            <span className="text-[11px] font-bold tracking-[0.4em] text-white/50 uppercase">
+            <span className="text-[11px] font-bold tracking-normal text-white/50 uppercase">
               NADAUN COLLECTIVE — 문의하기
             </span>
             <button
@@ -228,7 +228,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                         className="mt-10"
                       >
-                        <p className="text-xs tracking-[0.3em] uppercase text-[#FFB800]/70 mb-4 font-bold">광고 제작 — 어떤 작업이 필요하세요?</p>
+                        <p className="text-xs tracking-normal uppercase text-[#FFB800]/70 mb-4 font-bold">광고 제작 — 어떤 작업이 필요하세요?</p>
                         <textarea
                           name="광고제작_상세"
                           rows={3}
@@ -247,7 +247,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                         className="mt-10"
                       >
-                        <p className="text-xs tracking-[0.3em] uppercase text-[#FFB800]/70 mb-4 font-bold">광고 홍보 · 송출 — 어떤 매체가 필요하세요?</p>
+                        <p className="text-xs tracking-normal uppercase text-[#FFB800]/70 mb-4 font-bold">광고 홍보 · 송출 — 어떤 매체가 필요하세요?</p>
                         <textarea
                           name="광고홍보_상세"
                           rows={3}
@@ -267,7 +267,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                     <BigQ>프로젝트<br />규모를 알려주세요.</BigQ>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
                       <div>
-                        <p className="text-xs tracking-[0.3em] uppercase text-white/30 mb-4 font-light">예산 (Budget)</p>
+                        <p className="text-xs tracking-normal uppercase text-white/30 mb-4 font-light">예산 (Budget)</p>
                         <BigSelect name="예산" defaultValue="">
                           <option value="" disabled style={{ color: '#888', background: '#0a0a0a' }}>예산 범위 선택</option>
                           <option value="1000만원 미만" style={{ color: '#fff', background: '#0a0a0a' }}>1,000만원 미만</option>
@@ -279,7 +279,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         </BigSelect>
                       </div>
                       <div>
-                        <p className="text-xs tracking-[0.3em] uppercase text-white/30 mb-4 font-light">희망 일정 (Timeline)</p>
+                        <p className="text-xs tracking-normal uppercase text-white/30 mb-4 font-light">희망 일정 (Timeline)</p>
                         <BigInput
                           name="희망_일정"
                           type="text"
@@ -328,7 +328,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose }) => {
                         <p className="text-white/30 text-sm font-light">문의 분야(03)를 선택해주세요</p>
                       )}
                     </div>
-                    <div className="mt-16 pt-8 border-t border-white/8 flex flex-col md:flex-row gap-2 text-white/25 text-xs font-light tracking-wider">
+                    <div className="mt-16 pt-8 border-t border-white/8 flex flex-col md:flex-row gap-2 text-white/25 text-xs font-light tracking-normal">
                       <span>info@nadaun.co</span>
                       <span className="hidden md:inline mx-3">·</span>
                       <span>02-6053-6231</span>

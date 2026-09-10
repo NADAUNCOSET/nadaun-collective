@@ -137,7 +137,7 @@ const Hero: React.FC = () => {
 
         {/* ── Tagline ─────────────────────────────────── */}
         <motion.p
-          className="z-10 pointer-events-none absolute bottom-6 left-8 md:left-16 lg:left-24 text-[11px] text-white/35 tracking-[0.4em] uppercase font-light"
+          className="z-10 pointer-events-none absolute bottom-6 left-8 md:left-16 lg:left-24 text-[11px] text-white/35 tracking-normal uppercase font-light"
           style={{ opacity: taglineOp }}
         >
           EST. 2020 — SEOUL, KOREA

@@ -64,7 +64,7 @@ const Insights: React.FC<InsightsProps> = ({ onAiLabClick }) => {
               <Sparkles className="w-5 h-5" />
               <button 
                 onClick={onAiLabClick}
-                className="font-bold tracking-widest text-sm uppercase hover:underline cursor-pointer"
+                className="font-bold tracking-normal text-sm uppercase hover:underline cursor-pointer"
               >
                 NADAUN AI Lab
               </button>
@@ -82,7 +82,7 @@ const Insights: React.FC<InsightsProps> = ({ onAiLabClick }) => {
             <motion.div variants={itemVariants} className="mb-12">
                <button 
                 onClick={onAiLabClick}
-                className="group flex items-center gap-2 text-white font-bold text-sm tracking-widest hover:text-[#FFB800] transition-colors"
+                className="group flex items-center gap-2 text-white font-bold text-sm tracking-normal hover:text-[#FFB800] transition-colors"
                >
                  EXPLORE AI UNIVERSE <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                </button>
@@ -136,14 +136,14 @@ const Insights: React.FC<InsightsProps> = ({ onAiLabClick }) => {
                 transition={{ duration: 0.374 }}
               >
                 <div className="mb-8">
-                  <h4 className="text-xs font-bold text-[#FFB800] uppercase tracking-widest mb-3">Strategic Insight</h4>
+                  <h4 className="text-xs font-bold text-[#FFB800] uppercase tracking-normal mb-3">Strategic Insight</h4>
                   <p className="text-xl md:text-2xl font-light leading-relaxed text-white">
                     "{result.text}"
                   </p>
                 </div>
                 
                 <div>
-                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Trending Keywords</h4>
+                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-normal mb-4">Trending Keywords</h4>
                   <div className="flex flex-wrap gap-2">
                     {result.trends.map((trend, i) => (
                       <span key={i} className="px-4 py-2 bg-white/10 rounded-lg text-sm text-[#FFB800] border border-[#FFB800]/20">

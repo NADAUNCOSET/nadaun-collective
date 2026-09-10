@@ -167,13 +167,13 @@ const HubRowItem: React.FC<{
                 style={{ background: row.color }}
               />
               <span
-                className={`text-[14px] font-semibold tracking-[0.2em] transition-colors duration-300 ${
+                className={`text-[14px] font-semibold tracking-normal transition-colors duration-300 ${
                   isOpen ? 'text-[color:var(--ac)]' : 'text-white/30 group-hover:text-[color:var(--ac)]'
                 }`}
               >
                 {row.num}
               </span>
-              <span className="text-[15px] font-semibold text-white/60 tracking-wide whitespace-nowrap">{row.kr}</span>
+              <span className="text-[15px] font-semibold text-white/60 tracking-normal whitespace-nowrap">{row.kr}</span>
             </div>
 
             {/* kinetic title */}
@@ -287,7 +287,7 @@ const ServiceHub: React.FC<ServiceHubProps> = ({ onOverlay }) => {
           className="mb-5 md:mb-6"
         >
           <div>
-            <p className="text-[11px] tracking-[0.45em] uppercase font-semibold mb-3" style={{ color: '#FFB800' }}>
+            <p className="text-[11px] tracking-normal uppercase font-semibold mb-3" style={{ color: '#FFB800' }}>
               What We Do
             </p>
             <h2
@@ -334,13 +334,13 @@ const ServiceHub: React.FC<ServiceHubProps> = ({ onOverlay }) => {
         className="mt-2 flex items-center justify-between"
         style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
       >
-        <p className="text-white/35 text-[14px] tracking-wide">
+        <p className="text-white/35 text-[14px] tracking-normal">
           공간 인프라부터 사진·영상, 글로벌 에이전시, 온·오프라인 종합 마케팅까지.
         </p>
         <motion.span
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-white/25 text-[10px] tracking-[0.4em] uppercase"
+          className="text-white/25 text-[10px] tracking-normal uppercase"
         >
           Scroll
         </motion.span>

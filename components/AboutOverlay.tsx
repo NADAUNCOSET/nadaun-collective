@@ -72,7 +72,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
         className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
-        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
+        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
           NADAUN COLLECTIVE — Since 2020, Seoul
         </p>
 
@@ -119,7 +119,7 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
     <div style={{ height: `${H2}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, y: exitY }}>
-          <p className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
+          <p className="text-[13px] tracking-normal uppercase text-[#FFB800] mb-10 font-bold">WHO WE ARE</p>
           <motion.h2
             style={{ opacity: line1Op, y: line1Y, fontSize: 'clamp(4.5rem, 17vw, 14rem)' }}
             className="font-black tracking-[-0.03em] leading-[0.85] text-white block"
@@ -136,7 +136,7 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           </motion.p>
           <motion.div style={{ opacity: pillOp }} className="flex flex-wrap gap-3 mt-10">
             {['COMMERCE', 'CONTENT', 'DISTRIBUTION', 'AI STRATEGY'].map(tag => (
-              <span key={tag} className="text-xs font-bold uppercase tracking-wider px-5 py-2.5 border border-white/25 rounded-full text-white/70">
+              <span key={tag} className="text-xs font-bold uppercase tracking-normal px-5 py-2.5 border border-white/25 rounded-full text-white/70">
                 {tag}
               </span>
             ))}
@@ -185,7 +185,7 @@ const TimelineSlide: React.FC<{
       className="flex flex-col justify-center px-8 md:px-16 lg:px-24"
     >
       <span
-        className="text-[11px] tracking-[0.45em] uppercase font-bold mb-6 block"
+        className="text-[11px] tracking-normal uppercase font-bold mb-6 block"
         style={{ color: item.highlight ? '#FFB800' : 'rgba(255,255,255,0.35)' }}
       >
         {String(index + 1).padStart(2, '0')} · {item.year}
@@ -232,7 +232,7 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
           {/* ── Year rail at top ── */}
           <div className="absolute top-8 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 z-10">
-            <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/60 font-bold mb-4">OUR STORY</p>
+            <p className="text-[11px] tracking-normal uppercase text-[#FFB800]/60 font-bold mb-4">OUR STORY</p>
             <div className="relative">
               {/* Track line */}
               <div className="absolute top-[10px] left-0 right-0 h-[1px] bg-white/10" />
@@ -243,7 +243,7 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
                   return (
                     <div key={item.year} className="flex flex-col items-center gap-2">
                       <div className="w-[6px] h-[6px] rounded-full bg-white/15" />
-                      <span className="text-[10px] font-mono text-white/28 tracking-wider">{item.year}</span>
+                      <span className="text-[10px] font-mono text-white/28 tracking-normal">{item.year}</span>
                     </div>
                   );
                 })}
@@ -651,21 +651,21 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         {/* Descent target label — 대한민국 / KOREA */}
         <motion.div style={{ opacity: koreaLabelOp, y: koreaLabelY }}
           className="absolute inset-x-0 top-[57%] flex flex-col items-center text-center pointer-events-none">
-          <p className="text-[11px] md:text-[13px] tracking-[0.6em] uppercase text-[#FFB800] font-bold mb-2">KOREA</p>
+          <p className="text-[11px] md:text-[13px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">KOREA</p>
           <h2 className="font-black text-white tracking-[-0.02em] leading-none"
             style={{ fontSize: 'clamp(2.6rem, 8vw, 6rem)' }}>대한민국</h2>
-          <p className="mt-3 text-white/55 text-[11px] md:text-xs tracking-[0.35em] font-light">SEOUL · 37.5°N 127.0°E</p>
+          <p className="mt-3 text-white/55 text-[11px] md:text-xs tracking-normal font-light">SEOUL · 37.5°N 127.0°E</p>
         </motion.div>
 
         {/* DOM overlay text */}
         <div className="absolute inset-0 flex flex-col justify-start px-8 md:px-16 lg:px-24 pt-[14vh] pb-10 pointer-events-none">
           <motion.p style={{ opacity: headOp }}
-            className="text-[13px] tracking-[0.35em] uppercase text-[#FFB800] font-bold">
+            className="text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
             IP CONNECT — GLOBAL
           </motion.p>
 
           <motion.div style={{ opacity: titleOp }} className="mb-2">
-            <p className="text-[11px] tracking-[0.45em] uppercase text-[#FFB800] font-bold mb-5">SEOUL · KOREA</p>
+            <p className="text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-5">SEOUL · KOREA</p>
             <h2 className="font-black tracking-[-0.03em] leading-[0.86] text-white block"
               style={{ fontSize: 'clamp(3.5rem, 12vw, 10rem)' }}>IP</h2>
             <h2 className="font-black tracking-[-0.03em] leading-[0.86] block"
@@ -703,7 +703,7 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
 
         {/* Fixed context label */}
         <div className="absolute top-8 left-8 md:left-16 lg:left-24 z-10 pointer-events-none">
-          <p className="text-[11px] tracking-[0.35em] uppercase text-[#FFB800]/55 font-bold">
+          <p className="text-[11px] tracking-normal uppercase text-[#FFB800]/55 font-bold">
             THROUGH THE LINE — TTL CAMPAIGN
           </p>
         </div>
@@ -726,7 +726,7 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
         {/* ── CTA: 프로젝트 문의하기 — 중앙 정렬 ── */}
         <motion.div style={{ opacity: s3Op, y: s3Y }}
           className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-[#FFB800] font-bold mb-4">
+          <p className="text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-4">
             팬클럽 광고 · 해외 광고 · 공항 · 일본 · 동남아 · 미국 · 유럽
           </p>
           <h2 className="font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(3rem, 10vw, 9rem)', letterSpacing: '-0.04em' }}>
@@ -737,7 +737,7 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
             단 하나의 파트너로 모든 것을 완성합니다.
           </p>
           <button onClick={onContactClick}
-            className="self-start flex items-center gap-3 bg-[#FFB800] text-black font-black px-10 py-5 rounded-full hover:scale-105 transition-transform text-base tracking-wide">
+            className="self-start flex items-center gap-3 bg-[#FFB800] text-black font-black px-10 py-5 rounded-full hover:scale-105 transition-transform text-base tracking-normal">
             문의하기 →
           </button>
         </motion.div>
@@ -798,7 +798,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
             className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
           >
-            <span className="text-xs font-bold tracking-[0.3em] text-[#FFB800] uppercase">About</span>
+            <span className="text-xs font-bold tracking-normal text-[#FFB800] uppercase">About</span>
             <button onClick={onClose}
               className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
             >

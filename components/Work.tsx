@@ -118,7 +118,7 @@ const Work: React.FC<WorkProps> = ({ isOverlay = false }) => {
           viewport={{ once: true }}
           transition={{ duration: 0.468 }}
         >
-          <h2 className="text-sm font-bold tracking-[0.2em] text-[#FFB800] uppercase">
+          <h2 className="text-sm font-bold tracking-normal text-[#FFB800] uppercase">
             Selected Works
           </h2>
           <span className="text-xs text-gray-500 hidden md:block">
@@ -150,7 +150,7 @@ const Work: React.FC<WorkProps> = ({ isOverlay = false }) => {
                   <h3 className={`text-3xl md:text-6xl font-bold tracking-tight transition-all duration-300 ${hoveredWork === index ? 'text-white translate-x-4' : 'text-gray-500'}`}>
                     {work.title}
                   </h3>
-                  <p className={`text-xs md:text-sm font-bold tracking-widest uppercase mt-2 transition-all duration-300 ${hoveredWork === index ? 'text-[#FFB800] translate-x-4 opacity-100' : 'text-gray-600 opacity-0 h-0 overflow-hidden'}`}>
+                  <p className={`text-xs md:text-sm font-bold tracking-normal uppercase mt-2 transition-all duration-300 ${hoveredWork === index ? 'text-[#FFB800] translate-x-4 opacity-100' : 'text-gray-600 opacity-0 h-0 overflow-hidden'}`}>
                     {work.client} — {work.category}
                   </p>
                 </div>

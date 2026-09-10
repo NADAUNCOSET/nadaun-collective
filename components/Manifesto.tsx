@@ -86,7 +86,7 @@ const Manifesto: React.FC = () => {
           style={{ originX: 0 }}
         >
           <div className="h-[1px] flex-1 bg-gradient-to-r from-[#FFB800]/60 to-transparent" />
-          <span className="text-[#FFB800] text-xs tracking-[0.4em] uppercase font-medium shrink-0">
+          <span className="text-[#FFB800] text-xs tracking-normal uppercase font-medium shrink-0">
             NADAUN COLLECTIVE
           </span>
         </motion.div>
@@ -118,7 +118,7 @@ const Manifesto: React.FC = () => {
 
         {/* Tag line bottom */}
         <motion.p
-          className="text-xs tracking-[0.35em] uppercase text-white/25 mt-2"
+          className="text-xs tracking-normal uppercase text-white/25 mt-2"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

@@ -111,7 +111,7 @@ const NodeLabel: React.FC<{ node: ClientNode }> = ({ node }) => (
         ? 'clamp(9px, 1.1vw, 13px)'
         : 'clamp(8px, 0.9vw, 11px)',
       fontWeight: node.size === 'lg' ? 800 : node.size === 'md' ? 700 : 600,
-      letterSpacing: '0.06em',
+      letterSpacing: '0',
       color: node.size === 'lg'
         ? 'rgba(255,255,255,1)'
         : node.size === 'md'
@@ -220,7 +220,7 @@ const Clients: React.FC = () => {
           {/* Header */}
           <motion.div style={{ opacity: headerOp, y: headerY }} className="mb-8 flex items-baseline justify-between shrink-0">
             <div>
-              <p className="text-[10px] tracking-[0.5em] uppercase text-white/40 font-light mb-3">
+              <p className="text-[10px] tracking-normal uppercase text-white/40 font-light mb-3">
                 OUR PARTNERS
               </p>
               <h2
@@ -230,7 +230,7 @@ const Clients: React.FC = () => {
                 최고의 파트너
               </h2>
             </div>
-            <motion.p style={{ opacity: counterOp }} className="text-white/20 text-xs tracking-widest hidden md:block tabular-nums">
+            <motion.p style={{ opacity: counterOp }} className="text-white/20 text-xs tracking-normal hidden md:block tabular-nums">
               {count}+ BRANDS
             </motion.p>
           </motion.div>

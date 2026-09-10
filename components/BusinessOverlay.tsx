@@ -54,7 +54,7 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
         style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
         className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
-        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-[0.4em] uppercase text-[#FFB800] font-bold">
+        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-normal uppercase text-[#FFB800] font-bold">
           Business Overview
         </p>
         <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
@@ -113,7 +113,7 @@ const Ch2: React.FC<{
       <StickyPanel>
         <motion.div style={{ opacity: exitOp, x: exitX }}>
           <motion.p style={{ opacity: titleOp, x: titleX }}
-            className="text-sm md:text-base tracking-[0.4em] uppercase text-[#FFB800] mb-8 md:mb-12 font-bold"
+            className="text-sm md:text-base tracking-normal uppercase text-[#FFB800] mb-8 md:mb-12 font-bold"
           >BUSINESS DOMAINS</motion.p>
           <div className="flex flex-col gap-0">
             {DOMAINS.map((d, i) => {
@@ -137,13 +137,13 @@ const Ch2: React.FC<{
                       style={{ fontSize: 'clamp(2.3rem, 7vw, 6rem)' }}>
                       {d.title}
                     </h3>
-                    <p className="text-[10px] md:text-[12px] tracking-[0.2em] uppercase text-[#FFB800]/55 font-bold mt-2 block">
+                    <p className="text-[10px] md:text-[12px] tracking-normal uppercase text-[#FFB800]/55 font-bold mt-2 block">
                       {d.subtitle}
                     </p>
                   </div>
                   <div className="hidden lg:flex flex-wrap gap-1.5 ml-auto max-w-[46%] justify-end">
                     {d.tags.map(tag => (
-                      <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-[#FFB800]/60 border border-[#FFB800]/20 px-3 py-1.5 rounded-full">
+                      <span key={tag} className="text-[10px] font-bold uppercase tracking-normal text-[#FFB800]/60 border border-[#FFB800]/20 px-3 py-1.5 rounded-full">
                         {tag}
                       </span>
                     ))}
@@ -154,7 +154,7 @@ const Ch2: React.FC<{
             })}
             <div className="border-t border-white/10" />
           </div>
-          <motion.p style={{ opacity: d3Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-widest uppercase">
+          <motion.p style={{ opacity: d3Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-normal uppercase">
             도메인을 클릭하여 상세 확인 — 02 IMMERSIVE CREATIVE · 03 GLOBAL NETWORK
           </motion.p>
         </motion.div>
@@ -173,7 +173,7 @@ const Ch3: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = (
     <div style={{ height: `${H3}vh` }}>
       <StickyPanel>
         <motion.div style={{ opacity: op, y }}>
-          <p className="text-sm md:text-base tracking-[0.4em] uppercase text-[#FFB800] mb-6 font-bold">CONTACT</p>
+          <p className="text-sm md:text-base tracking-normal uppercase text-[#FFB800] mb-6 font-bold">CONTACT</p>
           <h2 className="font-black text-white leading-[0.9] mb-8" style={{ fontSize: 'clamp(3rem, 11vw, 9.5rem)', letterSpacing: '-0.04em' }}>
             프로젝트<br />문의하기
           </h2>
@@ -182,7 +182,7 @@ const Ch3: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = (
             단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
           </motion.p>
           <motion.button style={{ opacity: subOp }} onClick={onContactClick}
-            className="flex items-center gap-3 bg-[#FFB800] text-black font-black px-10 md:px-12 py-5 md:py-6 rounded-full hover:bg-white hover:scale-105 transition-all text-base md:text-lg tracking-wide">
+            className="flex items-center gap-3 bg-[#FFB800] text-black font-black px-10 md:px-12 py-5 md:py-6 rounded-full hover:bg-white hover:scale-105 transition-all text-base md:text-lg tracking-normal">
             문의하기 →
           </motion.button>
         </motion.div>
@@ -255,7 +255,7 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, startAtDomain
             className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
           >
-            <span className="text-xs font-bold tracking-[0.3em] text-[#FFB800] uppercase">Business</span>
+            <span className="text-xs font-bold tracking-normal text-[#FFB800] uppercase">Business</span>
             <div className="flex items-center gap-3">
               <button onClick={onClose}
                 className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"

@@ -126,7 +126,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
               <h3 className="text-sm font-bold tracking-tight mb-0.5" style={{ color: data.color }}>
                 {data.title}
               </h3>
-              <p className="text-[8px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+              <p className="text-[8px] font-bold tracking-normal text-gray-500 uppercase">
                 {data.subtitle}
               </p>
               <div className="h-[1px] w-full my-2" style={{ background: `linear-gradient(to right, transparent, ${data.color}44, transparent)` }} />
@@ -140,7 +140,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
                   {data.links!.map(link => (
                     <button
                       key={link.label}
-                      className="text-[8px] font-bold uppercase tracking-wider py-1 px-1.5 rounded border transition-colors cursor-pointer"
+                      className="text-[8px] font-bold uppercase tracking-normal py-1 px-1.5 rounded border transition-colors cursor-pointer"
                       style={{ borderColor: data.color + '50', color: data.color }}
                       onClick={() => window.open(link.url, '_blank')}
                     >
@@ -151,14 +151,14 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
               ) : hasTwoLinks ? (
                 <div className="flex gap-1.5 mt-1">
                   <button
-                    className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors cursor-pointer"
+                    className="flex-1 text-[8px] font-bold uppercase tracking-normal py-1 px-2 rounded border transition-colors cursor-pointer"
                     style={{ borderColor: data.color + '60', color: data.color }}
                     onClick={() => data.b2b && window.open(data.b2b, '_blank')}
                   >
                     {data.btnLabels?.b2b ?? 'B2B →'}
                   </button>
                   <button
-                    className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1 px-2 rounded border transition-colors"
+                    className="flex-1 text-[8px] font-bold uppercase tracking-normal py-1 px-2 rounded border transition-colors"
                     style={data.b2c ? { borderColor: data.color + '60', color: data.color, cursor: 'pointer' } : { borderColor: '#333', color: '#555', cursor: 'default' }}
                     onClick={() => data.b2c && window.open(data.b2c, '_blank')}
                   >
@@ -167,7 +167,7 @@ const Building: React.FC<{ data: BuildingData; onAiLabClick?: () => void; showLa
                 </div>
               ) : (
                 <div
-                  className="mt-1 text-[8px] uppercase tracking-widest cursor-pointer"
+                  className="mt-1 text-[8px] uppercase tracking-normal cursor-pointer"
                   style={{ color: data.url || data.id === 'ailab' ? data.color : '#555' }}
                   onClick={() => {
                     if (data.id === 'ailab' && onAiLabClick) onAiLabClick();
@@ -242,7 +242,7 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
             <h2 className="text-3xl font-bold tracking-tighter text-white leading-none">
               NADAUN <span className="text-[#FFB800]">UNIVERSE</span>
             </h2>
-            <p className="mt-3 text-[10px] tracking-[0.35em] uppercase text-white/30 font-light">
+            <p className="mt-3 text-[10px] tracking-normal uppercase text-white/30 font-light">
               나다운이 만드는 세계
             </p>
           </div>
@@ -261,7 +261,7 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                 <h3 className="text-xs font-bold leading-tight mb-0.5 text-white">
                   {item.title}
                 </h3>
-                <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-2">
+                <p className="text-[9px] text-gray-500 uppercase tracking-normal mb-2">
                   {item.subtitle}
                 </p>
                 <p className="text-[10px] text-gray-400 leading-relaxed whitespace-pre-line flex-1">
@@ -274,7 +274,7 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                     {item.links.map(link => (
                       <button
                         key={link.label}
-                        className="text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform"
+                        className="text-[8px] font-bold uppercase tracking-normal py-1.5 rounded border active:scale-95 transition-transform"
                         style={{ borderColor: item.color + '50', color: item.color }}
                         onClick={() => window.open(link.url, '_blank')}
                       >{link.label} →</button>
@@ -283,19 +283,19 @@ const IsoWorld: React.FC<IsoWorldProps> = ({ onAiLabClick }) => {
                 ) : (item.b2b || item.b2c) ? (
                   <div className="flex gap-1.5 mt-3">
                     <button
-                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform leading-tight"
+                      className="flex-1 text-[8px] font-bold uppercase tracking-normal py-1.5 rounded border active:scale-95 transition-transform leading-tight"
                       style={{ borderColor: item.color + '60', color: item.color }}
                       onClick={() => item.b2b && window.open(item.b2b, '_blank')}
                     >{(item.btnLabels?.b2b ?? 'PHOTO →').replace(' →', '')}</button>
                     <button
-                      className="flex-1 text-[8px] font-bold uppercase tracking-wider py-1.5 rounded border active:scale-95 transition-transform leading-tight"
+                      className="flex-1 text-[8px] font-bold uppercase tracking-normal py-1.5 rounded border active:scale-95 transition-transform leading-tight"
                       style={item.b2c ? { borderColor: item.color + '60', color: item.color } : { borderColor: '#333', color: '#555' }}
                       onClick={() => item.b2c && window.open(item.b2c, '_blank')}
                     >{item.b2c ? (item.btnLabels?.b2c ?? 'VIDEO →').replace(' →', '') : 'Soon'}</button>
                   </div>
                 ) : (
                   <button
-                    className="mt-3 text-[9px] uppercase tracking-wider text-left active:scale-95 transition-transform"
+                    className="mt-3 text-[9px] uppercase tracking-normal text-left active:scale-95 transition-transform"
                     style={{ color: item.url || item.id === 'ailab' ? item.color : '#444' }}
                     onClick={() => {
                       if (item.id === 'ailab' && onAiLabClick) onAiLabClick();

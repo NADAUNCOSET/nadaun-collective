@@ -130,7 +130,7 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
           style={{ opacity: ctaOp, y: ctaY }}
           className="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24"
         >
-          <p className="text-white/30 text-sm tracking-[0.3em] uppercase mb-6 font-light">
+          <p className="text-white/30 text-sm tracking-normal uppercase mb-6 font-light">
             Contact
           </p>
           <button

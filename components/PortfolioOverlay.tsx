@@ -71,12 +71,12 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
           <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-white/15 bg-[#1a1a1a]/90 px-6 backdrop-blur-md md:px-12">
             <div className="flex items-center gap-3">
               <span className="text-sm font-extrabold tracking-[-0.02em]">NADAUN</span>
-              <span className="text-sm font-medium tracking-[0.18em] text-[#FFB800]">PORTFOLIO</span>
+              <span className="text-sm font-medium tracking-normal text-[#FFB800]">PORTFOLIO</span>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="group flex items-center gap-3 text-xs font-bold tracking-[0.22em] text-white/70 transition-colors hover:text-[#FFB800]"
+              className="group flex items-center gap-3 text-xs font-bold tracking-normal text-white/70 transition-colors hover:text-[#FFB800]"
               aria-label="포트폴리오 닫기"
             >
               CLOSE
@@ -90,7 +90,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
             <div className="mb-10 grid gap-7 md:mb-14 md:grid-cols-12 md:items-end">
               <div className="md:col-span-8">
                 <motion.p
-                  className="mb-5 text-[11px] font-bold tracking-[0.35em] text-[#FFB800]"
+                  className="mb-5 text-[11px] font-bold tracking-normal text-[#FFB800]"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.28, duration: 0.5, ease }}
@@ -161,14 +161,14 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
 
                     <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-9 lg:p-11">
                       <div className="flex items-start justify-between">
-                        <span className="text-xs font-bold tracking-[0.3em] text-white/65">{card.number}</span>
+                        <span className="text-xs font-bold tracking-normal text-white/65">{card.number}</span>
                         <span className="grid h-11 w-11 place-items-center rounded-full border border-white/40 transition-all duration-300 group-hover:rotate-45 group-hover:border-[#FFB800] group-hover:bg-[#FFB800] group-hover:text-[#1a1a1a]">
                           <ArrowUpRight size={20} />
                         </span>
                       </div>
 
                       <div>
-                        <p className="mb-4 text-[10px] font-bold tracking-[0.25em] text-[#FFB800] md:text-xs">{card.eyebrow}</p>
+                        <p className="mb-4 text-[10px] font-bold tracking-normal text-[#FFB800] md:text-xs">{card.eyebrow}</p>
                         <h2
                           className="font-black leading-none tracking-[-0.05em]"
                           style={{ fontSize: 'clamp(3.6rem, 8vw, 8.5rem)', fontFamily: 'SUIT, Pretendard, sans-serif' }}

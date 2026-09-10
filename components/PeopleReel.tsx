@@ -64,7 +64,7 @@ const PeopleReel: React.FC = () => {
       {/* Counter */}
       <div
         className="absolute bottom-8 right-8 font-mono text-white/25 z-20 pointer-events-none"
-        style={{ fontSize: 11, letterSpacing: '0.15em' }}
+        style={{ fontSize: 11, letterSpacing: '0' }}
       >
         {String(current + 1).padStart(2, '0')} / {String(PHOTOS.length).padStart(2, '0')}
       </div>

@@ -75,7 +75,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
           <div className="fixed top-8 right-8 md:top-12 md:right-12 z-[110] flex items-center gap-2 md:gap-3">
             {onBack && (
               <button onClick={onBack}
-                className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-wider uppercase text-white/70 hover:text-[#FFB800] transition-all"
+                className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-normal uppercase text-white/70 hover:text-[#FFB800] transition-all"
               >
                 <ArrowLeft size={16} /> 사업영역
               </button>
@@ -98,7 +98,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                 className="flex items-center gap-3 text-[#FFB800] mb-6"
               >
                 <Sparkles className="w-6 h-6" />
-                <span className="font-bold tracking-[0.3em] text-sm uppercase">Innovation Lab</span>
+                <span className="font-bold tracking-normal text-sm uppercase">Innovation Lab</span>
               </motion.div>
               
               <h2 className="font-black tracking-[-0.04em] mb-8 leading-[0.88]" style={{ fontSize: 'clamp(3rem, 9vw, 7rem)' }}>
@@ -128,7 +128,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
-                  className={`px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-300 border ${
+                  className={`px-5 py-2 rounded-full text-xs font-bold tracking-normal uppercase transition-all duration-300 border ${
                     activeCategory === category 
                       ? 'bg-[#FFB800] text-black border-[#FFB800]' 
                       : 'bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white'
@@ -158,7 +158,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                     className="space-y-8"
                   >
                     <div className="flex items-center gap-4 border-b border-white/10 pb-4">
-                      <h3 className="text-2xl font-bold tracking-widest text-white">
+                      <h3 className="text-2xl font-bold tracking-normal text-white">
                         {category}
                       </h3>
                       <span className="text-xs font-mono text-gray-500 bg-white/5 px-2 py-1 rounded-md">
@@ -196,7 +196,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
                               </div>
 
                               <div className="mb-4">
-                                <span className="text-[10px] font-bold tracking-[0.2em] text-[#FFB800] uppercase mb-2 block">
+                                <span className="text-[10px] font-bold tracking-normal text-[#FFB800] uppercase mb-2 block">
                                   {tool.category}
                                 </span>
                                 <h3 className="text-2xl font-bold text-white group-hover:text-[#FFB800] transition-colors">
@@ -229,7 +229,7 @@ const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen,
             <div className="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
               <div className="flex items-center gap-4">
                 <span className="text-2xl font-bold tracking-tighter">NADAUN</span>
-                <span className="text-xs font-bold tracking-widest text-gray-600 uppercase">AI Innovation Lab</span>
+                <span className="text-xs font-bold tracking-normal text-gray-600 uppercase">AI Innovation Lab</span>
               </div>
               <p className="text-xs text-gray-600 font-medium">
                 COPYRIGHT©2026 NADAUN All Rights Reserved

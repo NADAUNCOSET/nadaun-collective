@@ -12,7 +12,7 @@ const About: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.374 }}
-              className="text-sm font-bold tracking-[0.2em] text-[#FFB800] mb-6 uppercase"
+              className="text-sm font-bold tracking-normal text-[#FFB800] mb-6 uppercase"
             >
               Who We Are
             </motion.h2>

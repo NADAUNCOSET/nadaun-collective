@@ -93,7 +93,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
           viewport={{ once: true }}
           transition={{ duration: 0.421, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="block text-[#FFB800] font-bold tracking-[0.25em] text-[11px] uppercase mb-7">
+          <span className="block text-[#FFB800] font-bold tracking-normal text-[11px] uppercase mb-7">
             IP PIPELINE — 5 STAGES
           </span>
 
@@ -111,7 +111,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
                 수많은 대행사를 오가며 IP의 정체성이 희석되는 시대는 끝났습니다.
                 기획부터 글로벌 확산까지 — 단 하나의 파이프라인으로.
               </p>
-              <p className="text-[#FFB800]/80 text-xs font-bold tracking-[0.15em] uppercase">
+              <p className="text-[#FFB800]/80 text-xs font-bold tracking-normal uppercase">
                 소통 비용은 줄이고, IP 퀄리티는 높입니다.
               </p>
             </div>
@@ -123,7 +123,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
               <React.Fragment key={area.id}>
                 <button
                   onClick={() => setActiveId(area.id)}
-                  className={`shrink-0 flex items-center gap-2.5 px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all duration-300 ${
+                  className={`shrink-0 flex items-center gap-2.5 px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-normal transition-all duration-300 ${
                     activeId === area.id
                       ? 'bg-[#FFB800] text-black'
                       : 'text-white/35 hover:text-white/60'
@@ -196,11 +196,11 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
                 {/* Top */}
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className={`font-mono text-[11px] tracking-[0.3em] transition-colors duration-300 ${activeId === area.id ? 'text-[#FFB800]' : 'text-white/20'}`}>
+                    <span className={`font-mono text-[11px] tracking-normal transition-colors duration-300 ${activeId === area.id ? 'text-[#FFB800]' : 'text-white/20'}`}>
                       {area.id}
                     </span>
                     {activeId !== area.id && (
-                      <p className="text-[10px] tracking-[0.2em] uppercase text-white/18 mt-1 font-medium">
+                      <p className="text-[10px] tracking-normal uppercase text-white/18 mt-1 font-medium">
                         {area.stage}
                       </p>
                     )}
@@ -231,7 +231,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
                       transition={{ delay: 0.08, duration: 0.351, ease: [0.16, 1, 0.3, 1] }}
                     >
                       {/* Subtitle */}
-                      <p className="text-[11px] tracking-[0.25em] uppercase text-[#FFB800]/70 font-bold mb-3">
+                      <p className="text-[11px] tracking-normal uppercase text-[#FFB800]/70 font-bold mb-3">
                         {area.subtitle}
                       </p>
 
@@ -248,7 +248,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
 
                       <div className="flex flex-wrap gap-2 mb-8">
                         {area.tags.map((tag, i) => (
-                          <span key={i} className="text-[10px] font-bold text-[#FFB800] border border-[#FFB800]/25 px-3 py-1.5 rounded-full bg-[#FFB800]/[0.05] uppercase tracking-wide">
+                          <span key={i} className="text-[10px] font-bold text-[#FFB800] border border-[#FFB800]/25 px-3 py-1.5 rounded-full bg-[#FFB800]/[0.05] uppercase tracking-normal">
                             {tag}
                           </span>
                         ))}
@@ -256,7 +256,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
 
                       <button
                         onClick={(e) => handleExploreClick(area.id, e)}
-                        className="text-xs font-bold border-b border-white/30 pb-1 hover:text-[#FFB800] hover:border-[#FFB800] transition-all duration-300 flex items-center gap-2 group text-white/70 uppercase tracking-wider"
+                        className="text-xs font-bold border-b border-white/30 pb-1 hover:text-[#FFB800] hover:border-[#FFB800] transition-all duration-300 flex items-center gap-2 group text-white/70 uppercase tracking-normal"
                       >
                         EXPLORE SOLUTION
                         <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -277,7 +277,7 @@ const Business: React.FC<BusinessProps> = ({ onAiLabClick, onIntegratedClick }) 
           viewport={{ once: true }}
           transition={{ duration: 0.468, delay: 0.128 }}
         >
-          <p className="text-white/22 text-xs tracking-[0.3em] uppercase font-medium">
+          <p className="text-white/22 text-xs tracking-normal uppercase font-medium">
             NADAUN COLLECTIVE — All-in-One IP Engine
           </p>
           <p className="text-white/35 text-sm leading-relaxed max-w-lg text-right">
