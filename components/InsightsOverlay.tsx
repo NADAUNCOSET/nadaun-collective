@@ -57,7 +57,7 @@ export default function InsightsOverlay({isOpen,onClose,onContactClick}:Insights
     <div key="archive" className="insight-archive"><p className="insight-kicker">NADAUN MOMENT · Production archive</p><SceneType>공개된 작업으로<br/>확인하는 제작의 축적.</SceneType><SceneType as="p" order={2} className="insight-body">브랜드 촬영과 기업 행사, 인물·제품 표현, 광고 영상과 브랜드 필름. 공개 포트폴리오에 수록된 결과물을 사진과 영상으로 구분해 기록합니다.</SceneType><div className="insight-metrics">{[
       {n:'343',unit:'개',label:'사진 프로젝트',detail:'공개 포트폴리오 프로젝트'},
       {n:'6,237',unit:'장',label:'수록 사진',detail:'프로젝트별 공개 이미지 합계'},
-      {n:'174',unit:'편',label:'수록 영상',detail:'가로·세로 포트폴리오 합계'},
+      {n:'173',unit:'편',label:'수록 영상',detail:'가로·세로 포트폴리오 합계'},
     ].map(item=><div key={item.label}><p className="insight-metric-value">{item.n}<span>{item.unit}</span></p><h3>{item.label}</h3><p>{item.detail}</p></div>)}</div><div className="insight-archive-links"><a href="https://photo.nadaun.co" target="_blank" rel="noreferrer">Photo archive <ArrowUpRight size={16}/></a><a href="https://video.nadaun.co" target="_blank" rel="noreferrer">Video archive <ArrowUpRight size={16}/></a></div><p className="insight-source">2026.09.10 공개 목록 기준. 동일 영상의 사이니지 회전본은 중복 집계하지 않습니다. 수록량은 제작 아카이브의 규모이며 매출·광고 성과 지표와 구분합니다.</p></div>,
     <div key="principles" className="insight-principles"><p className="insight-kicker">Measurement principles</p><SceneType>좋은 리포트는<br/>지표의 경계를 명확히 합니다.</SceneType><div>{[
       ['집행 이행','계약 편수, 실제 송출, 기간과 소재를 대조해 계획이 어떻게 실행되었는지 확인합니다.'],
