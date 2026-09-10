@@ -1,145 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-
-const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+import React, { useEffect, useRef, useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 const navItems = [
-  { label: 'ABOUT', id: 'about' },
-  { label: 'BUSINESS', id: 'business' },
-  { label: 'PORTFOLIO', id: 'portfolio', accent: true },
-  { label: 'INSIGHTS', id: 'insights' },
+  { label: 'ABOUT', id: 'about' }, { label: 'BUSINESS', id: 'business' },
+  { label: 'PORTFOLIO', id: 'portfolio' }, { label: 'INSIGHTS', id: 'insights' },
 ];
+interface HeaderProps { onNavClick: (id: string) => void; show?: boolean; introFinished?: boolean; }
 
-interface HeaderProps {
-  onNavClick: (id: string) => void;
-  show?: boolean;
-  introFinished?: boolean;
-}
-
-const Header: React.FC<HeaderProps> = ({ onNavClick, show = true, introFinished = true }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
+const Header: React.FC<HeaderProps> = ({ onNavClick, introFinished = true }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const headerRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const navigate = (id: string) => { setIsMenuOpen(false); onNavClick(id); };
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleItemClick = (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    onNavClick(id);
-    setIsMenuOpen(false);
-  };
-
+    if (!isMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setIsMenuOpen(false); menuRef.current?.focus(); } };
+    const onOutside = (e: PointerEvent) => { if (!headerRef.current?.contains(e.target as Node)) setIsMenuOpen(false); };
+    window.addEventListener('keydown', onKey); window.addEventListener('pointerdown', onOutside);
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('pointerdown', onOutside); };
+  }, [isMenuOpen]);
   return (
-    <>
-      <header 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled ? 'bg-black/90 backdrop-blur-md py-4 border-b border-white/10' : 'bg-transparent py-6 md:py-8'
-        }`}
-      >
-        {/* padding synced to COLLECTIVE text edges via --header-pad CSS var set in Hero */}
-        <div
-          className="flex justify-between items-center w-full transition-[padding] duration-300 ease-out"
-          style={{ paddingLeft: 'var(--header-pad, 1.5rem)', paddingRight: 'var(--header-pad, 1.5rem)' }}
-        >
-          {/* Logo Section */}
-          <motion.a
-            href="#"
-            className="flex items-center gap-2 z-50 relative cursor-pointer select-none"
-            initial={IS_MOBILE ? { opacity: 0 } : { y: 100 }}
-            animate={introFinished ? { y: 0, opacity: 1 } : IS_MOBILE ? { opacity: 0 } : { y: 100 }}
-            transition={{ duration: IS_MOBILE ? 0.4 : 0.281, ease: [0.22, 1, 0.36, 1], delay: 0.032 }}
-          >
-            <span className="text-2xl md:text-3xl font-extrabold text-white leading-none tracking-tight">NADAUN</span>
-            <span className="text-2xl md:text-3xl font-light leading-none tracking-tight" style={{ color: '#FFB800' }}>COLLECTIVE</span>
-          </motion.a>
-
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-10">
-            <motion.nav 
-              className="flex items-center space-x-10"
-              initial={{ opacity: 0 }}
-              animate={introFinished ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.234, delay: 0.096 }}
-            >
-              {navItems.map((item) => (
-                <button 
-                  key={item.label} 
-                  onClick={(e) => handleItemClick(item.id, e)}
-                  className={`text-lg font-bold tracking-widest transition-colors relative group cursor-pointer ${
-                    item.accent ? 'text-[#FFB800] hover:text-white' : 'text-white hover:text-[#FFB800]'
-                  }`}
-                >
-                  {item.label}
-                  <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-[#FFB800] scale-x-0 group-hover:scale-x-100 transition-transform origin-right group-hover:origin-left duration-300"></span>
-                </button>
-              ))}
-            </motion.nav>
-
-            {/* CONTACT BUTTON */}
-            <motion.button 
-              onClick={(e) => handleItemClick('contact', e)}
-              initial={{ y: 100 }}
-              animate={introFinished ? { y: 0 } : { y: 100 }}
-              transition={{ duration: 0.281, ease: [0.22, 1, 0.36, 1], delay: 0.064 }}
-              className="group relative z-[60] cursor-pointer flex items-center justify-center overflow-hidden bg-white hover:bg-[#FFB800] transition-colors duration-300 px-6 py-2 rounded-full"
-            >
-              <span className="text-sm font-bold tracking-widest text-black transition-colors">
-                CONTACT
-              </span>
-            </motion.button>
-          </div>
-
-          {/* Mobile Menu */}
-          <button 
-            className="md:hidden z-50 text-white hover:text-[#FFB800] transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
+    <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#1a1a1a]/95 backdrop-blur-md" style={{ opacity:introFinished ? 1 : 0, visibility:introFinished ? 'visible' : 'hidden', transition:'opacity .25s' }}>
+      <div className="h-16 md:h-[72px] px-4 md:px-8 flex items-center justify-between gap-4">
+        <a href="#" aria-label="NADAUN COLLECTIVE 홈" className="flex items-center gap-3 min-h-[44px] shrink-0">
+          <img src="/nadaun_logo.png" alt="NADAUN" width="100" height="40" className="w-20 md:w-[100px] h-10 object-contain brightness-0 invert" />
+          <span className="hidden sm:inline text-[10px] font-medium tracking-[.15em] text-white/50">COLLECTIVE</span>
+        </a>
+        <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-6">
+          {navItems.map(item => <button key={item.id} type="button" onClick={() => navigate(item.id)} className="min-h-[44px] text-[11px] font-medium tracking-[.1em] text-white/60 transition-colors hover:text-white">{item.label}</button>)}
+        </nav>
+        <div className="flex items-center gap-2 md:gap-5">
+          <button type="button" onClick={() => navigate('contact')} className="min-h-[44px] px-2 text-xs font-medium text-white hover:text-[#FBB200] transition-colors">Contact</button>
+          <button ref={menuRef} type="button" aria-label={isMenuOpen ? '메뉴 닫기' : '메뉴 열기'} aria-expanded={isMenuOpen} aria-controls="mobile-navigation" onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden w-11 h-11 flex items-center justify-center text-white">
+            {isMenuOpen ? <X size={20} strokeWidth={1.6} /> : <Menu size={20} strokeWidth={1.6} />}
           </button>
         </div>
-      </header>
-
-      {/* Mobile Fullscreen Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: '-100%' }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: '-100%' }}
-            transition={{ duration: 0.234, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 bg-black z-40 flex flex-col justify-center items-center"
-          >
-            <div className="flex flex-col space-y-8 text-center">
-              {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={(e) => handleItemClick(item.id, e)}
-                  className={`text-5xl font-bold tracking-tighter transition-colors flex items-center justify-center gap-4 group cursor-pointer ${
-                    item.accent ? 'text-[#FFB800] hover:text-white' : 'text-white hover:text-[#FFB800]'
-                  }`}
-                >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute left-8"><ArrowRight /></span>
-                  {item.label}
-                </button>
-              ))}
-               <button
-                  onClick={(e) => handleItemClick('contact', e)}
-                  className="text-5xl font-bold tracking-tighter text-[#FFB800] flex items-center justify-center gap-4 mt-8"
-                >
-                  CONTACT
-                </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+      </div>
+      {isMenuOpen && <nav id="mobile-navigation" aria-label="Mobile navigation" className="lg:hidden absolute top-full right-4 mt-2 w-64 p-4 bg-[#222] border border-white/10 shadow-lg">
+        {navItems.map(item => <button key={item.id} type="button" onClick={() => navigate(item.id)} className="block w-full min-h-[48px] px-3 text-left text-sm font-medium tracking-[.08em] text-white/70 hover:text-[#FBB200] transition-colors">{item.label}</button>)}
+      </nav>}
+    </header>
   );
 };
-
 export default Header;

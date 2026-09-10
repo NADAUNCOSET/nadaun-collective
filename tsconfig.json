@@ -25,5 +25,11 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "backups",
+    "migrated_prompt_history"
+  ]
 }

@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Clients from './components/Clients';
 import Footer from './components/Footer';
-import AboutOverlay from './components/AboutOverlay';
-import AiInnovationLabOverlay from './components/AiInnovationLabOverlay';
-import ContactOverlay from './components/ContactOverlay';
-import BusinessOverlay from './components/BusinessOverlay';
-import InsightsOverlay from './components/InsightsOverlay';
+const AboutOverlay = lazy(() => import('./components/AboutOverlay'));
+const AiInnovationLabOverlay = lazy(() => import('./components/AiInnovationLabOverlay'));
+const ContactOverlay = lazy(() => import('./components/ContactOverlay'));
+const BusinessOverlay = lazy(() => import('./components/BusinessOverlay'));
+const InsightsOverlay = lazy(() => import('./components/InsightsOverlay'));
 import Intro from './components/Intro';
 import ServiceHub from './components/ServiceHub';
 import ServiceHubV2 from './components/ServiceHubV2';
 import VideoReel from './components/VideoReel';
-import IntegratedSolutionOverlay from './components/IntegratedSolutionOverlay';
-import ImmersiveCreativeOverlay from './components/ImmersiveCreativeOverlay';
-import GlobalNetworkOverlay from './components/GlobalNetworkOverlay';
-import PortfolioOverlay from './components/PortfolioOverlay';
+const IntegratedSolutionOverlay = lazy(() => import('./components/IntegratedSolutionOverlay'));
+const ImmersiveCreativeOverlay = lazy(() => import('./components/ImmersiveCreativeOverlay'));
+const GlobalNetworkOverlay = lazy(() => import('./components/GlobalNetworkOverlay'));
+const PortfolioOverlay = lazy(() => import('./components/PortfolioOverlay'));
 import { motion, useScroll, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 
 const App: React.FC = () => {
@@ -27,7 +27,7 @@ const App: React.FC = () => {
   const cursorX = useSpring(rawCursorX, { stiffness: 300, damping: 26, mass: 0.5 });
   const cursorY = useSpring(rawCursorY, { stiffness: 300, damping: 26, mass: 0.5 });
 
-  const [introFinished, setIntroFinished] = useState(false);
+  const [introFinished, setIntroFinished] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
   // 기본 2안(이미지 타일). 1안 리스트 비교는 ?hub=1 로만 접근 (검수용)
   const [hubVersion] = useState<1 | 2>(() =>
@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [bizFromBack, setBizFromBack] = useState(false); // 상세 새창 백버튼 → 도메인으로 복귀
 
   useEffect(() => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const handleMouseMove = (e: MouseEvent) => {
       rawCursorX.set(e.clientX);
       rawCursorY.set(e.clientY);
@@ -55,7 +56,7 @@ const App: React.FC = () => {
   const closeOverlay = () => setActiveOverlay(null);
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-[#FFB800] selection:text-black cursor-none">
+    <div className="bg-[var(--nadaun-bg)] min-h-screen text-white selection:bg-[#FFB800] selection:text-black cursor-none">
 
       <AnimatePresence mode="sync">
         {!introFinished && <Intro onComplete={() => setIntroFinished(true)} />}
@@ -76,19 +77,20 @@ const App: React.FC = () => {
 
         {/* Cursor ring — spring trail */}
         <motion.div
-          className="fixed top-0 left-0 w-7 h-7 border border-white/70 rounded-full pointer-events-none z-[9999] hidden md:block"
+          className="nadaun-cursor fixed top-0 left-0 w-7 h-7 border border-white/70 rounded-full pointer-events-none z-[9999] hidden md:block"
           style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%', mixBlendMode: 'difference' }}
         />
         {/* Cursor dot — instant */}
         <motion.div
-          className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] hidden md:block"
+          className="nadaun-cursor fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] hidden md:block"
           style={{ x: rawCursorX, y: rawCursorY, translateX: '-50%', translateY: '-50%' }}
         />
 
-        {/* OVERLAYS */}
-        <AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />
-        <AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToDomains} />
-        <BusinessOverlay
+        {/* Fetch each detail view only when requested. */}
+        <Suspense fallback={<div className="fixed inset-0 z-[100] grid place-items-center bg-[#1a1a1a]" role="status"><span className="text-sm text-white/60">Loading…</span><button type="button" onClick={closeOverlay} className="absolute top-4 right-4 w-11 h-11" aria-label="닫기">×</button></div>}>
+        {activeOverlay === 'about' && (<AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />)}
+        {activeOverlay === 'ai-lab' && (<AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToDomains} />)}
+        {activeOverlay === 'business' && (<BusinessOverlay
           isOpen={activeOverlay === 'business'}
           startAtDomains={bizFromBack}
           onClose={closeOverlay}
@@ -97,33 +99,35 @@ const App: React.FC = () => {
           onCreativeClick={() => setActiveOverlay('immersive-creative')}
           onGlobalClick={() => setActiveOverlay('global-network')}
           onContactClick={() => setActiveOverlay('contact')}
-        />
-        <InsightsOverlay
+        />)}
+        {activeOverlay === 'insights' && (<InsightsOverlay
           isOpen={activeOverlay === 'insights'}
           onClose={closeOverlay}
           onContactClick={() => setActiveOverlay('contact')}
-        />
-        <ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />
-        <PortfolioOverlay isOpen={activeOverlay === 'portfolio'} onClose={closeOverlay} />
-        <IntegratedSolutionOverlay
+        />)}
+        {activeOverlay === 'contact' && (<ContactOverlay isOpen={activeOverlay === 'contact'} onClose={closeOverlay} />)}
+        {activeOverlay === 'portfolio' && (<PortfolioOverlay isOpen={activeOverlay === 'portfolio'} onClose={closeOverlay} />)}
+        {activeOverlay === 'integrated-solution' && (<IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
           onClose={closeOverlay}
           onBack={backToDomains}
           onContactClick={() => setActiveOverlay('contact')}
-        />
-        <ImmersiveCreativeOverlay
+        />)}
+        {activeOverlay === 'immersive-creative' && (<ImmersiveCreativeOverlay
           isOpen={activeOverlay === 'immersive-creative'}
           onClose={closeOverlay}
           onBack={backToDomains}
           onContactClick={() => setActiveOverlay('contact')}
           onGlobalClick={() => setActiveOverlay('global-network')}
-        />
-        <GlobalNetworkOverlay
+        />)}
+        {activeOverlay === 'global-network' && (<GlobalNetworkOverlay
           isOpen={activeOverlay === 'global-network'}
           onClose={closeOverlay}
           onBack={backToDomains}
           onContactClick={() => setActiveOverlay('contact')}
-        />
+        />)}
+
+        </Suspense>
 
         <main>
           <div className="relative">
@@ -134,7 +138,7 @@ const App: React.FC = () => {
             )}
           </div>
           <Hero />
-          <VideoReel />
+          <VideoReel paused={!!activeOverlay} />
           <Clients />
         </main>
 

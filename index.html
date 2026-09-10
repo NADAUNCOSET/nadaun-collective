@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#1a1a1a" />
     <title>종합광고대행사·사진영상제작·기업브랜딩 | 나다운</title>
 
     <!-- ─── SEO / 검색엔진 (2026-07-06) ─── -->
@@ -64,6 +64,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
     <!-- Preconnect for fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -74,14 +75,14 @@
     <link rel="preload" href="/symbol-black.webp" as="image" type="image/webp" />
     <link rel="preload" href="/hero/pepsi-festa.webp" as="image" type="image/webp" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+
 
     <style>
       *, *::before, *::after { box-sizing: border-box; }
       html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
       body {
-        font-family: 'Manrope', sans-serif;
-        background-color: #000;
+        font-family: var(--nadaun-font);
+        background-color: var(--nadaun-bg);
         color: #fff;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
@@ -96,7 +97,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #555; }
       }
       /* Prevent FOUC */
-      #root { background: #000; min-height: 100dvh; }
+      #root { background: var(--nadaun-bg); min-height: 100dvh; }
     </style>
   </head>
   <body>

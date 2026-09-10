@@ -22,10 +22,12 @@ export default defineConfig(({ mode }) => {
       cssMinify: true,
       rollupOptions: {
         output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom'],
-            'framer-vendor': ['framer-motion'],
-            'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
+          manualChunks(id) {
+            const moduleId = id.replaceAll('\\', '/');
+            // Keep shared helpers and react-dom/client out of the deferred 3D chunk.
+            if (moduleId.includes('commonjsHelpers') || moduleId.includes('vite/preload-helper') || /\/node_modules\/(react|react-dom|scheduler)\//.test(moduleId)) return 'react-vendor';
+            if (/\/node_modules\/(three|@react-three|@react-spring)\//.test(moduleId)) return 'three-vendor';
+            if (/\/node_modules\/framer-motion\//.test(moduleId)) return 'framer-vendor';
           },
         },
       },

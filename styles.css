@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nadaun-bg: #1a1a1a;
+  --nadaun-text: #f5f4f0;
+  --nadaun-accent: #fbb200;
+  --nadaun-line: rgba(245,244,240,.12);
+  --nadaun-font: 'Pretendard', 'Manrope', system-ui, sans-serif;
+}
+body { margin:0; font-family:var(--nadaun-font); background:var(--nadaun-bg); color:var(--nadaun-text); }
+button, a, input, textarea, select { -webkit-tap-highlight-color:transparent; }
+button:focus-visible, a:focus-visible { outline:2px solid var(--nadaun-accent); outline-offset:4px; }
+@media (hover:none), (pointer:coarse) { .cursor-none { cursor:auto; } .nadaun-cursor { display:none; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .nadaun-cursor { display:none; } *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
