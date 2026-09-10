@@ -1,0 +1,82 @@
+.lab-page { --lab-bg:var(--nadaun-bg,#1a1a1a); --lab-text:var(--nadaun-text,#f5f4f0); --lab-accent:#fbb200; --lab-muted:rgba(245,244,240,.64); background:var(--lab-bg); color:var(--lab-text); }
+.lab-header { position:sticky; top:0; z-index:20; height:64px; display:flex; align-items:center; gap:8px; padding:0 clamp(20px,4vw,64px); background:var(--lab-bg); border-bottom:1px solid #ffffff1a; }
+.lab-progress { position:absolute; inset:0 0 auto; height:1px; background:var(--lab-accent); transform-origin:left; }
+.lab-wordmark { font-size:12px; font-weight:500; margin-right:auto; }
+.lab-header nav { display:flex; gap:24px; margin-right:16px; }
+.lab-header button { min-height:44px; font-size:12px; letter-spacing:0; color:var(--lab-muted); transition:color .2s; }
+.lab-header button:hover,.lab-link:hover { color:var(--lab-accent); }
+.lab-icon { width:44px; display:grid; place-items:center; flex-shrink:0; }
+.lab-content { max-width:1680px; padding:0 clamp(24px,5vw,80px); margin:auto; }
+.lab-gold,.lab-eyebrow { color:var(--lab-accent); }
+.lab-eyebrow { font-size:12px; font-weight:500; margin-bottom:28px; letter-spacing:0; }
+.lab-page h1,.lab-page h2,.lab-page h3 { font-family:SUIT,Pretendard,sans-serif; letter-spacing:-.035em; font-weight:800; }
+.lab-opening { width:100%; display:grid; grid-template-columns:1.2fr .8fr; gap:clamp(40px,8vw,128px); align-items:center; }
+.lab-opening h1 { font-size:clamp(44px,6.5vw,104px); line-height:1.08; margin-bottom:36px; }
+.lab-page p { word-break:keep-all; overflow-wrap:break-word; }
+.lab-lead { color:var(--lab-muted); font-size:18px; line-height:1.9; max-width:600px; }
+.lab-hero-image { height:min(63svh,700px); position:relative; overflow:hidden; }
+.lab-hero-image img { width:100%; height:100%; object-fit:cover; }
+.lab-page figcaption { position:absolute; left:18px; bottom:18px; font-size:11px; color:#f5f4f0; text-shadow:0 1px 5px #222; }
+.lab-statement { width:100%; }
+.lab-statement h2 { font-size:clamp(36px,5.2vw,84px); line-height:1.2; }
+.lab-statement > p:last-child { max-width:630px; margin:32px 0 0 auto; color:var(--lab-muted); font-size:16px; line-height:1.9; }
+.lab-section { padding:112px 0; border-top:1px solid #ffffff24; scroll-margin-top:80px; }
+.lab-section-heading { display:grid; grid-template-columns:1.1fr 1fr; gap:64px; }
+.lab-section h2 { font-size:clamp(34px,4.6vw,72px); line-height:1.12; }
+.lab-section-heading .lab-lead { font-size:22px; font-weight:600; color:var(--lab-text); margin-bottom:24px; line-height:1.55; }
+.lab-section-heading p:not(.lab-lead),.lab-stage > p,.lab-operating > p,.lab-signage-grid p { color:var(--lab-muted); font-size:15px; line-height:1.9; }
+.lab-link { display:inline-flex; gap:22px; align-items:center; min-height:44px; border-bottom:1px solid #ffffff66; margin-top:30px; font-size:15px; font-weight:500; transition:color .2s; }
+.lab-section-heading .lab-access { margin-top:12px; font-size:11px; color:#ffffff70; }
+.lab-stages { margin-top:80px; }
+.lab-stage { display:grid; grid-template-columns:40px 1fr 1.3fr; gap:24px; padding:32px 0; border-top:1px solid #ffffff24; align-items:start; }
+.lab-stage-number { color:var(--lab-accent); font-size:12px; padding-top:6px; }
+.lab-stage h3 { font-size:25px; }
+.lab-output { font-size:12px; color:#ffffff66; margin-top:10px; }
+.lab-operating { display:grid; grid-template-columns:1fr 1fr; gap:64px; margin-top:64px; border-top:1px solid #ffffff24; padding-top:48px; }
+.lab-operating h3 { font-size:30px; line-height:1.3; }
+.lab-signage-visual { position:relative; margin:64px 0 48px; }
+.lab-signage-visual figure { position:relative; overflow:hidden; height:clamp(320px,48vw,640px); }
+.lab-signage-visual img { width:100%; height:100%; object-fit:cover; transition:transform .8s cubic-bezier(.16,1,.3,1); }
+.lab-signage-visual:hover img { transform:scale(1.02); }
+.lab-signage-types { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px 24px; border-bottom:1px solid #ffffff24; padding:24px 0; font-size:clamp(18px,2vw,30px); font-family:'Cormorant Garamond',Georgia,serif; }
+.lab-signage-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
+.lab-signage-grid h3 { font-size:24px; margin-bottom:20px; }
+.lab-final .lab-link { margin-top:40px; }
+@media(max-width:1023px) {
+ .lab-opening { grid-template-columns:1fr 1fr; gap:32px; }
+ .lab-opening h1 { font-size:clamp(34px,5.8vw,64px); }
+ .lab-lead { font-size:15px; line-height:1.8; }
+ .lab-section-heading { gap:36px; }
+ .lab-signage-grid { gap:24px; }
+}
+@media(max-width:639px) {
+ .lab-header { padding:0 16px; gap:0; }
+ .lab-wordmark { font-size:10px; }
+ .lab-header nav { gap:12px; margin-right:4px; }
+ .lab-header nav button { font-size:10px; }
+ .lab-header nav button:first-child { display:none; }
+ .lab-icon { width:40px; }
+ .lab-opening { grid-template-columns:1fr; gap:28px; }
+ .lab-opening h1 { font-size:clamp(34px,9vw,54px); margin-bottom:20px; }
+ .lab-eyebrow { margin-bottom:18px; font-size:11px; }
+ .lab-lead { font-size:13px; line-height:1.8; }
+ .lab-hero-image { height:23svh; min-height:130px; }
+ .lab-hero-image img { object-position:center 60%; }
+ .lab-statement h2 { font-size:clamp(28px,7.8vw,44px); }
+ .lab-statement > p:last-child { font-size:13px; margin-top:28px; line-height:1.85; }
+ .lab-section { padding:72px 0; }
+ .lab-section-heading,.lab-operating { grid-template-columns:1fr; gap:28px; }
+ .lab-section-heading .lab-lead { font-size:19px; }
+ .lab-section-heading p:not(.lab-lead),.lab-stage > p,.lab-operating > p,.lab-signage-grid p { font-size:14px; }
+ .lab-stage { grid-template-columns:24px 1fr; gap:12px; padding:28px 0; }
+ .lab-stage > p { grid-column:2; }
+ .lab-stage h3 { font-size:23px; }
+ .lab-stages { margin-top:48px; }
+ .lab-signage-grid { grid-template-columns:1fr; gap:36px; }
+ .lab-signage-visual { margin-top:40px; }
+ .lab-signage-visual figure { height:320px; }
+ .lab-signage-types { justify-content:flex-start; }
+ .lab-operating h3 { font-size:28px; }
+}
+@media(max-height:620px) and (min-width:640px) { .lab-opening h1 { font-size:44px; margin-bottom:20px; } .lab-lead { font-size:14px; } .lab-statement h2 { font-size:36px; } .lab-statement > p:last-child { margin-top:20px; font-size:14px; } }
+@media(prefers-reduced-motion:reduce) { .lab-page * { transition:none!important; } }

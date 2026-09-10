@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import Header from './components/Header';
+import './components/navigation-shell.css';
 import Hero from './components/Hero';
 import Clients from './components/Clients';
 import Footer from './components/Footer';
@@ -22,6 +23,7 @@ const App: React.FC = () => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
+  const [cursorVisible, setCursorVisible] = useState(false);
   const rawCursorX = useMotionValue(-100);
   const rawCursorY = useMotionValue(-100);
   const cursorX = useSpring(rawCursorX, { stiffness: 300, damping: 26, mass: 0.5 });
@@ -36,13 +38,35 @@ const App: React.FC = () => {
   const [bizFromBack, setBizFromBack] = useState(false); // 상세 새창 백버튼 → 도메인으로 복귀
 
   useEffect(() => {
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const hideCursor = () => setCursorVisible(false);
     const handleMouseMove = (e: MouseEvent) => {
+      const target = e.target instanceof Element ? e.target : null;
+      const nativeControl = target?.closest('input, textarea, select, [contenteditable="true"], iframe');
+      if (!finePointer.matches || reducedMotion.matches || nativeControl || !document.hasFocus()) {
+        hideCursor();
+        return;
+      }
       rawCursorX.set(e.clientX);
       rawCursorY.set(e.clientY);
+      setCursorVisible(true);
     };
+    const handleVisibility = () => { if (document.hidden) hideCursor(); };
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    document.documentElement.addEventListener('mouseleave', hideCursor);
+    window.addEventListener('blur', hideCursor);
+    document.addEventListener('visibilitychange', handleVisibility);
+    finePointer.addEventListener('change', hideCursor);
+    reducedMotion.addEventListener('change', hideCursor);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.documentElement.removeEventListener('mouseleave', hideCursor);
+      window.removeEventListener('blur', hideCursor);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      finePointer.removeEventListener('change', hideCursor);
+      reducedMotion.removeEventListener('change', hideCursor);
+    };
   }, [rawCursorX, rawCursorY]);
 
   // Lock body scroll when overlay is open
@@ -56,14 +80,14 @@ const App: React.FC = () => {
   const closeOverlay = () => setActiveOverlay(null);
 
   return (
-    <div className="bg-[var(--nadaun-bg)] min-h-screen text-white selection:bg-[#FFB800] selection:text-black cursor-none">
+    <div className="collective-shell bg-[var(--nadaun-bg)] min-h-screen text-white selection:bg-[#FFB800] selection:text-black" data-custom-cursor={cursorVisible}>
 
       <AnimatePresence mode="sync">
         {!introFinished && <Intro onComplete={() => setIntroFinished(true)} />}
       </AnimatePresence>
 
       <div className="relative z-0">
-        <Header onNavClick={handleNavClick} show introFinished={introFinished} />
+        <Header onNavClick={handleNavClick} show introFinished={introFinished} activeSection={activeOverlay} onHome={closeOverlay} />
 
         {introFinished && (
           <motion.div
@@ -77,19 +101,21 @@ const App: React.FC = () => {
 
         {/* Cursor ring — spring trail */}
         <motion.div
-          className="nadaun-cursor fixed top-0 left-0 w-7 h-7 border border-white/70 rounded-full pointer-events-none z-[9999] hidden md:block"
-          style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%', mixBlendMode: 'difference' }}
+          className="nadaun-cursor fixed top-0 left-0 w-7 h-7 border border-white/70 rounded-full pointer-events-none z-[9999]"
+          aria-hidden="true"
+          style={{ opacity: cursorVisible ? 1 : 0, x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%', mixBlendMode: 'difference' }}
         />
         {/* Cursor dot — instant */}
         <motion.div
-          className="nadaun-cursor fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] hidden md:block"
-          style={{ x: rawCursorX, y: rawCursorY, translateX: '-50%', translateY: '-50%' }}
+          className="nadaun-cursor fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999]"
+          aria-hidden="true"
+          style={{ opacity: cursorVisible ? 1 : 0, x: rawCursorX, y: rawCursorY, translateX: '-50%', translateY: '-50%' }}
         />
 
         {/* Fetch each detail view only when requested. */}
-        <Suspense fallback={<div className="fixed inset-0 z-[100] grid place-items-center bg-[#1a1a1a]" role="status"><span className="text-sm text-white/60">Loading…</span><button type="button" onClick={closeOverlay} className="absolute top-4 right-4 w-11 h-11" aria-label="닫기">×</button></div>}>
+        <div className="collective-overlays"><Suspense fallback={<div className="fixed inset-0 z-[100] grid place-items-center bg-[#1a1a1a]" role="status"><span className="text-sm text-white/60">Loading…</span><button type="button" onClick={closeOverlay} className="absolute top-4 right-4 w-11 h-11" aria-label="닫기">×</button></div>}>
         {activeOverlay === 'about' && (<AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => setActiveOverlay('contact')} />)}
-        {activeOverlay === 'ai-lab' && (<AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToDomains} />)}
+        {activeOverlay === 'ai-lab' && (<AiInnovationLabOverlay isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToDomains} onContactClick={() => setActiveOverlay('contact')} />)}
         {activeOverlay === 'business' && (<BusinessOverlay
           isOpen={activeOverlay === 'business'}
           startAtDomains={bizFromBack}
@@ -127,7 +153,7 @@ const App: React.FC = () => {
           onContactClick={() => setActiveOverlay('contact')}
         />)}
 
-        </Suspense>
+        </Suspense></div>
 
         <main>
           <div className="relative">

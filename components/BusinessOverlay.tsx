@@ -16,14 +16,14 @@ const DOMAINS = [
   { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',        tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
   { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',        tags: ['TVC · CF', '브랜드필름', '기업 VCR', '3D · 모션', '사진 촬영', '영상 촬영', '지면 · 앨범'], icon: Zap },
   { id: '03', title: 'GLOBAL NETWORK',      subtitle: 'Nationwide & Global Media',     tags: ['Broadcast · IPTV · BTL', 'Global Media', 'Overseas'],      icon: Globe     },
-  { id: '04', title: 'AI INNOVATION LAB',   subtitle: 'Next-Gen Tech Enhancement',     tags: ['AI Production', 'VFX Pipeline', 'Gen AI'],                 icon: Sparkles  },
+  { id: '04', title: 'AI INNOVATION LAB',   subtitle: 'Production Systems & Signage',     tags: ['Production Workflow', 'Visual Development', 'Digital Signage'],                 icon: Sparkles  },
 ];
 
 
 
 const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
-    style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+    style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
     className="flex flex-col justify-center px-8 md:px-16 lg:px-24 overflow-hidden"
   >
     {children}
@@ -51,7 +51,7 @@ const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   return (
     <div style={{ height: `${H1}vh` }}>
       <div
-        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
         className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
         <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-normal uppercase text-[#FFB800] font-bold">
@@ -207,6 +207,7 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, startAtDomain
   const scrollRef = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  // Share the same damped scroll clock across every chapter and the progress bar.
 
   useEffect(() => {
     if (!isOpen) return;
@@ -269,9 +270,9 @@ const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, startAtDomain
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Ch1 g={progress} />
-            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} onCreativeClick={onCreativeClick} onGlobalClick={onGlobalClick} />
-            <Ch3 g={progress} onContactClick={onContactClick} />
+            <Ch1 g={scaleX} />
+            <Ch2 g={scaleX} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} onCreativeClick={onCreativeClick} onGlobalClick={onGlobalClick} />
+            <Ch3 g={scaleX} onContactClick={onContactClick} />
           </div>
         </motion.div>
       )}

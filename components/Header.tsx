@@ -5,9 +5,9 @@ const navItems = [
   { label: 'ABOUT', id: 'about' }, { label: 'BUSINESS', id: 'business' },
   { label: 'PORTFOLIO', id: 'portfolio' }, { label: 'INSIGHTS', id: 'insights' },
 ];
-interface HeaderProps { onNavClick: (id: string) => void; show?: boolean; introFinished?: boolean; }
+interface HeaderProps { onNavClick: (id: string) => void; show?: boolean; introFinished?: boolean; activeSection?:string|null; onHome?:()=>void; }
 
-const Header: React.FC<HeaderProps> = ({ onNavClick, introFinished = true }) => {
+const Header: React.FC<HeaderProps> = ({ onNavClick, introFinished = true, activeSection, onHome }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
@@ -26,16 +26,16 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, introFinished = true }) => 
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('pointerdown', onOutside); };
   }, [isMenuOpen]);
   return (
-    <header ref={headerRef} className={`fixed top-0 left-0 right-0 z-50 transition-colors ${isScrolled ? 'border-b border-white/10 bg-[#1a1a1a]/95 backdrop-blur-md' : 'bg-[#1a1a1a] lg:bg-transparent'}`} style={{ opacity:introFinished ? 1 : 0, visibility:introFinished ? 'visible' : 'hidden', transition:'opacity .25s' }}>
-      <div className={`h-16 px-4 lg:px-[var(--header-pad,1.5rem)] flex items-center justify-between gap-4 transition-[height] ${isScrolled ? 'lg:h-[76px]' : 'lg:h-[108px]'}`}>
-        <a href="#" aria-label="NADAUN COLLECTIVE 홈" className="flex items-center gap-2 min-h-[44px] shrink-0">
+    <header ref={headerRef} className={`fixed top-0 left-0 right-0 z-[300] transition-colors ${isScrolled || activeSection ? 'border-b border-white/10 bg-[#1a1a1a]/95 backdrop-blur-md' : 'bg-[#1a1a1a] lg:bg-transparent'}`} style={{ opacity:introFinished ? 1 : 0, visibility:introFinished ? 'visible' : 'hidden', transition:'opacity .25s' }}>
+      <div className="h-16 lg:h-[76px] px-4 lg:px-[var(--header-pad,1.5rem)] flex items-center justify-between gap-4">
+        <a href="#" onClick={(event)=>{event.preventDefault();setIsMenuOpen(false);onHome?.();window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}} aria-label="NADAUN COLLECTIVE 홈" className="flex items-center gap-2 min-h-[44px] shrink-0">
           <img src="/nadaun_logo.png" alt="" width="80" height="40" className="lg:hidden w-20 h-10 object-contain brightness-0 invert" />
           <span className="hidden lg:inline text-3xl font-extrabold text-white leading-none tracking-tight">NADAUN</span>
           <span className="text-[10px] lg:text-3xl font-medium lg:font-light leading-none tracking-normal lg:tracking-tight text-white/50 lg:text-[#FFB800]">COLLECTIVE</span>
         </a>
         <div className="hidden lg:flex items-center gap-10">
           <nav aria-label="Main navigation" className="flex items-center gap-10">
-            {navItems.map(item => <button key={item.id} type="button" onClick={() => navigate(item.id)} className={`min-h-[44px] text-lg font-bold tracking-normal transition-colors ${item.id === 'portfolio' ? 'text-[#FFB800] hover:text-white' : 'text-white hover:text-[#FFB800]'}`}>{item.label}</button>)}
+            {navItems.map(item => <button key={item.id} type="button" aria-current={item.id===activeSection?'page':undefined} onClick={() => navigate(item.id)} className={`min-h-[44px] text-lg font-bold tracking-normal transition-colors ${item.id === (activeSection || 'portfolio') ? 'text-[#FFB800] hover:text-white' : 'text-white hover:text-[#FFB800]'}`}>{item.label}</button>)}
           </nav>
           <button type="button" onClick={() => navigate('contact')} className="min-h-[44px] px-6 py-2 rounded-full bg-white text-[#1a1a1a] text-sm font-bold tracking-normal hover:bg-[#FFB800] transition-colors">CONTACT</button>
         </div>
@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, introFinished = true }) => 
         </div>
       </div>
       {isMenuOpen && <nav id="mobile-navigation" aria-label="Mobile navigation" className="lg:hidden absolute top-full right-4 mt-2 w-64 p-4 bg-[#222] border border-white/10 shadow-lg">
-        {navItems.map(item => <button key={item.id} type="button" onClick={() => navigate(item.id)} className="block w-full min-h-[48px] px-3 text-left text-sm font-medium tracking-normal text-white/70 hover:text-[#FBB200] transition-colors">{item.label}</button>)}
+        {navItems.map(item => <button key={item.id} type="button" aria-current={item.id===activeSection?'page':undefined} onClick={() => navigate(item.id)} className="block w-full min-h-[48px] px-3 text-left text-sm font-medium tracking-normal text-white/70 hover:text-[#FBB200] transition-colors">{item.label}</button>)}
       </nav>}
     </header>
   );

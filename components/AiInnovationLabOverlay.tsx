@@ -1,246 +1,70 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, ExternalLink, Sparkles, Cpu, Image as ImageIcon, Video, Search, Palette, Music, Box } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { motion, useReducedMotion, useScroll } from 'framer-motion';
+import { ArrowLeft, ArrowUpRight, X } from 'lucide-react';
+import { InsightsScrollContext, ScrollReveal, ScrollStory, SceneLine } from './InsightsMotion';
+import './insights-motion.css';
+import './lab-production.css';
 
-const CATEGORIES = ['ALL', 'LLM', 'IMAGE', 'VIDEO', 'AUDIO', 'DESIGN & 3D'];
-
-// 2026-07 기준 최신 핫리스트 (시장 점유율·아레나 리더보드 기반)
-const AI_TOOLS = [
-  { name: 'ChatGPT', url: 'https://chat.openai.com', category: 'LLM', desc: '점유율 1위(글로벌 54%) — OpenAI 대화형 AI의 표준입니다.', icon: <Cpu className="w-5 h-5" />, color: '#10a37f' },
-  { name: 'Gemini', url: 'https://gemini.google.com', category: 'LLM', desc: '점유율 2위 — 1년 새 450% 성장한 Google 멀티모달 AI입니다.', icon: <Sparkles className="w-5 h-5" />, color: '#4285f4' },
-  { name: 'Claude', url: 'https://claude.ai', category: 'LLM', desc: '최고 성장세(연 855%↑) — 에이전틱 작업·코딩 최강 Anthropic AI입니다.', icon: <Cpu className="w-5 h-5" />, color: '#d97757' },
-  { name: 'DeepSeek', url: 'https://www.deepseek.com', category: 'LLM', desc: '오픈소스 추론(reasoning) 모델의 대표주자입니다.', icon: <Cpu className="w-5 h-5" />, color: '#4d6bfe' },
-  { name: 'Grok', url: 'https://grok.com', category: 'LLM', desc: 'xAI의 실시간 정보 결합 대화형 AI입니다.', icon: <Cpu className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Perplexity', url: 'https://www.perplexity.ai', category: 'LLM', desc: '출처 기반 실시간 AI 검색 엔진입니다.', icon: <Search className="w-5 h-5" />, color: '#20b2aa' },
-
-  { name: 'GPT Image 2', url: 'https://openai.com', category: 'IMAGE', desc: '이미지 아레나 1위 — OpenAI의 최신 이미지 생성 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#10a37f' },
-  { name: 'Nano Banana', url: 'https://gemini.google.com', category: 'IMAGE', desc: 'Google 화제의 이미지 생성·편집 모델(Gemini Flash Image)입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffd400' },
-  { name: 'Midjourney', url: 'https://www.midjourney.com', category: 'IMAGE', desc: 'v7 — 예술적 미감·시네마틱 라이팅의 골드 스탠다드입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'FLUX', url: 'https://bfl.ai', category: 'IMAGE', desc: '오픈소스 이미지 1위 — Black Forest Labs의 대표 모델입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Ideogram', url: 'https://ideogram.ai', category: 'IMAGE', desc: '텍스트·타이포 표현에 가장 강한 이미지 AI입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ff7a00' },
-  { name: 'Krea', url: 'https://www.krea.ai', category: 'IMAGE', desc: '실시간 생성·업스케일 크리에이티브 툴입니다.', icon: <ImageIcon className="w-5 h-5" />, color: '#ffffff' },
-
-  { name: 'Kling 3.0', url: 'https://klingai.com', category: 'VIDEO', desc: '영상 아레나 1위 — 사실적 모션의 최강 영상 생성 AI입니다.', icon: <Video className="w-5 h-5" />, color: '#ff4d6d' },
-  { name: 'Veo 3.1', url: 'https://deepmind.google/models/veo/', category: 'VIDEO', desc: 'Google의 시네마틱 영상 생성 — 오디오 동시 생성 지원.', icon: <Video className="w-5 h-5" />, color: '#4285f4' },
-  { name: 'Sora 2', url: 'https://sora.com', category: 'VIDEO', desc: 'OpenAI의 소셜 숏폼형 영상 생성 — 사운드·대사까지 한 번에.', icon: <Video className="w-5 h-5" />, color: '#ff4b4b' },
-  { name: 'Seedance', url: 'https://seed.bytedance.com', category: 'VIDEO', desc: 'ByteDance — 롱폼 이미지-투-비디오의 최신 강자입니다.', icon: <Video className="w-5 h-5" />, color: '#00f0ff' },
-  { name: 'Runway', url: 'https://runwayml.com', category: 'VIDEO', desc: 'Gen-4.5 — 프로덕션 컨트롤에 가장 강한 영상 툴입니다.', icon: <Video className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Wan', url: 'https://wan.video', category: 'VIDEO', desc: '오픈소스 영상 1위 — Alibaba의 공개 가중치 모델입니다.', icon: <Video className="w-5 h-5" />, color: '#7c3aed' },
-
-  { name: 'Suno', url: 'https://suno.com', category: 'AUDIO', desc: '텍스트 한 줄로 완성곡을 만드는 음악 생성 1위입니다.', icon: <Music className="w-5 h-5" />, color: '#ff8c00' },
-  { name: 'ElevenLabs', url: 'https://elevenlabs.io', category: 'AUDIO', desc: '가장 자연스러운 AI 음성 합성·더빙 플랫폼입니다.', icon: <Music className="w-5 h-5" />, color: '#ffffff' },
-  { name: 'Udio', url: 'https://www.udio.com', category: 'AUDIO', desc: '감정을 담은 고품질 AI 음악 생성기입니다.', icon: <Music className="w-5 h-5" />, color: '#2563eb' },
-
-  { name: 'Gamma', url: 'https://gamma.app', category: 'DESIGN & 3D', desc: 'AI로 프레젠테이션·웹사이트를 제작합니다.', icon: <Palette className="w-5 h-5" />, color: '#ff69b4' },
-  { name: 'Spline', url: 'https://spline.design', category: 'DESIGN & 3D', desc: '웹 기반 3D 디자인 및 AI 생성 도구입니다.', icon: <Box className="w-5 h-5" />, color: '#ff00ff' },
-  { name: 'Meshy', url: 'https://www.meshy.ai', category: 'DESIGN & 3D', desc: '텍스트·이미지를 3D 모델로 생성합니다.', icon: <Box className="w-5 h-5" />, color: '#7c3aed' },
-  { name: 'Canva Magic', url: 'https://www.canva.com', category: 'DESIGN & 3D', desc: '디자인 프로세스를 혁신하는 AI 도구 모음입니다.', icon: <Palette className="w-5 h-5" />, color: '#00c4cc' },
+const WORKSPACE = 'https://allinone.nadaun.co';
+const STAGES = [
+  { n:'01', title:'브리프와 제작 기준', output:'Creative brief', body:'캠페인 목적, 타깃, 핵심 메시지와 납품 규격을 제작 기준으로 정리합니다. 클라이언트 자료와 레퍼런스를 프로젝트에 연결해 기획 판단의 근거를 공유합니다.' },
+  { n:'02', title:'기획안과 트리트먼트', output:'Proposal · Treatment', body:'콘셉트, 카피, 시각적 방향과 구성안을 페이지 단위로 설계합니다. 검토 의견과 확정 상태를 구분하고, 승인된 방향을 후속 제작 문서에 반영합니다.' },
+  { n:'03', title:'스토리보드와 콘티', output:'Storyboard · Shot design', body:'컷의 목적과 장면 구성을 프레임으로 구체화합니다. 구도, 렌즈, 카메라 무빙, 조명, 인물의 동선과 컷 연결을 검토해 연출 의도를 촬영팀이 해석할 수 있는 언어로 정리합니다.' },
+  { n:'04', title:'애니메틱', output:'Timing · Editorial rhythm', body:'콘티를 시간축에 배치하고 컷 길이, 전환, 내레이션과 가이드 사운드를 함께 검토합니다. 촬영 전에 메시지의 전달 속도와 편집 리듬을 확인하고, 합의된 컷 배열을 제작 기준으로 확정합니다.' },
+  { n:'05', title:'샷리스트와 촬영 준비', output:'Shot list · Call sheet', body:'확정 콘티의 컷 정보를 실행 샷리스트에 연결합니다. 샷 사이즈, 앵글, 렌즈, 무빙, 장소, 출연자와 장비를 정리하고, 장소별 콜시트와 부서별 준비 항목을 구성합니다.' },
+  { n:'06', title:'제작 운영과 검수', output:'Production management', body:'담당자, 일정, 작업 상태와 결과물을 프로젝트 단위로 관리합니다. 선택된 소스와 편집 인계 정보를 연결하고, 현장 체크리스트와 납품 항목을 대조해 누락을 확인합니다.' },
 ];
+const SIGNAGE = [
+  ['콘텐츠 운영', '브랜드 필름, 프로모션, 메뉴와 공간 안내를 노출 목적에 맞게 구성합니다. 매체 규격과 시청 거리, 체류 시간에 따라 화면의 정보량과 영상 리듬을 설계합니다.'],
+  ['플랫폼 개발', '다점포 운영, 지점별 콘텐츠 편성, 가로·세로 디스플레이와 재생 환경을 고려해 관리 화면과 플레이어를 개발합니다. 배포 방식과 운영 권한은 고객사의 조직 및 인프라 요건에 맞춰 설계합니다.'],
+  ['글로벌 공급', 'F&B, 리테일, 호텔, 쇼룸과 기업 공간을 대상으로 사이니지 플랫폼을 개발·납품합니다. 국가별 언어, 지점 운영 방식과 현지 설치 환경을 반영해 도입 범위를 구성합니다.'],
+];
+interface Props { isOpen:boolean; onClose:()=>void; onBack?:()=>void; onContactClick?:()=>void; }
+export default function AiInnovationLabOverlay({isOpen,onClose,onBack,onContactClick}:Props) {
+  const reduce=useReducedMotion();
+  const scrollRef=useRef<HTMLElement>(null);
+  const {scrollYProgress}=useScroll({container:scrollRef});
+  const jump=(id:string)=>{
+    const container=scrollRef.current;
+    const target=container?.querySelector<HTMLElement>(`#${id}`);
+    if(container&&target)container.scrollTo({top:target.getBoundingClientRect().top-container.getBoundingClientRect().top+container.scrollTop-80,behavior:reduce?'auto':'smooth'});
+  };
+  useEffect(()=>{
+    if(!isOpen)return;
+    const key=(event:KeyboardEvent)=>{if(event.key==='Escape')onClose();};
+    window.addEventListener('keydown',key);
+    return()=>window.removeEventListener('keydown',key);
+  },[isOpen,onClose]);
+  if(!isOpen)return null;
+  return <InsightsScrollContext.Provider value={scrollRef}>
+    <motion.section ref={scrollRef} role="dialog" aria-modal="false" aria-label="NADAUN Lab" className="lab-page fixed inset-0 z-[105] overflow-y-auto overflow-x-hidden" initial={reduce?false:{y:'100%'}} animate={{y:0}} transition={{duration:.4,ease:[.16,1,.3,1]}}>
+      <header className="lab-header">
+        <motion.div className="lab-progress" aria-hidden="true" style={{scaleX:scrollYProgress}}/>
+        <span className="lab-wordmark">NADAUN COLLECTIVE — LAB</span>
+        <nav aria-label="Lab sections"><button onClick={()=>jump('lab-workspace')}>Production</button><button onClick={()=>jump('lab-signage')}>Signage</button></nav>
+        {onBack&&<button className="lab-icon" onClick={onBack} aria-label="사업영역으로 돌아가기"><ArrowLeft size={19}/></button>}
+        <button className="lab-icon" onClick={onClose} aria-label="랩 닫기"><X size={20}/></button>
+      </header>
+      <div className="lab-content">
+        <ScrollStory intro={<div className="lab-opening">
+          <div><p className="lab-eyebrow">Creative engineering</p><h1><SceneLine visible>정교한 제작.</SceneLine><SceneLine>명료한 운영<span className="lab-gold">.</span></SceneLine></h1><p className="lab-lead">나다운은 촬영과 연출의 전문성을 소프트웨어로 확장합니다. 작품의 사실감과 미적 완성도를 높이고, 복잡한 제작 업무를 일관된 기준으로 운영하는 시스템을 만듭니다.</p></div>
+          <figure className="lab-hero-image"><img src="/hero/royal-salute.webp" alt="나다운이 촬영한 로얄살루트 제품과 전시 공간" width="667" height="1000" decoding="async"/><figcaption>NADAUN Photography · Royal Salute</figcaption></figure>
+        </div>} impact={<div className="lab-statement"><p className="lab-eyebrow">Our standard</p><h2>빛과 질감.<br/>움직임과 리듬.<br/><span className="lab-gold">판단의 기준은 작품.</span></h2><p>기술은 연출 의도를 정확하게 구현하기 위한 제작 수단입니다. 실사 촬영의 빛, 재질과 공간감을 기준으로 시각화와 후반 작업을 정교하게 다듬습니다. 화면의 설득력과 브랜드에 적합한 미감을 최종 판단의 기준으로 삼습니다.</p></div>}/>
 
-interface AiInnovationLabOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onBack?: () => void;
+        <section id="lab-workspace" className="lab-section">
+          <ScrollReveal><p className="lab-eyebrow">Production platform</p><div className="lab-section-heading"><h2>ALL IN ONE<br/>SOLUTION<span className="lab-gold">.</span></h2><div><p className="lab-lead">나다운의 광고 제작 운영 시스템.</p><p>온라인·오프라인 광고의 기획 문서와 촬영 준비 정보를 동일한 프로젝트 안에서 관리합니다. 기획안, 콘티, 애니메틱과 샷리스트가 컷 단위로 연결되어, 검토 과정의 결정이 제작 현장에 정확하게 전달됩니다.</p><a className="lab-link" href={WORKSPACE} target="_blank" rel="noopener noreferrer">워크스페이스 열기 <ArrowUpRight size={18}/></a><p className="lab-access">운영 워크스페이스 · 승인된 계정으로 접속</p></div></div></ScrollReveal>
+          <div className="lab-stages">{STAGES.map(stage=><ScrollReveal key={stage.n} className="lab-stage"><span className="lab-stage-number">{stage.n}</span><div><h3>{stage.title}</h3><p className="lab-output">{stage.output}</p></div><p>{stage.body}</p></ScrollReveal>)}</div>
+          <ScrollReveal className="lab-operating"><h3>문서의 정합성이<br/>실행의 속도를 만듭니다.</h3><p>자료를 반복해서 옮기거나 서로 다른 버전의 문서를 대조하는 부담을 줄입니다. 팀은 확정된 컷, 담당 업무와 준비 상태를 같은 맥락에서 확인하고, 수정이 필요한 지점을 빠르게 판단할 수 있습니다. 제작의 속도는 명확한 의사결정과 안정적인 정보 전달에서 만들어집니다.</p></ScrollReveal>
+        </section>
+
+        <section id="lab-signage" className="lab-section">
+          <ScrollReveal><p className="lab-eyebrow">Digital signage</p><div className="lab-section-heading"><h2>공간에 맞춘<br/>미디어 운영<span className="lab-gold">.</span></h2><div><p className="lab-lead">브랜드 콘텐츠가 매장에서 작동하는 방식까지 설계합니다.</p><p>전 세계 F&B 및 다양한 상업 공간에 적용할 수 있는 사이니지 플랫폼을 개발·납품합니다. 콘텐츠 제작 역량과 플레이어 개발 경험을 결합해, 브랜드 표현과 현장 운영이 함께 고려된 디스플레이 환경을 구축합니다.</p></div></div></ScrollReveal>
+          <ScrollReveal className="lab-signage-visual"><figure><img src="/hero/pepsi-festa.webp" alt="펩시 페스타의 대형 무대 디스플레이와 브랜드 콘텐츠" width="1000" height="667" loading="lazy" decoding="async"/><figcaption>NADAUN Work · Pepsi Festa</figcaption></figure><div className="lab-signage-types"><span>F&B</span><span>Retail</span><span>Hospitality</span><span>Brand spaces</span></div></ScrollReveal>
+          <div className="lab-signage-grid">{SIGNAGE.map(([title,body])=><ScrollReveal key={title}><h3>{title}</h3><p>{body}</p></ScrollReveal>)}</div>
+        </section>
+
+        <section className="lab-section lab-final"><ScrollReveal><p className="lab-eyebrow">Work with NADAUN</p><h2>제작과 운영의<br/>기준을 설계합니다.</h2><button className="lab-link" onClick={()=>{onClose();onContactClick?.();}}>프로젝트 문의하기 <ArrowUpRight size={20}/></button></ScrollReveal></section>
+      </div>
+    </motion.section>
+  </InsightsScrollContext.Provider>;
 }
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
-  <span className="inline-flex flex-wrap">
-    {text.split(' ').map((w, i) => (
-      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
-        <motion.span className="inline-block"
-          initial={{ x: '-45%', opacity: 0 }} animate={{ x: '0%', opacity: 1 }}
-          transition={{ duration: 0.72, delay: delay + i * 0.09, ease: EASE }} style={style}>
-          {w}&nbsp;
-        </motion.span>
-      </span>
-    ))}
-  </span>
-);
-
-const AiInnovationLabOverlay: React.FC<AiInnovationLabOverlayProps> = ({ isOpen, onClose, onBack }) => {
-  const [activeCategory, setActiveCategory] = useState('ALL');
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "100%" }}
-          transition={{ duration: 0.374, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] bg-black text-white overflow-y-auto"
-        >
-          {/* 우상단: 사업영역(백) + X(홈) 나란히 */}
-          <div className="fixed top-8 right-8 md:top-12 md:right-12 z-[110] flex items-center gap-2 md:gap-3">
-            {onBack && (
-              <button onClick={onBack}
-                className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-normal uppercase text-white/70 hover:text-[#FFB800] transition-all"
-              >
-                <ArrowLeft size={16} /> 사업영역
-              </button>
-            )}
-            <button onClick={onClose}
-              className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md"
-            >
-              <X size={24} className="text-white group-hover:text-[#FFB800] transition-colors" />
-            </button>
-          </div>
-
-          <div className="min-h-screen container mx-auto px-6 py-24 md:py-32">
-            
-            {/* Header Section */}
-            <div className="mb-12 md:mb-16 max-w-4xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.064, duration: 0.374 }}
-                className="flex items-center gap-3 text-[#FFB800] mb-6"
-              >
-                <Sparkles className="w-6 h-6" />
-                <span className="font-bold tracking-normal text-sm uppercase">Innovation Lab</span>
-              </motion.div>
-              
-              <h2 className="font-black tracking-[-0.04em] mb-8 leading-[0.88]" style={{ fontSize: 'clamp(3rem, 9vw, 7rem)' }}>
-                <WordSlide text="EXPLORE" /><br />
-                <WordSlide text="AI UNIVERSE." delay={0.2} style={{ color: '#FFB800' }} />
-              </h2>
-
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.128, duration: 0.374 }}
-                className="text-gray-400 text-lg md:text-xl max-w-2xl font-light leading-relaxed"
-              >
-                나다운이 실제 제작 현장에서 쓰는 글로벌 AI 도구들 —
-                LLM · 이미지 · 영상 · 오디오 · 3D까지, 최전선의 도구를 큐레이션해 한곳에 모았습니다.
-              </motion.p>
-            </div>
-
-            {/* Category Filter */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.16, duration: 0.374 }}
-              className="flex flex-wrap gap-2 mb-16"
-            >
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={`px-5 py-2 rounded-full text-xs font-bold tracking-normal uppercase transition-all duration-300 border ${
-                    activeCategory === category 
-                      ? 'bg-[#FFB800] text-black border-[#FFB800]' 
-                      : 'bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </motion.div>
-
-            {/* Grid Section Grouped by Category */}
-            <div className="space-y-24">
-              {CATEGORIES.filter(c => c !== 'ALL').map((category) => {
-                if (activeCategory !== 'ALL' && activeCategory !== category) return null;
-                
-                const categoryTools = AI_TOOLS.filter(tool => tool.category === category);
-                if (categoryTools.length === 0) return null;
-
-                return (
-                  <motion.div 
-                    key={category}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.234 }}
-                    className="space-y-8"
-                  >
-                    <div className="flex items-center gap-4 border-b border-white/10 pb-4">
-                      <h3 className="text-2xl font-bold tracking-normal text-white">
-                        {category}
-                      </h3>
-                      <span className="text-xs font-mono text-gray-500 bg-white/5 px-2 py-1 rounded-md">
-                        {categoryTools.length} TOOLS
-                      </span>
-                    </div>
-                    
-                    <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      <AnimatePresence mode="popLayout">
-                        {categoryTools.map((tool, index) => (
-                          <motion.a
-                            layout
-                            key={tool.name}
-                            href={tool.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.187 }}
-                            className="group relative bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 hover:border-[#FFB800]/30 transition-all duration-500 flex flex-col h-full overflow-hidden"
-                          >
-                            {/* Hover Background Glow */}
-                            <div className="absolute -inset-px bg-gradient-to-br from-[#FFB800]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            
-                            <div className="relative z-10">
-                              <div className="flex justify-between items-start mb-8">
-                                <div 
-                                  className="p-3 rounded-xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform duration-500"
-                                  style={{ color: tool.color }}
-                                >
-                                  {tool.icon}
-                                </div>
-                                <ExternalLink className="w-5 h-5 text-gray-600 group-hover:text-[#FFB800] transition-colors" />
-                              </div>
-
-                              <div className="mb-4">
-                                <span className="text-[10px] font-bold tracking-normal text-[#FFB800] uppercase mb-2 block">
-                                  {tool.category}
-                                </span>
-                                <h3 className="text-2xl font-bold text-white group-hover:text-[#FFB800] transition-colors">
-                                  {tool.name}
-                                </h3>
-                              </div>
-
-                              <p className="text-gray-500 text-sm leading-relaxed font-medium group-hover:text-gray-300 transition-colors">
-                                {tool.desc}
-                              </p>
-                            </div>
-
-                            {/* Bottom Decoration */}
-                            <div className="mt-auto pt-8 flex items-center gap-2">
-                              <div className="h-[1px] flex-grow bg-white/5 group-hover:bg-[#FFB800]/20 transition-colors" />
-                              <span className="text-[10px] font-mono text-gray-700 group-hover:text-[#FFB800]/50 transition-colors">
-                                VISIT SITE
-                              </span>
-                            </div>
-                          </motion.a>
-                        ))}
-                      </AnimatePresence>
-                    </motion.div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Footer */}
-            <div className="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-              <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold tracking-tighter">NADAUN</span>
-                <span className="text-xs font-bold tracking-normal text-gray-600 uppercase">AI Innovation Lab</span>
-              </div>
-              <p className="text-xs text-gray-600 font-medium">
-                COPYRIGHT©2026 NADAUN All Rights Reserved
-              </p>
-            </div>
-
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-export default AiInnovationLabOverlay;

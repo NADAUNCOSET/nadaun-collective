@@ -38,7 +38,7 @@ const PARTNERS = [
 
 const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> = ({ children, centered }) => (
   <div
-    style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+    style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
     className={`flex flex-col ${centered ? 'items-center justify-center text-center' : 'justify-center px-8 md:px-16 lg:px-24'} overflow-hidden`}
   >
     {children}
@@ -69,7 +69,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   return (
     <div style={{ height: `${H1}vh` }}>
       <div
-        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
         className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
       >
         <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-[13px] tracking-normal uppercase text-[#FFB800] font-bold">
@@ -227,7 +227,7 @@ const Chapter3: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 
   return (
     <div style={{ height: `${H3}vh` }}>
-      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }} className="relative overflow-hidden">
+      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }} className="relative overflow-hidden">
         <motion.div style={{ opacity: exitOp }} className="absolute inset-0">
 
           {/* ── Year rail at top ── */}
@@ -633,7 +633,7 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   return (
     <div style={{ height: `${H4}vh` }}>
       <motion.div
-        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)`, opacity: exitOp }}
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)`, opacity: exitOp }}
         className="relative overflow-hidden bg-[#04060d]"
       >
         <Canvas
@@ -698,7 +698,7 @@ const Chapter5: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }
 
   return (
     <div style={{ height: `${H5}vh` }}>
-      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+      <div style={{ position: 'sticky', top: HEADER_H, height: `calc(var(--collective-view-height, 100vh) - ${HEADER_H}px)` }}
            className="relative overflow-hidden">
 
         {/* Fixed context label */}
@@ -758,6 +758,7 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
   const scrollRef = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  // Share the same damped scroll clock across every chapter and the progress bar.
 
   useEffect(() => {
     if (!isOpen) return;
@@ -811,11 +812,11 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
             className="flex-1 overflow-y-scroll"
             style={{ scrollbarWidth: 'none' }}
           >
-            <Chapter1 g={progress} />
-            <Chapter2 g={progress} />
-            <Chapter3 g={progress} />
-            <Chapter4 g={progress} />
-            <Chapter5 g={progress} onContactClick={onContactClick} />
+            <Chapter1 g={scaleX} />
+            <Chapter2 g={scaleX} />
+            <Chapter3 g={scaleX} />
+            <Chapter4 g={scaleX} />
+            <Chapter5 g={scaleX} onContactClick={onContactClick} />
           </div>
         </motion.div>
       )}
