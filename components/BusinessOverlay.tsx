@@ -1,31 +1,282 @@
-import React from 'react';
-import { ArrowUpRight } from 'lucide-react';
-import CompanyOverlay, { ContactLine, Reveal } from './CompanyOverlay';
+import React, { useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, MotionValue } from 'framer-motion';
+import { X, Lightbulb, Zap, Globe, Sparkles } from 'lucide-react';
 
-const SERVICES = [
-  { id:'integrated',number:'01',en:'Integrated Solution',title:'브랜드 전략과 사업 설계',body:'제품과 브랜드의 과제를 정의하고, IP 전략부터 시장 포지셔닝, 커머스와 유통까지 실행 구조를 설계합니다. 기획의 방향이 제작과 운영에 일관되게 이어지도록 연결합니다.',scope:['IP Architecture','Brand Strategy','Market Positioning','Commerce & Distribution'] },
-  { id:'creative',number:'02',en:'Immersive Creative',title:'사진·영상 크리에이티브',body:'브랜드의 메시지와 매체의 특성에 맞춰 표현 방식을 설계합니다. 연출, 촬영, 편집, 3D와 모션그래픽을 조율해 사진과 영상의 제작 완성도를 높입니다.',scope:['TVC · CF','Brand Film · VCR','Photography','3D · Motion Graphics','지면 · 앨범'] },
-  { id:'global',number:'03',en:'Global Network',title:'국내외 미디어 실행',body:'콘텐츠가 고객을 만나는 채널과 시점을 설계합니다. 방송과 IPTV, 오프라인 광고, 해외 매체를 프로젝트 목적에 맞게 구성하고 소재 제작부터 송출까지 연결합니다.',scope:['Broadcast · IPTV','BTL · Outdoor','Global Media','Overseas Network'] },
-  { id:'ai',number:'04',en:'AI Innovation Lab',title:'AI를 활용한 제작 확장',body:'기획 시각화와 콘텐츠 제작 과정에 생성형 AI를 적용합니다. 기존 촬영·VFX 제작 방식과 결합해 표현의 선택지를 넓히고, 프로젝트별 제작 흐름을 설계합니다.',scope:['AI Production','VFX Pipeline','Generative AI'] },
+const HEADER_H = 57;
+
+// Ch1 intro + Ch2 도메인 리스트 + Ch3 문의하기 (상세 immersive/global은 별도 새창 오버레이)
+const H1 = 120, H2 = 240, H3 = 180; // 인트로 → 도메인 → 문의하기 (상세는 새창 오버레이) 대표 룰 2026-06-13
+const TOTAL = H1 + H2 + H3;
+
+const C1S = 0,   C1E = H1 / TOTAL;
+const C2S = C1E, C2E = (H1 + H2) / TOTAL;
+const C3S = C2E, C3E = 1;
+
+const DOMAINS = [
+  { id: '01', title: 'INTEGRATED SOLUTION', subtitle: 'IP Strategy & Planning',        tags: ['IP Architecture', 'Brand Strategy', 'Market Positioning'], icon: Lightbulb },
+  { id: '02', title: 'IMMERSIVE CREATIVE',  subtitle: 'High-End IP Production',        tags: ['TVC · CF', '브랜드필름', '기업 VCR', '3D · 모션', '사진 촬영', '영상 촬영', '지면 · 앨범'], icon: Zap },
+  { id: '03', title: 'GLOBAL NETWORK',      subtitle: 'Nationwide & Global Media',     tags: ['Broadcast · IPTV · BTL', 'Global Media', 'Overseas'],      icon: Globe     },
+  { id: '04', title: 'AI INNOVATION LAB',   subtitle: 'Next-Gen Tech Enhancement',     tags: ['AI Production', 'VFX Pipeline', 'Gen AI'],                 icon: Sparkles  },
 ];
-const PROCESS = [
-  { label:'01 · Brief', title:'과제와 목표', body:'프로젝트 목적, 타깃, 일정과 예산을 확인하고 필요한 실행 범위를 정의합니다.' },
-  { label:'02 · Plan', title:'전략과 설계', body:'핵심 메시지, 크리에이티브 방향, 채널과 산출물의 기준을 구체화합니다.' },
-  { label:'03 · Produce', title:'제작과 검수', body:'기획을 촬영과 후반 제작으로 구현하고, 사용 규격과 품질을 검수합니다.' },
-  { label:'04 · Deliver', title:'납품과 실행', body:'합의한 규격으로 결과물을 납품하고, 매체 집행 범위에 따라 실행을 연결합니다.' },
-];
+
+
+
+const StickyPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+    className="flex flex-col justify-center px-8 md:px-16 lg:px-24 overflow-hidden"
+  >
+    {children}
+  </div>
+);
+
+// ── Ch1 — word-by-word horizontal slide ──────────────────────────────────────
+const Ch1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+  const p = useTransform(g, [C1S, C1E], [0, 1]);
+
+  // 세 단어가 순서대로 나타나 한 화면에 모두 남음 (대표 룰: 차례대로 한 화면에, About Ch1 패턴 통일 2026-06-12)
+  const w1Op = useTransform(p, [0.04, 0.16], [0, 1]);
+  const w1Y  = useTransform(p, [0.04, 0.16], ['40px', '0px']);
+  const w2Op = useTransform(p, [0.20, 0.32], [0, 1]);
+  const w2Y  = useTransform(p, [0.20, 0.32], ['40px', '0px']);
+  const w3Op = useTransform(p, [0.36, 0.48], [0, 1]);
+  const w3Y  = useTransform(p, [0.36, 0.48], ['40px', '0px']);
+  const subOp = useTransform(p, [0.50, 0.62], [0, 1]);
+  const subY  = useTransform(p, [0.50, 0.62], ['20px', '0px']);
+  const exitOp = useTransform(p, [0.74, 0.98], [1, 0]);
+  const exitY  = useTransform(p, [0.74, 0.98], ['0px', '-60px']);
+
+  const FS = { fontSize: 'clamp(3rem, 11vw, 9rem)' } as const;
+
+  return (
+    <div style={{ height: `${H1}vh` }}>
+      <div
+        style={{ position: 'sticky', top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+        className="relative overflow-hidden flex flex-col justify-center px-8 md:px-16 lg:px-24"
+      >
+        <p className="absolute top-8 left-8 md:left-16 lg:left-24 text-xs tracking-normal uppercase text-[#FFB800] font-bold">
+          Business Overview
+        </p>
+        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
+          <motion.h1 style={{ opacity: w1Op, y: w1Y, color: '#ffffff', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap">
+            <span style={FS}>WE BUILD</span>
+          </motion.h1>
+          <motion.h1 style={{ opacity: w2Op, y: w2Y, color: 'rgba(255,255,255,0.22)', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap">
+            <span style={FS}>THE NEXT</span>
+          </motion.h1>
+          <motion.h1 style={{ opacity: w3Op, y: w3Y, color: '#FFB800', willChange: 'transform' }}
+            className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap">
+            <span style={FS}>LEVEL.</span>
+          </motion.h1>
+          <motion.p
+            style={{ opacity: subOp, y: subY }}
+            className="mt-10 text-white/60 text-base md:text-xl font-light leading-relaxed max-w-xl"
+          >
+            커머스 제품 개발부터 유통 판매, 하이엔드 콘텐츠 제작까지 —<br />
+            단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
+          </motion.p>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+// ── Ch2 — domain list (clickable) ────────────────────────────────────────────
+const Ch2: React.FC<{
+  g: MotionValue<number>;
+  onAiLabClick?: () => void;
+  onIntegratedClick?: () => void;
+  onCreativeClick?: () => void;
+  onGlobalClick?: () => void;
+}> = ({ g, onAiLabClick, onIntegratedClick, onCreativeClick, onGlobalClick }) => {
+  const p = useTransform(g, [C2S, C2E], [0, 1]);
+
+  const titleOp = useTransform(p, [0.00, 0.10], [0, 1]);
+  const titleX  = useTransform(p, [0.00, 0.10], ['-5%', '0%']);
+
+  const d0Op = useTransform(p, [0.08, 0.18], [0, 1]); const d0X = useTransform(p, [0.08, 0.18], ['5%', '0%']);
+  const d1Op = useTransform(p, [0.18, 0.28], [0, 1]); const d1X = useTransform(p, [0.18, 0.28], ['5%', '0%']);
+  const d2Op = useTransform(p, [0.28, 0.38], [0, 1]); const d2X = useTransform(p, [0.28, 0.38], ['5%', '0%']);
+  const d3Op = useTransform(p, [0.38, 0.48], [0, 1]); const d3X = useTransform(p, [0.38, 0.48], ['5%', '0%']);
+  const d4Op = useTransform(p, [0.48, 0.58], [0, 1]); const d4X = useTransform(p, [0.48, 0.58], ['5%', '0%']);
+
+  const exitOp = useTransform(p, [0.76, 0.94], [1, 0]);
+  const exitX  = useTransform(p, [0.76, 0.94], ['0%', '-6%']);
+
+  const dOps = [d0Op, d1Op, d2Op, d3Op, d4Op];
+  const dXs  = [d0X, d1X, d2X, d3X, d4X];
+
+  return (
+    <div style={{ height: `${H2}vh` }}>
+      <StickyPanel>
+        <motion.div style={{ opacity: exitOp, x: exitX }}>
+          <motion.p style={{ opacity: titleOp, x: titleX }}
+            className="text-sm md:text-base tracking-normal uppercase text-[#FFB800] mb-8 md:mb-12 font-bold"
+          >BUSINESS DOMAINS</motion.p>
+          <div className="flex flex-col gap-0">
+            {DOMAINS.map((d, i) => {
+              const Icon = d.icon;
+              return (
+                <motion.div
+                  key={d.id}
+                  style={{ opacity: dOps[i], x: dXs[i] }}
+                  className="group border-t border-white/12 py-6 md:py-9 flex items-center gap-4 md:gap-8 cursor-pointer hover:bg-white/[0.03] -mx-4 px-4 rounded-lg transition-colors"
+                  onClick={() => {
+                    if (d.id === '01' && onIntegratedClick) onIntegratedClick();
+                    if (d.id === '02' && onCreativeClick) onCreativeClick();
+                    if (d.id === '03' && onGlobalClick) onGlobalClick();
+                    if (d.id === '04' && onAiLabClick) onAiLabClick();
+                  }}
+                >
+                  <span className="font-mono text-xs md:text-sm text-white/25 shrink-0 w-6 md:w-8">{d.id}</span>
+                  <Icon className="w-6 h-6 md:w-8 md:h-8 text-white/30 group-hover:text-[#FFB800] transition-colors shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-black tracking-[-0.02em] text-white/85 group-hover:text-white transition-colors leading-[0.95]"
+                      style={{ fontSize: 'clamp(2.3rem, 7vw, 6rem)' }}>
+                      {d.title}
+                    </h3>
+                    <p className="text-[10px] md:text-[12px] tracking-normal uppercase text-[#FFB800]/55 font-bold mt-2 block">
+                      {d.subtitle}
+                    </p>
+                  </div>
+                  <div className="hidden lg:flex flex-wrap gap-1.5 ml-auto max-w-[46%] justify-end">
+                    {d.tags.map(tag => (
+                      <span key={tag} className="text-[10px] font-bold uppercase tracking-normal text-[#FFB800]/60 border border-[#FFB800]/20 px-3 py-1.5 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-white/25 group-hover:text-[#FFB800] group-hover:translate-x-1 transition-all text-xl md:text-3xl ml-3 md:ml-5 shrink-0">→</span>
+                </motion.div>
+              );
+            })}
+            <div className="border-t border-white/10" />
+          </div>
+          <motion.p style={{ opacity: d3Op }} className="mt-6 text-[11px] text-white/22 font-light tracking-normal uppercase">
+            도메인을 클릭하여 상세 확인 — 02 IMMERSIVE CREATIVE · 03 GLOBAL NETWORK
+          </motion.p>
+        </motion.div>
+      </StickyPanel>
+    </div>
+  );
+};
+
+// ── Ch3 — 문의하기 (도메인 다음, 메인 스크롤 끝) — 상세는 새창 오버레이 대표 룰 2026-06-13 ──
+const Ch3: React.FC<{ g: MotionValue<number>; onContactClick?: () => void }> = ({ g, onContactClick }) => {
+  const p = useTransform(g, [C3S, C3E], [0, 1]);
+  const op = useTransform(p, [0.04, 0.24], [0, 1]);
+  const y  = useTransform(p, [0.04, 0.24], ['6%', '0%']);
+  const subOp = useTransform(p, [0.20, 0.40], [0, 1]);
+  return (
+    <div style={{ height: `${H3}vh` }}>
+      <StickyPanel>
+        <motion.div style={{ opacity: op, y }}>
+          <p className="text-sm md:text-base tracking-normal uppercase text-[#FFB800] mb-6 font-bold">CONTACT</p>
+          <h2 className="font-black text-white leading-[0.9] mb-8" style={{ fontSize: 'clamp(3rem, 11vw, 9.5rem)', letterSpacing: '-0.04em' }}>
+            프로젝트<br />문의하기
+          </h2>
+          <motion.p style={{ opacity: subOp }} className="text-white/50 text-base md:text-2xl font-light leading-relaxed max-w-2xl mb-12">
+            기획부터 하이엔드 제작, AI 테크 솔루션, 글로벌 마케팅까지 —<br className="hidden md:block" />
+            단 하나의 파트너로 브랜드의 모든 것을 완성합니다.
+          </motion.p>
+          <motion.button style={{ opacity: subOp }} onClick={onContactClick}
+            className="flex items-center gap-3 bg-[#FFB800] text-black font-black px-10 md:px-12 py-5 md:py-6 rounded-full hover:bg-white hover:scale-105 transition-all text-base md:text-lg tracking-normal">
+            문의하기 →
+          </motion.button>
+        </motion.div>
+      </StickyPanel>
+    </div>
+  );
+};
+
+// ── Main overlay ──────────────────────────────────────────────────────────────
 interface BusinessOverlayProps {
-  isOpen:boolean; startAtDomains?:boolean; onClose:()=>void;
-  onAiLabClick?:()=>void; onIntegratedClick?:()=>void; onCreativeClick?:()=>void;
-  onGlobalClick?:()=>void; onContactClick?:()=>void;
+  isOpen: boolean;
+  startAtDomains?: boolean;
+  onClose: () => void;
+  onAiLabClick?: () => void;
+  onIntegratedClick?: () => void;
+  onCreativeClick?: () => void;
+  onGlobalClick?: () => void;
+  onContactClick?: () => void;
 }
-export default function BusinessOverlay({isOpen,startAtDomains,onClose,onAiLabClick,onIntegratedClick,onCreativeClick,onGlobalClick,onContactClick}:BusinessOverlayProps) {
-  if (!isOpen) return null;
-  const actions:Record<string,(()=>void)|undefined> = { integrated:onIntegratedClick,creative:onCreativeClick,global:onGlobalClick,ai:onAiLabClick };
-  return <CompanyOverlay title="Business" onClose={onClose} startSection={startAtDomains?'business-services':undefined} sections={[{id:'business-services',label:'Services'},{id:'business-process',label:'Process'}]}>
-    <section className="cp-hero"><div><p className="cp-label accent">Four disciplines. One team.</p><h1 className="cp-title">브랜드의 과제를<br/><em>실행 가능한 결과로.</em></h1></div><p className="cp-description">전략, 제작, 매체, 기술. 네 가지 전문 영역을 프로젝트에 맞춰 연결합니다. 필요한 분야의 개별 협업부터 기획·제작·집행을 통합한 운영까지, 목표와 범위에 맞는 팀을 구성합니다.</p></section>
-    <section id="business-services" tabIndex={-1} aria-label="Business services" className="cp-services">{SERVICES.map(item=><Reveal key={item.id}><article className="cp-service"><div className="cp-service-top"><p className="cp-label accent">{item.en}</p><span className="cp-label">{item.number}</span></div><h2>{item.title}</h2><p className="cp-description">{item.body}</p><ul>{item.scope.map(scope=><li key={scope}>{scope}</li>)}</ul>{actions[item.id]&&<button type="button" onClick={actions[item.id]} className="cp-text-link" aria-label={`${item.en} 자세히 보기`}>자세히 보기 <ArrowUpRight size={18} strokeWidth={1.5}/></button>}</article></Reveal>)}</section>
-    <section id="business-process" tabIndex={-1} className="cp-section"><div className="cp-section-heading"><p className="cp-label">How we work</p><h2>시작부터 전달까지,<br/>명확한 실행 순서.</h2></div><ol className="cp-process">{PROCESS.map(item=><li key={item.label}><p className="cp-label accent">{item.label}</p><h3>{item.title}</h3><p>{item.body}</p></li>)}</ol></section>
-    <ContactLine onClick={onContactClick}/>
-  </CompanyOverlay>;
-}
+
+const BusinessOverlay: React.FC<BusinessOverlayProps> = ({ isOpen, startAtDomains, onClose, onAiLabClick, onIntegratedClick, onCreativeClick, onGlobalClick, onContactClick }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const progress = useMotionValue(0);
+  const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    progress.set(0);
+    if (startAtDomains) {
+      // 상세 새창에서 백 → 인트로 건너뛰고 도메인(사업영역) 화면으로 바로
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const max = el.scrollHeight - el.clientHeight;
+        if (max > 0) el.scrollTop = (C2S + 0.05) * max;
+      }));
+    } else {
+      el.scrollTop = 0;
+    }
+    const onScroll = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      if (max > 0) progress.set(el.scrollTop / max);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [isOpen, startAtDomains, progress]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-[200] bg-[#070707] text-white flex flex-col overflow-hidden"
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ duration: 0.421, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div
+            className="absolute top-0 left-0 right-0 h-[2px] bg-[#FFB800] origin-left z-10"
+            style={{ scaleX }}
+          />
+          <div
+            className="shrink-0 flex items-center justify-between px-8 md:px-16 border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
+            style={{ height: HEADER_H }}
+          >
+            <span className="text-xs font-bold tracking-normal text-[#FFB800] uppercase">Business</span>
+            <div className="flex items-center gap-3">
+              <button onClick={onClose}
+                className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-y-scroll"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            <Ch1 g={progress} />
+            <Ch2 g={progress} onAiLabClick={onAiLabClick} onIntegratedClick={onIntegratedClick} onCreativeClick={onCreativeClick} onGlobalClick={onGlobalClick} />
+            <Ch3 g={progress} onContactClick={onContactClick} />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default BusinessOverlay;
