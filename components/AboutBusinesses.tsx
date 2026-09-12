@@ -1,6 +1,8 @@
-import React, { useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, Plus, Minus } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion, useTransform, MotionValue } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
+import { InsightsScrollContext, ScrollStory, SceneLine, StoryMedia, ScrollReveal } from './InsightsMotion';
+import './insights-motion.css';
 import './about-businesses.css';
 
 type Business = { id:string; title:string; name:string; description:string; scope:string[]; image:string; alt:string; links:{label:string; url?:string; overlay?:string}[] };
@@ -14,23 +16,38 @@ const BUSINESSES:Business[] = [
   {id:'marketing',title:'MARKETING',name:'온라인 · 오프라인 광고대행',description:'브랜드 전략과 캠페인 기획을 콘텐츠·매체 집행으로 연결합니다. 채널의 특성에 맞춰 소재와 편성을 설계하고, 실제 송출과 노출 등 확인 가능한 결과를 기록합니다.',scope:['브랜드 전략 · 캠페인 기획','디지털 · 방송 · IPTV · 옥외 광고','광고 협찬 · PPL · 언론홍보','집행 검수 · 성과 리포팅'],image:'https://media.nadaun.co/collective/btl/01-subway.webp',alt:'지하철 스크린도어 광고 매체',links:[{label:'통합 솔루션',overlay:'integrated-solution'},{label:'미디어 · 매체',overlay:'global-network'},{label:'INSIGHTS',overlay:'insights'}]},
 ];
 
-export default function AboutBusinesses({onNavigate}:{onNavigate:(id:string)=>void}) {
-  const [selected,setSelected]=useState<string|null>('moment');
-  const scroller=useRef<HTMLElement>(null);
-  const revealSelected=(id:string)=>{
-    const root=scroller.current;
-    const button=root?.querySelector<HTMLElement>(`#business-trigger-${id}`);
-    if(!root||!button||button.getAttribute('aria-expanded')!=='true')return;
-    const offset=button.getBoundingClientRect().top-root.getBoundingClientRect().top;
-    if(offset>root.clientHeight*.4)root.scrollTo({top:root.scrollTop+offset-24,behavior:'smooth'});
-  };
-  return <section ref={scroller} id="about-businesses" className="about-businesses" aria-label="우리의 7가지 사업군">
-    <div className="about-business-heading"><p className="editorial-kicker">NADAUN COLLECTIVE · WHAT WE DO</p><h2>우리의 7가지 사업군<span>.</span></h2><p className="editorial-body">각 사업군을 눌러 나다운이 하는 일을 살펴보세요.</p></div>
-    <div className="about-business-list">{BUSINESSES.map((item,index)=><article key={item.id}>
-      <h3><button type="button" id={`business-trigger-${item.id}`} aria-expanded={selected===item.id} aria-controls={`business-panel-${item.id}`} onClick={()=>setSelected(selected===item.id?null:item.id)}><span className="about-business-number">{String(index+1).padStart(2,'0')}</span><span>{item.title}<small>{item.name}</small></span>{selected===item.id?<Minus size={18}/>:<Plus size={18}/>}</button></h3>
-      <AnimatePresence initial={false}>{selected===item.id&&<motion.div id={`business-panel-${item.id}`} role="region" aria-labelledby={`business-trigger-${item.id}`} initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{duration:.5,ease:[.16,1,.3,1]}} onAnimationComplete={()=>revealSelected(item.id)} style={{overflow:'hidden'}}>
-        <div className="about-business-detail"><div><motion.p className="editorial-body" initial={{y:22,opacity:0}} animate={{y:0,opacity:1}} transition={{duration:.5,delay:.08}}>{item.description}</motion.p><ul>{item.scope.map((line,i)=><motion.li key={line} initial={{y:16,opacity:0}} animate={{y:0,opacity:1}} transition={{duration:.45,delay:.12+i*.045}}>{line}</motion.li>)}</ul><div className="about-business-links">{item.links.map(link=>link.url?<a key={link.label} href={link.url} target="_blank" rel="noreferrer">{link.label}<ArrowUpRight size={16}/></a>:<button key={link.label} type="button" onClick={()=>onNavigate(link.overlay!)}>{link.label}<ArrowUpRight size={16}/></button>)}</div></div><figure><motion.img src={item.image} alt={item.alt} loading="lazy" decoding="async" initial={{scale:1.08}} animate={{scale:1}} transition={{duration:.8,ease:[.16,1,.3,1]}}/>{item.id==='production'&&<figcaption>제작 워크스페이스 · 콘셉트 프리뷰</figcaption>}{item.id==='starlogin'&&<figcaption>STARLOGIN 소개자료(2022) · 과거 수행 사례</figcaption>}</figure></div>
-      </motion.div>}</AnimatePresence>
-    </article>)}</div>
-  </section>;
+
+const BENEFITS:Record<string,[string,string]> = {
+  moment:['메시지를','장면으로'], space:['현장에 맞는','촬영 환경'],
+  marketing:['브랜드가','닿는 매체'], signage:['공간을 채우는','콘텐츠'],
+  production:['제작 정보를','한곳에'], starlogin:['브랜드에 맞는','사람'],
+  wedding:['두 사람다운','순간의 기록'],
+};
+const BENEFIT_ORDER=['moment','space','marketing','signage','production','starlogin','wedding'];
+function BenefitLink({id,index,progress,onSelect}:{id:string;index:number;progress:MotionValue<number>;onSelect:(id:string)=>void}) {
+  const y=useTransform(progress,[0,.46,1],[12+index*3,0,-36-index*2]);
+  const opacity=useTransform(progress,[0,.65,1],[1,1,0]);
+  return <motion.li initial={{opacity:0,y:28}} animate={{opacity:1,y:0}} transition={{duration:.6,delay:.18+index*.055,ease:[.16,1,.3,1]}}>
+    <motion.button type="button" data-benefit={id} style={{y,opacity}} onClick={()=>onSelect(id)}>
+      <span className="benefit-number">0{index+1}</span><span>{BENEFITS[id].join(' ')}</span><ArrowUpRight size={16}/>
+    </motion.button>
+  </motion.li>;
+}
+export function AboutBenefits({progress,onSelect}:{progress:MotionValue<number>;onSelect:(id:string)=>void}) {
+  return <nav className="about-benefits" aria-label="7가지 베네핏"><p>7 BENEFITS</p><ol>{BENEFIT_ORDER.map((id,index)=><BenefitLink key={id} id={id} index={index} progress={progress} onSelect={onSelect}/>)}</ol></nav>;
+}
+
+export default function AboutBusinesses({selected,onNavigate,onReturn}:{selected:string;onNavigate:(id:string)=>void;onReturn:()=>void}) {
+  const scrollRef=useRef<HTMLElement>(null);
+  const item=BUSINESSES.find(b=>b.id===selected)!;
+  const benefit=BENEFITS[item.id];
+  const caption=item.id==='production'?'제작 워크스페이스 · NIKE 콘셉트 프리뷰':item.id==='starlogin'?'STARLOGIN 소개자료(2022) · 과거 수행 사례':item.id==='signage'?'디지털 매체 이미지 · 플랫폼 납품 사례와 구분':item.title;
+  return <InsightsScrollContext.Provider value={scrollRef}><section ref={scrollRef} className="about-benefit-detail" aria-label={`${benefit.join(' ')} 상세`} tabIndex={0}>
+    <div className="benefit-story-content">
+      <ScrollStory intro={<div className="benefit-opening"><div><p className="benefit-kicker">{item.title}</p><h2><SceneLine visible>{benefit[0]}</SceneLine><SceneLine order={1}>{benefit[1]}.</SceneLine></h2><p className="benefit-scroll-cue">스크롤하여 살펴보기 ↓</p></div><StoryMedia src={item.image} alt={item.alt} caption={caption}/></div>} impact={<div className="benefit-statement"><p className="benefit-kicker">{item.title}</p><h2>{item.name}</h2><p className="editorial-body">{item.description}</p></div>}/>
+      <div className="benefit-scope"><p className="benefit-kicker">함께 만드는 것</p>{item.scope.map((line,index)=><ScrollReveal key={line} className="benefit-scope-row"><span>0{index+1}</span><h3>{line}</h3></ScrollReveal>)}
+        <ScrollReveal className="about-business-links">{item.links.map(link=>link.url?<a key={link.label} href={link.url} target="_blank" rel="noreferrer">{link.label}<ArrowUpRight size={16}/></a>:<button key={link.label} type="button" onClick={()=>onNavigate(link.overlay!)}>{link.label}<ArrowUpRight size={16}/></button>)}<button onClick={onReturn}>7가지 베네핏으로 돌아가기 <span aria-hidden>↗</span></button></ScrollReveal>
+      </div>
+    </div>
+  </section></InsightsScrollContext.Provider>;
 }

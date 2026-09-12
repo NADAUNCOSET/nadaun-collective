@@ -1,51 +1,60 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
-import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, MotionValue, MotionStyle } from 'framer-motion';
+import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, MotionValue, MotionStyle } from 'framer-motion';
 
 export const InsightsScrollContext=createContext<React.RefObject<HTMLElement>|undefined>(undefined);
 const SceneProgress=createContext<MotionValue<number>|null>(null);
 
+/** Native scroll supplies one reversible clock; the 200/30 spring is About's response. */
 export function ScrollReveal({children,className=''}:{children:React.ReactNode;className?:string}) {
   const container=useContext(InsightsScrollContext);
   const target=useRef<HTMLDivElement>(null);
-  const reduce=useReducedMotion();
-  const {scrollYProgress}=useScroll({container,target,layoutEffect:false,offset:['start 0.96','start 0.66']});
-  const opacity=useTransform(scrollYProgress,[0,1],[0,1]);
-  const y=useTransform(scrollYProgress,[0,1],[36,0]);
-  return <motion.div ref={target} className={className} style={reduce?undefined:{opacity,y}}>{children}</motion.div>;
+  const {scrollYProgress}=useScroll({container,target,layoutEffect:false,offset:['start 0.98','end 0.04']});
+  const p=useSpring(scrollYProgress,{stiffness:200,damping:30,restDelta:.001});
+  const opacity=useTransform(p,[0,.20,.78,1],[0,1,1,0]);
+  const y=useTransform(p,[0,.20,.78,1],[64,12,-16,-64]);
+  return <motion.div ref={target} className={className} data-scroll-reveal style={{opacity,y}}>{children}</motion.div>;
 }
 
-export function SceneLine({children,visible=false}:{children:React.ReactNode;visible?:boolean}) {
+export function SceneLine({children,visible=false,order=0}:{children:React.ReactNode;visible?:boolean;order?:number}) {
   const scene=useContext(SceneProgress);
-  const finalProgress=useMotionValue(1);
-  const reduce=useReducedMotion();
+  const finalProgress=useMotionValue(.22);
   const progress=scene??finalProgress;
-  const y=useTransform(progress,[0,.22],visible?['0%','0%']:['105%','0%']);
-  const opacity=useTransform(progress,[0,.16],visible?[1,1]:[0,1]);
-  return <span className="insights-line"><motion.span style={reduce?undefined:{y,opacity}}>{children}</motion.span></span>;
+  const delay=order*.035;
+  const y=useTransform(progress,[0,.16+delay,.30,.48],visible?['0%','-4%','-12%','-105%']:['105%','0%','-8%','-105%']);
+  const opacity=useTransform(progress,[0,.12+delay,.32,.46],visible?[1,1,1,0]:[0,1,1,0]);
+  return <span className="insights-line"><motion.span style={{y,opacity}}>{children}</motion.span></span>;
+}
+
+export function StoryMedia({src,alt,caption}:{src:string;alt:string;caption?:string}) {
+  const scene=useContext(SceneProgress);
+  const settled=useMotionValue(0);
+  const p=scene??settled;
+  const y=useTransform(p,[0,.25,.58,1],[56,0,-48,-80]);
+  const scale=useTransform(p,[0,.35,.60,1],[1.15,1.02,1.22,1.32]);
+  const filter=useTransform(p,[0,.34,.50,.68],['brightness(1)','brightness(1)','brightness(.2)','brightness(.12)']);
+  const clipPath=useTransform(p,[0,.30,.58],['inset(10% 8% 10% 8%)','inset(0% 0% 0% 0%)','inset(0% 0% 0% 0%)']);
+  return <motion.figure className="story-media" style={{y,clipPath}}><motion.img src={src} alt={alt} decoding="async" style={{scale,filter}}/>{caption&&<figcaption>{caption}</figcaption>}</motion.figure>;
 }
 
 export function ScrollStory({intro,impact}:{intro:React.ReactNode;impact:React.ReactNode}) {
   const container=useContext(InsightsScrollContext);
   const target=useRef<HTMLDivElement>(null);
-  const reduce=useReducedMotion();
   const {scrollYProgress}=useScroll({container,target,layoutEffect:false,offset:['start start','end end']});
-  // One shared transition preserves velocity and acceleration across both scenes.
-  // The 200/30 response follows the original Collective motion system.
-  const transitionTarget=useTransform(scrollYProgress,[.30,.66],[0,1]);
-  const transition=useSpring(transitionTarget,{stiffness:200,damping:30,restDelta:.001});
-  const introOpacity=useTransform(transition,[0,1],[1,0]);
-  const impactOpacity=transition;
-  const introY=useTransform(transition,[0,1],['0%','-12%']);
-  const impactY=useTransform(transition,[0,1],['12%','0%']);
-  const introScale=useTransform(transition,[0,1],[1,1.5]);
-  const impactScale=useTransform(transition,[0,1],[.5,1]);
+  const p=useSpring(scrollYProgress,{stiffness:200,damping:30,restDelta:.001});
+  const introOpacity=useTransform(p,[0,.52,.68],[1,1,0]);
+  const introCopy=useTransform(p,[0,.32,.45],[1,1,0]);
+  const impactOpacity=useTransform(p,[.46,.55,1],[0,1,1]);
+  const introY=useTransform(p,[0,.30,.52],[0,-20,-100]);
+  const impactY=useTransform(p,[.45,.70,1],[100,12,-32]);
+  const introScale=useTransform(p,[0,.52],[1,1.16]);
+  const impactScale=useTransform(p,[.45,1],[.92,1.025]);
   const [impactActive,setImpactActive]=useState(false);
-  useMotionValueEvent(transition,'change',value=>setImpactActive(value>=.5));
-  return <SceneProgress.Provider value={scrollYProgress}>
-    <div ref={target} id="insights-story" className={`insights-story${reduce?' insights-story-static':''}`}>
+  useMotionValueEvent(p,'change',value=>setImpactActive(value>=.48));
+  return <SceneProgress.Provider value={p}>
+    <div ref={target} className="insights-story" data-scroll-story>
       <div className="insights-story-pin">
-        <motion.div className="insights-scene" aria-hidden={!reduce&&impactActive} style={reduce?undefined:{opacity:introOpacity,y:introY,scale:introScale,pointerEvents:impactActive?'none':'auto'}}>{intro}</motion.div>
-        <motion.div className="insights-scene insights-impact" aria-hidden={!reduce&&!impactActive} style={reduce?undefined:{opacity:impactOpacity,y:impactY,scale:impactScale,pointerEvents:impactActive?'auto':'none'}}>{impact}</motion.div>
+        <motion.div className="insights-scene" aria-hidden={impactActive} {...(impactActive?{inert:''}:{})} style={{opacity:introOpacity,y:introY,scale:introScale,transformOrigin:'left center',pointerEvents:impactActive?'none':'auto','--story-copy-opacity':introCopy} as MotionStyle}>{intro}</motion.div>
+        <motion.div className="insights-scene insights-impact" aria-hidden={!impactActive} {...(!impactActive?{inert:''}:{})} style={{opacity:impactOpacity,y:impactY,scale:impactScale,transformOrigin:'left center',pointerEvents:impactActive?'auto':'none'}}>{impact}</motion.div>
       </div>
     </div>
   </SceneProgress.Provider>;

@@ -1,25 +1,26 @@
-.about-return,.about-business-nav{min-height:44px;background:none;border:0;}
-.about-business-nav{margin-left:auto;margin-right:24px;font-size:12px;color:#f5f4f0;}
-.about-business-nav[aria-expanded=true]{color:#fbb200;}
-.about-business-entry{display:inline-flex;align-items:center;gap:28px;min-height:44px;border-bottom:1px solid #ffffff60;font-size:15px;}
-.about-businesses{flex:1;min-height:0;overflow-y:auto;padding:clamp(32px,6vh,72px) var(--editorial-inset);background:#1a1a1a;}
-.about-business-heading{margin-bottom:40px;}
-.about-business-heading .editorial-kicker{color:#fbb200;margin-bottom:18px;}
-.about-business-heading h2{margin-bottom:20px;line-height:1.15;}
-.about-business-heading h2 span{color:#fbb200;}
-.about-business-list{max-width:1440px;margin:auto;}
-.about-business-list article{border-top:1px solid #ffffff26;}
-.about-business-list article:last-child{border-bottom:1px solid #ffffff26;}
-.about-business-list h3>button{width:100%;display:grid;grid-template-columns:40px 1fr 24px;align-items:center;gap:20px;padding:22px 0;text-align:left;min-height:80px;font-family:Manrope,Pretendard,sans-serif;font-size:clamp(18px,2.4vw,34px);letter-spacing:-.02em;transition:color .3s;}
-.about-business-list h3>button:hover,.about-business-list h3>button[aria-expanded=true]{color:#fbb200;}
-.about-business-number{font-family:Pretendard,sans-serif;font-size:12px;font-weight:400;color:#ffffff70;letter-spacing:0;}
-.about-business-list small{display:block;margin-top:8px;color:#ffffff90;font-family:Pretendard,sans-serif;font-size:12px;font-weight:400;letter-spacing:0;}
-.about-business-detail{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(24px,5vw,80px);padding:4px 0 36px 60px;}
-.about-business-detail ul{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;margin-top:24px;font-size:13px;color:#ffffffa0;}
-.about-business-detail figure{position:relative;margin:0;overflow:hidden;height:clamp(190px,24vw,300px);}
-.about-business-detail img{width:100%;height:100%;object-fit:cover;}
-.about-business-detail figcaption{position:absolute;bottom:12px;left:12px;padding:5px 8px;background:#1a1a1ace;font-size:10px;color:#f5f4f0;}
-.about-business-links{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:24px;}
-.about-business-links a,.about-business-links button{display:inline-flex;align-items:center;gap:12px;min-height:44px;border-bottom:1px solid #ffffff50;font-size:13px;}
-.about-business-links a:hover,.about-business-links button:hover{color:#fbb200;}
-@media(max-width:639px){.about-business-nav{font-size:11px;margin-right:12px;}.about-business-heading{margin-bottom:28px;}.about-business-list h3>button{grid-template-columns:22px 1fr 18px;gap:10px;font-size:18px;}.about-business-detail{grid-template-columns:1fr;gap:24px;padding-left:0;}.about-business-detail ul{font-size:12px;gap:10px;}.about-business-detail figure{height:180px;}.about-business-list small{font-size:11px;}}
+.about-hero-composition{display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:clamp(40px,8vw,140px);}
+.about-hero-copy{min-width:0;}
+.about-benefits>p,.benefit-kicker{font-size:12px;color:#fbb200;letter-spacing:0;margin-bottom:22px;}
+.about-benefits ol{list-style:none;padding:0;margin:0;}
+.about-benefits button{display:grid;grid-template-columns:24px 1fr 20px;align-items:center;gap:16px;width:100%;min-height:52px;padding:10px 0;text-align:left;border-bottom:1px solid #ffffff24;font-size:clamp(15px,1.35vw,21px);line-height:1.3;transition:color .3s;}
+.about-benefits button:hover{color:#fbb200;}
+.about-benefits button:focus-visible,.about-business-links :focus-visible{outline:1px solid #fbb200;outline-offset:4px;}
+.benefit-number{font-size:11px;color:#ffffff60;}
+.about-benefit-detail{position:relative;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;outline:none;}
+.benefit-story-content{padding-inline:var(--editorial-inset);}
+.about-benefit-detail .insights-story-pin{top:0;}
+.benefit-opening{width:100%;display:grid;grid-template-columns:1fr 1.1fr;align-items:center;gap:clamp(32px,6vw,90px);}
+.benefit-opening h2{font-size:var(--editorial-title);line-height:1.14;}
+.benefit-scroll-cue{margin-top:30px;font-size:12px;color:#ffffff60;}
+.benefit-statement{max-width:900px;}
+.benefit-statement h2{margin-bottom:32px;}
+.benefit-statement .editorial-body{max-width:700px;}
+.benefit-scope{padding:80px 0 160px;}
+.benefit-scope-row{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:24px;min-height:150px;border-top:1px solid #ffffff24;padding:32px 0;}
+.benefit-scope-row>span{font-size:12px;color:#fbb200;}
+.benefit-scope-row h3{font-size:clamp(22px,3vw,40px);line-height:1.4;word-break:keep-all;}
+.about-business-links{display:flex;flex-wrap:wrap;gap:20px 32px;margin-top:64px;}
+.about-business-links a,.about-business-links button{display:inline-flex;align-items:center;gap:16px;min-height:44px;border-bottom:1px solid #ffffff50;font-size:13px;}
+@media(max-width:767px){.about-hero-composition{grid-template-columns:1fr;gap:26px;padding-top:35px;}.about-hero-copy .editorial-body{margin-top:20px;}.about-benefits>p{margin-bottom:8px;font-size:10px;}.about-benefits button{min-height:44px;padding:6px 0;font-size:14px;gap:12px;}.benefit-opening{grid-template-columns:1fr;gap:24px;}.benefit-opening .story-media{height:28svh;}.benefit-opening h2{font-size:var(--editorial-title);}.benefit-kicker{margin-bottom:16px;font-size:11px;}.benefit-scroll-cue{margin-top:18px;}.benefit-statement h2{margin-bottom:24px;}.benefit-scope{padding:40px 0 100px;}.benefit-scope-row{grid-template-columns:24px 1fr;gap:16px;min-height:140px;padding:24px 0;}.benefit-scope-row h3{font-size:24px;}}
+@media(max-height:760px) and (max-width:767px){.about-hero-composition{gap:18px;padding-top:20px;}.about-hero-copy .editorial-body{margin-top:14px;font-size:12px;}.about-hero-copy h1{line-height:1!important;}.about-benefits button{font-size:13px;}.collective-about .editorial-kicker.absolute{top:16px;font-size:10px;}}
+@media(max-height:620px){.about-benefits button{min-height:44px;}.benefit-opening .story-media{height:26svh;}.about-hero-composition{gap:20px;}.about-stage-layer:first-child>div>div{overflow-y:auto;}}

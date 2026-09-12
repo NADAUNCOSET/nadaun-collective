@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 type LinkChip = { label: string; url?: string; overlay?: string };
@@ -19,7 +19,7 @@ type HubItem = {
   links: LinkChip[];
 };
 
-const ITEMS: HubItem[] = [
+export const ITEMS: HubItem[] = [
   {
     id: 'moment',
     num: '01',
@@ -63,31 +63,26 @@ const ITEMS: HubItem[] = [
     ],
   },
   {
-    id: 'signage', num: '03', title: 'DIGITAL SIGNAGE',
-    kr: '사이니지 제작 · 플랫폼',
-    desc: '스마트 TV 기반 사이니지. 설치와 네트워크를 관리하고 사진 · 영상 제작 플로우와 온라인 운영을 자동화합니다. 제작비 300만 원, TV · 설치 인건비 별도.',
-    color: '#F5F4F0', img: 'https://media.nadaun.co/collective/btl/02-outdoor.webp',
-    links: [{ label: '사이니지 플랫폼', overlay: 'digital-signage' }],
-  },
-  {
-    id: 'wedding',
-    num: '04',
-    title: 'NADAUN WEDDING',
-    kr: '웨딩 스냅 · 필름',
-    desc: '가장 나다운 순간 — 웨딩 스냅 · 본식 촬영, 두 사람다운 장면을 그대로 기록',
-    color: '#E8C48E',
+    id: 'marketing',
+    num: '03',
+    title: 'MARKETING',
+    kr: '온라인 · 오프라인 광고대행 · 마케팅',
+    desc: '브랜드 전략과 캠페인 기획, 디지털 · 방송 · 옥외 광고, 광고 협찬 · PPL · 언론홍보와 디지털 사이니지를 운영합니다.',
+    color: '#FFB800',
     rolling: [
-      { src: 'https://media.nadaun.co/wedding/gallery/02.jpg', name: '스튜디오' },
-      { src: 'https://media.nadaun.co/wedding/gallery/05.jpg', name: '가든' },
-      { src: 'https://media.nadaun.co/wedding/gallery/12.jpg', name: '스카이', pos: 'center 30%' },
-      { src: 'https://media.nadaun.co/wedding/gallery/25.jpg', name: '골든아워', pos: 'center' },
-      { src: 'https://media.nadaun.co/wedding/gallery/22.jpg', name: '포레스트', pos: 'center' },
-      { src: 'https://media.nadaun.co/wedding/gallery/27.jpg', name: '론 스냅', pos: 'center' },
+      { src: 'https://media.nadaun.co/collective/btl/01-subway.webp', name: '지하철 스크린도어' },
+      { src: 'https://media.nadaun.co/collective/btl/03-taxi.webp', name: '택시 미디어' },
+      { src: 'https://media.nadaun.co/collective/btl/04-bus.webp', name: '버스 외부광고' },
     ],
-    links: [{ label: 'WEDDING', url: 'https://wedding.nadaun.co' }],
+    links: [
+      { label: '통합 솔루션', overlay: 'integrated-solution' },
+      { label: '미디어 · 매체', overlay: 'global-network' },
+      { label: '디지털 사이니지', overlay: 'digital-signage' },
+      { label: 'INSIGHTS', overlay: 'insights' },
+    ],
   },
   {
-    id: 'production', num: '05', title: 'ALL IN ONE SOLUTION',
+    id: 'production', num: '04', title: 'ALL IN ONE SOLUTION',
     kr: '프리제작 솔루션',
     desc: '기획안 · 스토리보드 · 콘티 · 애니메틱 · 샷리스트를 연결하는 프리프로덕션 자동화 시스템.',
     color: '#F5F4F0', img: 'https://media.nadaun.co/allinone/projects/NIKE-OLIVE-BURGUNDY-12-SCENE-MAGAZINE-FILM/01_STILL/S01_HERO-26ec0115fb772ac7.webp',
@@ -95,7 +90,7 @@ const ITEMS: HubItem[] = [
   },
   {
     id: 'starlogin',
-    num: '06',
+    num: '05',
     title: 'STARLOGIN',
     kr: '국내 · 글로벌 에이전시',
     desc: '국내외 아티스트와 인플루언서, 유튜버 · 셀럽 · 왕홍의 협업을 기획합니다. 브랜드와 크리에이터의 적합성을 검토하고 캠페인 목적에 맞게 연결합니다.',
@@ -112,23 +107,23 @@ const ITEMS: HubItem[] = [
     ],
     links: [{ label: 'GLOBAL AGENCY', overlay: 'starlogin' }],
   },
+
   {
-    id: 'marketing',
-    num: '07',
-    title: 'MARKETING',
-    kr: '온라인 · 오프라인 광고대행 · 마케팅',
-    desc: '브랜드 전략과 캠페인 기획, 디지털 · 방송 · 옥외 광고, 광고 협찬 · PPL · 언론홍보를 통합 운영합니다.',
-    color: '#FFB800',
+    id: 'wedding',
+    num: '06',
+    title: 'NADAUN WEDDING',
+    kr: '웨딩 스냅 · 필름',
+    desc: '가장 나다운 순간 — 웨딩 스냅 · 본식 촬영, 두 사람다운 장면을 그대로 기록',
+    color: '#E8C48E',
     rolling: [
-      { src: 'https://media.nadaun.co/collective/btl/01-subway.webp', name: '지하철 스크린도어' },
-      { src: 'https://media.nadaun.co/collective/btl/03-taxi.webp', name: '택시 미디어' },
-      { src: 'https://media.nadaun.co/collective/btl/04-bus.webp', name: '버스 외부광고' },
+      { src: 'https://media.nadaun.co/wedding/gallery/02.jpg', name: '스튜디오' },
+      { src: 'https://media.nadaun.co/wedding/gallery/05.jpg', name: '가든' },
+      { src: 'https://media.nadaun.co/wedding/gallery/12.jpg', name: '스카이', pos: 'center 30%' },
+      { src: 'https://media.nadaun.co/wedding/gallery/25.jpg', name: '골든아워', pos: 'center' },
+      { src: 'https://media.nadaun.co/wedding/gallery/22.jpg', name: '포레스트', pos: 'center' },
+      { src: 'https://media.nadaun.co/wedding/gallery/27.jpg', name: '론 스냅', pos: 'center' },
     ],
-    links: [
-      { label: '통합 솔루션', overlay: 'integrated-solution' },
-      { label: '미디어 · 매체', overlay: 'global-network' },
-      { label: 'INSIGHTS', overlay: 'insights' },
-    ],
+    links: [{ label: 'WEDDING', url: 'https://wedding.nadaun.co' }],
   },
 ];
 
@@ -290,7 +285,6 @@ const LinkWord: React.FC<{ link: LinkChip; index: number; color: string; onOverl
 
 const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onOverlay: (id: string) => void; revealStarted: boolean }> = ({ activeId, setActiveId, onOverlay, revealStarted }) => {
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const reduce = useReducedMotion();
 
   return (
   <div
@@ -311,11 +305,11 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
             }
           }}
           data-hub-tile={item.id}
-          initial={reduce ? false : { opacity:0, y:isMobile ? -72 : -180, scale:.96 }}
+          initial={{ opacity:0, y:isMobile ? -72 : -180, scale:.96 }}
           whileInView={revealStarted ? { opacity:1, y:0, scale:1 } : undefined}
           viewport={{ once:true, amount:.12 }}
-          animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? '48vh' : '24vh') : '58vh' }}
-          transition={reduce ? { duration:0 } : {
+          animate={{ flexGrow: active ? 2.6 : 1, height: isMobile ? (active ? (item.id === 'marketing' ? 'max(56svh, 460px)' : '48vh') : '24vh') : '58vh' }}
+          transition={{
             flexGrow:{ type:'spring', stiffness:65, damping:23, restDelta:.0005 },
             height:{ duration:.6, ease:NADAUN_EASE },
             y:{ duration:.95, delay:isMobile ? .08 : ti * .105, ease:NADAUN_EASE },
@@ -376,10 +370,10 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
 
           {/* label */}
           <motion.div className="absolute inset-x-0 bottom-0 p-4 md:p-5"
-            initial={reduce ? false : { opacity:0, y:18 }}
+            initial={{ opacity:0, y:18 }}
             whileInView={revealStarted ? { opacity:1, y:0 } : undefined}
             viewport={{ once:true, amount:.1 }}
-            transition={reduce ? { duration:0 } : { duration:.6, delay:.28 + (isMobile ? 0 : ti * .105), ease:NADAUN_EASE }}
+            transition={{ duration:.6, delay:.28 + (isMobile ? 0 : ti * .105), ease:NADAUN_EASE }}
           >
             <div className="flex items-center gap-3 mb-1.5">
               {/* 모바일은 번호 제거, 얇은 폰트로 좌측 정렬 (대표 지시 2026-07-15) */}
@@ -393,7 +387,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
               </span>
             </div>
             <h3
-              className="text-white leading-none whitespace-nowrap"
+              className="text-white leading-[1.05] whitespace-normal break-words"
               style={{
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 800,

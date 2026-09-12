@@ -30,7 +30,7 @@ const App: React.FC = () => {
   const cursorX = useSpring(rawCursorX, { stiffness: 300, damping: 26, mass: 0.5 });
   const cursorY = useSpring(rawCursorY, { stiffness: 300, damping: 26, mass: 0.5 });
 
-  const [introFinished, setIntroFinished] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [introFinished, setIntroFinished] = useState(false);
   const [hubRevealStarted, setHubRevealStarted] = useState(false);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
   const [inquiryPreset, setInquiryPreset] = useState<'signage'|'solution'|undefined>();
@@ -136,6 +136,7 @@ const App: React.FC = () => {
         {activeOverlay === 'portfolio' && (<PortfolioOverlay isOpen={activeOverlay === 'portfolio'} onClose={closeOverlay} />)}
         {activeOverlay === 'integrated-solution' && (<IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
+          onSignageClick={() => openLab('signage')}
           onClose={closeOverlay}
           onBack={backToHub}
           onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}

@@ -67,3 +67,6 @@
 .portfolio-word-mask {display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em;margin-right:.18em;}
 .portfolio-word-mask>span {display:block;}
 .portfolio-word-mask:last-child {margin-right:0;}
+
+.collective-overlays>.fixed{scrollbar-width:none;}
+.collective-overlays>.fixed::-webkit-scrollbar{display:none;}

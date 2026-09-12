@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useMemo, useState, Suspense, createContext, useContext } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useMemo, useState, Suspense, createContext, useContext } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
-import AboutBusinesses from './AboutBusinesses';
+import AboutBusinesses, { AboutBenefits } from './AboutBusinesses';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -57,7 +57,7 @@ const StickyPanel: React.FC<{ children: React.ReactNode; centered?: boolean }> =
 );
 
 // ── Chapter 1 — horizontal word slides (same pattern as BusinessOverlay Ch1) ──
-const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+const Chapter1: React.FC<{ g: MotionValue<number>; onBenefit:(id:string)=>void }> = ({ g, onBenefit }) => {
   const p = useTransform(g, [Math.max(0,C1S-.024), Math.min(1,C1E+.024)], [0, 1]);
 
   // 세 단어가 끊김 없이 부드럽게 이어져 한 화면에 모두 남음 (stagger 겹침, 모두 머무름) 대표 룰 2026-06-13
@@ -87,8 +87,8 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           NADAUN COLLECTIVE — Since 2020, Seoul
         </p>
 
-        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="flex flex-col">
-          <motion.h1 style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
+        <motion.div style={{ opacity: exitOp, y: exitY, willChange: 'transform, opacity' }} className="about-hero-composition">
+          <div className="about-hero-copy"><motion.h1 style={{ opacity: w1Op, y: w1Y, color: 'white', willChange: 'transform' }}
             className="font-black tracking-[-0.04em] leading-[0.95] whitespace-nowrap"
           ><span style={FS}>VISUAL</span></motion.h1>
           <motion.h1 style={{ opacity: w2Op, y: w2Y, color: 'white', willChange: 'transform' }}
@@ -102,7 +102,8 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
           >
             스토리텔링을 기반으로 브랜드의 메시지를<br />
             사진·영상·공간 매체에 구현하는 비주얼 콘텐츠 솔루션
-          </motion.p>
+          </motion.p></div>
+          <AboutBenefits progress={p} onSelect={onBenefit}/>
         </motion.div>
       </div>
     </div>
@@ -110,7 +111,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 };
 
 // ── Chapter 2 ─────────────────────────────────────────────────────────────────
-const Chapter2: React.FC<{ g: MotionValue<number>; onBusinesses: () => void }> = ({ g, onBusinesses }) => {
+const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const p = useTransform(g, [Math.max(0,C2S-.024), Math.min(1,C2E+.024)], [0, 1]);
 
   const line1Op = useTransform(p, [0.00, 0.16], [0, 1]);
@@ -122,7 +123,6 @@ const Chapter2: React.FC<{ g: MotionValue<number>; onBusinesses: () => void }> =
   ]);
   const bodyOp = useTransform(p, [0.42, 0.60], [0, 1]);
   const bodyY  = useTransform(p, [0.42, 0.60], ['3%', '0%']);
-  const pillOp = useTransform(p, [0.56, 0.74], [0, 1]);
   const exitOp = useTransform(p, [0.78, 0.96], [1, 0]);
   const exitY  = useTransform(p, [0.78, 0.96], ['0%', '-5%']);
 
@@ -146,9 +146,7 @@ const Chapter2: React.FC<{ g: MotionValue<number>; onBusinesses: () => void }> =
             장면의 맥락, 이미지의 질감과 편집의 리듬을 조율하고<br />
             매체에 적합한 사진·영상과 시각 경험으로 구현합니다.
           </motion.p>
-          <motion.div style={{ opacity: pillOp }} className="flex flex-wrap gap-3 mt-10">
-            <button type="button" onClick={onBusinesses} className="about-business-entry">우리의 7가지 사업군 <span aria-hidden="true">↗</span></button>
-          </motion.div>
+
         </motion.div></AboutCopy>
       </StickyPanel>
     </div>
@@ -726,8 +724,13 @@ interface AboutOverlayProps {
 }
 
 const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactClick, onNavigate }) => {
-  const [businessesOpen, setBusinessesOpen] = useState(false);
+  const [selectedBenefit, setSelectedBenefit] = useState<string|null>(null);
+  const benefitTrigger = useRef<HTMLElement|null>(null);
+  const aboutScrollTop = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const selectBenefit=(id:string)=>{aboutScrollTop.current=scrollRef.current?.scrollTop??0;benefitTrigger.current=document.activeElement as HTMLElement;setSelectedBenefit(id);};
+  const returnToAbout=()=>setSelectedBenefit(null);
+  useLayoutEffect(()=>{if(selectedBenefit!==null)return;const el=scrollRef.current;if(el)el.scrollTop=aboutScrollTop.current;benefitTrigger.current?.focus({preventScroll:true});},[selectedBenefit]);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
   // Share the same damped scroll clock across every chapter and the progress bar.
@@ -748,10 +751,10 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
 
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') businessesOpen ? setBusinessesOpen(false) : onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') selectedBenefit ? returnToAbout() : onClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose, businessesOpen]);
+  }, [isOpen, onClose, selectedBenefit]);
 
   return (
     <AnimatePresence>
@@ -771,8 +774,8 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
             className="editorial-header shrink-0 flex items-center justify-between border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
           >
-            <button type="button" className="about-return text-xs font-bold tracking-normal text-[#FFB800] uppercase" onClick={() => setBusinessesOpen(false)}>{businessesOpen ? '← About' : 'About'}</button>
-            <button type="button" className="about-business-nav" aria-expanded={businessesOpen} aria-controls="about-businesses" onClick={() => setBusinessesOpen(!businessesOpen)}>우리의 7가지 사업군</button>
+            <button type="button" className="about-return text-xs font-bold tracking-normal text-[#FFB800] uppercase" onClick={returnToAbout}>{selectedBenefit ? '← About' : 'About'}</button>
+
             <button onClick={onClose} aria-label="어바웃 닫기"
               className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
             >
@@ -783,18 +786,18 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
           <div
             ref={scrollRef}
             className="flex-1 min-h-0 overflow-y-scroll"
-            hidden={businessesOpen}
-            style={{ scrollbarWidth: 'none' }}
+            hidden={selectedBenefit!==null}
+            style={{ scrollbarWidth: 'none', overflowAnchor:'none' }}
           >
             <div className="about-scroll-track" style={{height:`${TOTAL}vh`}}><div className="about-stage">
-              <AboutLayer g={scaleX} start={C1S} end={C1E}><Chapter1 g={scaleX}/></AboutLayer>
-              <AboutLayer g={scaleX} start={C2S} end={C2E}><Chapter2 g={scaleX} onBusinesses={() => setBusinessesOpen(true)}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C1S} end={C1E}><Chapter1 g={scaleX} onBenefit={selectBenefit}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C2S} end={C2E}><Chapter2 g={scaleX}/></AboutLayer>
               <AboutLayer g={scaleX} start={C3S} end={C3E}><Chapter3 g={scaleX}/></AboutLayer>
               <AboutLayer g={scaleX} start={C4S} end={C4E}><Chapter4 g={scaleX}/></AboutLayer>
               <AboutLayer g={scaleX} start={C5S} end={C5E}><Chapter5 g={scaleX} onContactClick={onContactClick}/></AboutLayer>
             </div></div>
           </div>
-          {businessesOpen && <AboutBusinesses onNavigate={onNavigate}/>}
+          {selectedBenefit && <AboutBusinesses key={selectedBenefit} selected={selectedBenefit} onNavigate={onNavigate} onReturn={returnToAbout}/>}
         </motion.div>
       )}
     </AnimatePresence>

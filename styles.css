@@ -13,4 +13,4 @@ body { margin:0; font-family:var(--nadaun-font); background:var(--nadaun-bg); co
 button, a, input, textarea, select { -webkit-tap-highlight-color:transparent; }
 button:focus-visible, a:focus-visible { outline:2px solid var(--nadaun-accent); outline-offset:4px; }
 @media (hover:none), (pointer:coarse) { .cursor-none { cursor:auto; } .nadaun-cursor { display:none; } }
-@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .nadaun-cursor { display:none; } *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .nadaun-cursor { display:none; } }

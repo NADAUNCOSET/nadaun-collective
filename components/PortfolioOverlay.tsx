@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import React, { useEffect, useState, useRef } from 'react';
+import { AnimatePresence, motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ArrowUpRight, X } from 'lucide-react';
 
 type PortfolioOverlayProps = {
@@ -44,8 +44,14 @@ const cards: PortfolioCard[] = [
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) => {
+  const scrollRef=useRef<HTMLElement>(null);
+  const {scrollYProgress}=useScroll({container:scrollRef});
+  const progress=useSpring(scrollYProgress,{stiffness:200,damping:30,restDelta:.001});
+  const titleY=useTransform(progress,[0,1],[0,-64]);
+  const mediaY=useTransform(progress,[0,1],[0,-36]);
+  const mediaScale=useTransform(progress,[0,1],[1.06,1]);
   const [active, setActive] = useState<'video' | 'photo'>('video');
-  const reduce=useReducedMotion();
+
 
   useEffect(() => {
     if (!isOpen) return;
@@ -60,8 +66,9 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
     <AnimatePresence>
       {isOpen && (
         <motion.section
+          ref={scrollRef}
           className="collective-editorial collective-portfolio fixed inset-0 z-[100] overflow-y-auto bg-[#1a1a1a] text-white"
-          initial={reduce?false:{opacity:0}}
+          initial={{opacity:0}}
           animate={{opacity:1}}
           exit={{opacity:0}}
           transition={{duration:.3,ease}}
@@ -87,7 +94,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
           </header>
 
           <div className="editorial-page-content mx-auto flex flex-col">
-            <div className="editorial-intro">
+            <motion.div className="editorial-intro" style={{y:titleY}}>
               <div className="md:col-span-8">
                 <motion.p
                   className="editorial-kicker mb-5 text-[11px] font-bold tracking-normal text-[#FFB800]"
@@ -102,7 +109,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                   style={{ fontSize: 'var(--editorial-title)', fontFamily: 'SUIT, Pretendard, sans-serif' }}
                   initial={false}
                 >
-                  {['OUR','WORK.'].map((word,index)=><span key={word} className="portfolio-word-mask"><motion.span initial={reduce?false:{y:'105%'}} animate={{y:'0%'}} transition={{type:'spring',stiffness:200,damping:30,delay:.18+index*.09}}>{word}</motion.span></span>)}
+                  {['OUR','WORK.'].map((word,index)=><span key={word} className="portfolio-word-mask"><motion.span initial={{y:'105%'}} animate={{y:'0%'}} transition={{type:'spring',stiffness:200,damping:30,delay:.18+index*.09}}>{word}</motion.span></span>)}
                 </motion.h1>
               </div>
               <motion.p
@@ -114,7 +121,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                 브랜드의 이야기를 장면과 이미지로 구현합니다.<br />
                 사진과 영상에 담긴 나다운의 작업을 확인하세요.
               </motion.p>
-            </div>
+            </motion.div>
 
             <div className="grid flex-1 gap-px overflow-hidden rounded-[2px] bg-white/15 md:grid-cols-2">
               {cards.map((card, index) => {
@@ -128,12 +135,13 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                     onMouseEnter={() => setActive(card.id)}
                     onFocus={() => setActive(card.id)}
                     className="group relative min-h-[310px] overflow-hidden bg-[#222] md:min-h-[52vh]"
-                    initial={reduce?false:{opacity:0,y:44}}
+                    initial={{opacity:0,y:44}}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.34 + index * 0.09, duration: 0.65, ease }}
                   >
                     {card.mediaType === 'video' ? (
-                      <video
+                      <motion.video
+                        style={{y:mediaY,scale:mediaScale}}
                         src={card.media}
                         autoPlay
                         muted
@@ -143,7 +151,8 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.035]"
                       />
                     ) : (
-                      <img
+                      <motion.img
+                        style={{y:mediaY,scale:mediaScale}}
                         src={card.media}
                         alt="NADAUN photo portfolio preview"
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.035]"
@@ -165,7 +174,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                         </span>
                       </div>
 
-                      <motion.div initial={reduce?false:{opacity:0,y:28}} animate={{opacity:1,y:0}} transition={{type:'spring',stiffness:200,damping:30,delay:.54+index*.09}}>
+                      <motion.div initial={{opacity:0,y:28}} animate={{opacity:1,y:0}} transition={{type:'spring',stiffness:200,damping:30,delay:.54+index*.09}}>
                         <p className="mb-4 text-[10px] font-bold tracking-normal text-[#FFB800] md:text-xs">{card.eyebrow}</p>
                         <h2
                           className="font-black leading-none tracking-[-0.05em]"

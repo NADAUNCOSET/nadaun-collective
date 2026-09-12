@@ -137,7 +137,7 @@
  .insight-principles h3 { font-size:18px; margin-bottom:10px; }
 }
 @media(max-height:680px) { .insights-deck-inner { overflow-y:auto; overscroll-behavior:auto; } }
-@media(prefers-reduced-motion:reduce) { .insight-page * { transition:none!important; } }
+
 
 .insights-image-bridge { position:absolute; inset:0; z-index:5; pointer-events:none; overflow:hidden; }
 .insights-image-bridge img { width:100%; height:100%; object-fit:cover; }
@@ -187,3 +187,12 @@
 @media(max-height:760px){.insights-connected-stage .insights-deck-inner{overflow-y:auto;overscroll-behavior-y:auto;scrollbar-width:thin;}}
 @media(max-width:639px){.insights-impact-content{gap:24px;}.insight-impact-image{height:22svh;}.insights-impact-number{font-size:clamp(48px,15vw,74px)!important;}.insight-metrics>div>div{padding-top:16px;}.insight-report-grid{row-gap:12px;}}
 @media(max-width:639px){.insights-connected-stage .insights-deck-inner{overflow-y:auto;scrollbar-width:thin;}.insight-case-editorial img{max-height:27svh;object-fit:contain;}}
+
+/* Shared About choreography: masked media and staggered copy on the same clock. */
+.story-media{position:relative;height:min(50svh,580px);overflow:hidden;margin:0;}
+.story-media img{width:100%;height:100%;object-fit:cover;}
+.story-media figcaption{position:absolute;bottom:12px;left:12px;right:12px;width:fit-content;padding:6px 8px;font-size:10px;line-height:1.5;background:#1a1a1abf;color:#f5f4f0;}
+.insights-story-pin{overflow:hidden;}
+@media(max-width:767px){.story-media{height:26svh;}.insights-scene{padding-block:20px;}}
+
+.insights-scene:not(.insights-impact) :is(.lab-opening,.marketing-opening,.benefit-opening)>div:first-child{opacity:var(--story-copy-opacity,1);}

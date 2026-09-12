@@ -79,7 +79,7 @@
  .lab-operating h3 { font-size:28px; }
 }
 @media(max-height:620px) and (min-width:640px) { .lab-opening h1 { font-size:44px; margin-bottom:20px; } .lab-lead { font-size:14px; } .lab-statement h2 { font-size:36px; } .lab-statement > p:last-child { margin-top:20px; font-size:14px; } }
-@media(prefers-reduced-motion:reduce) { .lab-page * { transition:none!important; } }
+
 
 .lab-signage-offer { display:grid; grid-template-columns:1.1fr 1fr; gap:64px; margin-top:56px; padding:32px; background:#ffffff06; border-top:1px solid #ffffff26; }
 .lab-signage-offer .lab-eyebrow { margin-bottom:16px; color:var(--lab-muted); }
@@ -89,3 +89,12 @@
 .lab-signage-offer h3 { font-size:28px; line-height:1.25; margin-bottom:20px; }
 .lab-signage-offer h3 + p { font-size:15px; line-height:1.9; color:var(--lab-muted); }
 @media(max-width:639px) { .lab-signage-offer { grid-template-columns:1fr; gap:32px; padding:24px; margin-top:32px; } .lab-signage-offer h3 { font-size:24px; } .lab-signage-offer h3 + p { font-size:14px; } }
+
+/* All detail entries use About's reading scale and a pinned, reversible opening. */
+.lab-page.collective-editorial h1{font-size:var(--editorial-title);}
+.lab-page.collective-editorial h2{font-size:var(--editorial-heading);}
+.lab-page.collective-editorial .lab-lead{font-size:var(--editorial-body);line-height:1.85;}
+.lab-page.collective-editorial .lab-opening{padding-block:24px;}
+.lab-page.collective-editorial .lab-section:has(>.insights-story){padding-top:0;}
+.lab-page.collective-editorial .lab-opening .story-media{width:100%;}
+@media(max-width:767px){.lab-page.collective-editorial .lab-opening{grid-template-columns:1fr;gap:24px;align-content:center;}.lab-page.collective-editorial .lab-opening h1{margin-bottom:20px;}.lab-page.collective-editorial .lab-opening .story-media{height:24svh;}.lab-page.collective-editorial .lab-statement>p:last-child{font-size:13px;line-height:1.85;}.lab-page.collective-editorial .lab-opening .lab-link{margin-top:16px;}.lab-page.collective-editorial .lab-opening .lab-access{margin-top:8px;font-size:10px;}}

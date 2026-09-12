@@ -1,34 +1,10 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-// 단어별 좌→우 슬라이드 (문장 완성)
-const WordSlide: React.FC<{ text: string; style?: React.CSSProperties; delay?: number }> = ({ text, style, delay = 0 }) => (
-  <span className="inline-flex flex-wrap justify-center">
-    {text.split(' ').map((w, i) => (
-      <span key={i} className="inline-block overflow-hidden py-[0.04em]">
-        <motion.span className="inline-block"
-          initial={{ x: '-45%', opacity: 0 }}
-          whileInView={{ x: '0%', opacity: 1 }}
-          viewport={{ once: false, margin: '-10%' }}
-          transition={{ duration: 0.72, delay: delay + i * 0.09, ease: EASE }}
-          style={style}>
-          {w}&nbsp;
-        </motion.span>
-      </span>
-    ))}
-  </span>
-);
-
-interface GlobalNetworkOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;   // 홈으로
-  onBack: () => void;    // 사업영역(도메인)으로
-  onContactClick: () => void;
-}
-
+import React, { useEffect, useRef } from 'react';
+import { motion, useScroll } from 'framer-motion';
+import { X, ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { InsightsScrollContext, ScrollStory, SceneLine, StoryMedia, ScrollReveal } from './InsightsMotion';
+import './insights-motion.css';
+import './marketing-motion.css';
+interface Props {isOpen:boolean;onClose:()=>void;onBack:()=>void;onContactClick:()=>void;}
 const BROADCAST = [
   { cat: '공영 · 지상파',     items: ['KBS', 'MBC', 'SBS', 'EBS'] },
   { cat: '지역 민방',         items: ['TBC', 'KNN', 'KBC', 'TJB', 'JTV', 'UBC', 'CJB', 'G1', 'JIBS'] },
@@ -53,137 +29,19 @@ const OVERSEAS = [
   { label: '글로벌 팬덤', spec: 'K-POP 팬클럽 · 공항 · 글로벌 옥외',    img: 'https://media.nadaun.co/collective/ad-media/overseas-04.webp' },
 ];
 
-const FadeIn = ({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 50, filter: 'blur(12px)' }}
-    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-    viewport={{ once: false, margin: '-12%' }}
-    transition={{ duration: 0.561, delay, ease: [0.16, 1, 0.3, 1] }}
-    className={className}
-  >
-    {children}
-  </motion.div>
-);
 
-const MediaCard: React.FC<{ item: { label: string; spec: string; img: string }; tag: string }> = ({ item, tag }) => (
-  <div className="relative rounded-2xl overflow-hidden aspect-[16/10] group">
-    <img src={item.img} alt={item.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-    <div className="absolute bottom-0 left-0 p-5 md:p-7">
-      <p className="text-[10px] md:text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">{tag}</p>
-      <p className="font-black text-white leading-none mb-2" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3.6rem)', letterSpacing: '-0.03em' }}>{item.label}</p>
-      <p className="text-white/55 font-light" style={{ fontSize: 'clamp(0.8rem, 1.3vw, 1.05rem)' }}>{item.spec}</p>
+export default function GlobalNetworkOverlay({isOpen,onClose,onBack,onContactClick}:Props) {
+  const scrollRef=useRef<HTMLElement>(null);
+  const {scrollYProgress}=useScroll({container:scrollRef});
+  useEffect(()=>{if(!isOpen)return;const key=(e:KeyboardEvent)=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[isOpen,onClose]);
+  if(!isOpen)return null;
+  return <InsightsScrollContext.Provider value={scrollRef}><motion.section ref={scrollRef} role="dialog" aria-label="미디어 · 매체" className="marketing-page collective-editorial fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" initial={{y:'100%'}} animate={{y:0}} transition={{duration:.495,ease:[.22,1,.36,1]}}>
+    <header className="marketing-header"><motion.div className="marketing-progress" style={{scaleX:scrollYProgress}}/><span>MARKETING · 미디어 · 매체</span><button onClick={onBack} aria-label="메인으로 돌아가기"><ArrowLeft size={18}/></button><button onClick={onClose} aria-label="미디어 상세 닫기"><X size={20}/></button></header>
+    <div className="marketing-content">
+      <ScrollStory intro={<div className="marketing-opening"><div><p className="marketing-kicker">Media network</p><h1><SceneLine visible>전국에서.</SceneLine><SceneLine order={1}>전세계로.</SceneLine></h1><p className="editorial-body">방송 · IPTV · 케이블 · 오프라인 BTL.<br/>브랜드와 타깃이 만나는 매체를 설계합니다.</p></div><StoryMedia src={BTL[0].img} alt={BTL[0].label} caption="Media · 지하철 스크린도어"/></div>} impact={<div className="marketing-statement"><p className="marketing-kicker">Nationwide · Global</p><h2>매체의 특성에 맞게.<br/>지역의 맥락에 맞게.</h2><p className="editorial-body">전국 방송과 오프라인 매체, 해외 미디어의 규격과 집행 조건을 검토합니다. 캠페인 목적과 지역별 접점을 기준으로 송출 계획을 구성합니다.</p></div>}/>
+      <section className="marketing-media-section"><ScrollReveal><p className="marketing-kicker">Nationwide broadcast</p><h2>전국 방송 송출.</h2><p className="editorial-body">공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성</p></ScrollReveal><div className="marketing-broadcast">{BROADCAST.map(group=><ScrollReveal key={group.cat}><h3>{group.cat}</h3><p>{group.items.join(' · ')}</p></ScrollReveal>)}</div></section>
+      {[{title:'오프라인 매체.',label:'Offline BTL',items:BTL},{title:'해외 광고.',label:'Overseas',items:OVERSEAS}].map(group=><section className="marketing-media-section" key={group.label}><ScrollReveal><p className="marketing-kicker">{group.label}</p><h2>{group.title}</h2></ScrollReveal><div className="marketing-media-grid">{group.items.map((item,i)=><ScrollReveal key={item.label}><figure><img src={item.img} alt={item.label} loading="lazy" decoding="async"/></figure><div><span>0{i+1}</span><h3>{item.label}</h3></div><p>{item.spec}</p></ScrollReveal>)}</div></section>)}
+      <section className="marketing-final"><ScrollReveal><h2>브랜드가 닿을 곳을<br/>함께 설계합니다.</h2><button className="marketing-link" onClick={onContactClick}>광고 문의하기 <ArrowUpRight size={18}/></button></ScrollReveal></section>
     </div>
-  </div>
-);
-
-const GlobalNetworkOverlay: React.FC<GlobalNetworkOverlayProps> = ({ isOpen, onClose, onBack, onContactClick }) => {
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          transition={{ duration: 0.374 }}
-          className="fixed inset-0 z-[120] bg-[#050505] text-white overflow-y-auto overflow-x-hidden scroll-smooth"
-        >
-          {/* 우상단: 사업영역(백) + X(홈) 나란히 */}
-          <div className="fixed top-7 right-7 md:top-10 md:right-10 z-[130] flex items-center gap-2 md:gap-3">
-            <button onClick={onBack}
-              className="flex items-center gap-2 px-4 md:px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full backdrop-blur-md text-xs md:text-sm font-bold tracking-normal uppercase text-white/70 hover:text-[#FFB800] transition-all">
-              <ArrowLeft size={16} /> 사업영역
-            </button>
-            <button onClick={onClose}
-              className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md">
-              <X size={22} className="text-white group-hover:text-[#FFB800] transition-colors" />
-            </button>
-          </div>
-
-          {/* Intro */}
-          <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
-            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 56, opacity: 1 }} transition={{ duration: 0.8, ease: EASE }} className="h-px bg-[#FFB800] mb-9" />
-            <FadeIn>
-              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-9">03 — GLOBAL NETWORK</p>
-            </FadeIn>
-            <h2 className="font-black tracking-[-0.045em] leading-[0.86] mb-10" style={{ fontSize: 'clamp(3.6rem, 13vw, 11rem)' }}>
-              <WordSlide text="전국에서" /><br />
-              <WordSlide text="전세계로." delay={0.22} style={{ color: '#FFB800' }} />
-            </h2>
-            <FadeIn delay={0.5}>
-              <p className="text-white/55 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed break-keep">
-                방송 · IPTV · 케이블부터 오프라인 BTL, 해외 미디어까지 —<br className="hidden md:block" />
-                어떤 매체든, 어디든 닿는 나다운의 송출 네트워크.
-              </p>
-            </FadeIn>
-            <motion.div animate={{ y: [0, 14, 0], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.0, ease: 'easeInOut' }}
-              className="absolute bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-              <span className="text-[10px] tracking-normal text-gray-500 uppercase font-bold">Scroll</span>
-              <ChevronDown className="text-gray-500 w-5 h-5" />
-            </motion.div>
-          </section>
-
-          {/* 1. 전국 방송 송출 */}
-          <section className="min-h-screen flex flex-col justify-center py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-7xl mx-auto w-full">
-            <FadeIn>
-              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">NATIONWIDE BROADCAST</p>
-              <h3 className="font-black text-white leading-[0.9] mb-4" style={{ fontSize: 'clamp(2.8rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}>전국 방송 송출</h3>
-              <p className="text-white/45 text-base md:text-xl font-light mb-12">공영 · 지역민방 · 종편 · 케이블 · 보도 · IPTV · 위성 — 모든 송출 채널</p>
-            </FadeIn>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-              {BROADCAST.map((grp, i) => (
-                <FadeIn key={grp.cat} delay={0.04 * i}>
-                  <div className="border-l-2 border-[#FFB800]/40 pl-5">
-                    <p className="text-[11px] tracking-normal uppercase text-[#FFB800] font-bold mb-2">{grp.cat}</p>
-                    <p className="font-black leading-tight text-white/90" style={{ fontSize: 'clamp(1.4rem, 2.8vw, 2.6rem)', letterSpacing: '-0.01em' }}>{grp.items.join(' · ')}</p>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-          </section>
-
-          {/* 2. 오프라인 BTL */}
-          <section className="min-h-screen flex flex-col justify-center py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-7xl mx-auto w-full">
-            <FadeIn>
-              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">OFFLINE BTL</p>
-              <h3 className="font-black text-white leading-[0.9] mb-4" style={{ fontSize: 'clamp(2.8rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}>오프라인 매체</h3>
-              <p className="text-white/45 text-base md:text-xl font-light mb-12">지하철 · 옥외 전광판 · 택시 · 버스 — 전국 BTL 집행</p>
-            </FadeIn>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-7">
-              {BTL.map((item, i) => (
-                <FadeIn key={item.label} delay={0.05 * i}><MediaCard item={item} tag={`오프라인 BTL · 0${i + 1}`} /></FadeIn>
-              ))}
-            </div>
-          </section>
-
-          {/* 3. 해외 광고 */}
-          <section className="min-h-screen flex flex-col justify-center py-28 px-6 md:px-16 lg:px-24 border-t border-white/5 max-w-7xl mx-auto w-full">
-            <FadeIn>
-              <p className="text-xs md:text-sm tracking-normal uppercase text-[#FFB800] font-bold mb-3">OVERSEAS</p>
-              <h3 className="font-black text-white leading-[0.9] mb-4" style={{ fontSize: 'clamp(2.8rem, 8vw, 7rem)', letterSpacing: '-0.03em' }}>해외 광고</h3>
-              <p className="text-white/45 text-base md:text-xl font-light mb-12">일본 · 중국 · 동남아 · 미국 · 유럽 · 글로벌 팬덤</p>
-            </FadeIn>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-7">
-              {OVERSEAS.map((item, i) => (
-                <FadeIn key={item.label} delay={0.05 * i}><MediaCard item={item} tag={`OVERSEAS · 0${i + 1}`} /></FadeIn>
-              ))}
-            </div>
-          </section>
-
-          {/* CTA */}
-          <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 border-t border-white/5 bg-gradient-to-b from-transparent to-[#FFB800]/5">
-            <FadeIn>
-              <h3 className="font-black text-white mb-8 tracking-tighter leading-none" style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}>
-                전국·전세계<br /><span className="text-[#FFB800]">어디든.</span>
-              </h3>
-              <button onClick={() => { onClose(); onContactClick(); }}
-                className="mx-auto bg-[#FFB800] text-black px-12 py-6 rounded-full font-bold tracking-normal uppercase hover:bg-white hover:scale-105 transition-all duration-500 flex items-center gap-4 group text-lg md:text-xl">
-                광고 문의하기 <ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform duration-500" />
-              </button>
-            </FadeIn>
-          </section>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-export default GlobalNetworkOverlay;
+  </motion.section></InsightsScrollContext.Provider>;
+}

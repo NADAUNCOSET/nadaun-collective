@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion';
+import { ITEMS } from './ServiceHubV2';
 import { ArrowUpRight, Plus } from 'lucide-react';
 
 type LinkChip = { label: string; url?: string; overlay?: string };
@@ -14,65 +15,7 @@ type HubRow = {
   links: LinkChip[];
 };
 
-const ROWS: HubRow[] = [
-  {
-    id: 'space',
-    num: '01',
-    title: 'NADAUN SPACE',
-    kr: '스튜디오 · 장비 구매 · 렌탈',
-    desc: '스튜디오 장비 구매 및 렌탈 — 모든 창작의 시작이 되는 공간 인프라',
-    color: '#00C2FF',
-    links: [
-      { label: '자사몰', url: 'https://www.rainbowbene.com/' },
-      { label: '스토어', url: 'https://smartstore.naver.com/rainbowbene' },
-      { label: '블로그', url: 'https://blog.naver.com/nadaunstudio' },
-      { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
-    ],
-  },
-  {
-    id: 'moment',
-    num: '02',
-    title: 'NADAUN MOMENT',
-    kr: '사진 · 영상 기획 · 제작',
-    desc: '사진 · 영상 콘텐츠 기획 및 제작 — 기업의 순간을 정제된 감각으로 기록',
-    color: '#FF8C00',
-    links: [
-      { label: 'PHOTO', url: 'https://photo.nadaun.co' },
-      { label: 'VIDEO', url: 'https://video.nadaun.co' },
-    ],
-  },
-  {
-    id: 'starlogin',
-    num: '03',
-    title: 'STARLOGIN',
-    kr: '국내 · 글로벌 에이전시',
-    desc: '국내 · 글로벌 에이전시, IP 컨설팅, 글로벌 유통 · 제작 — 브랜드를 세계와 연결',
-    color: '#FF6B35',
-    links: [{ label: 'GLOBAL AGENCY', url: 'https://starlogin.com' }],
-  },
-  {
-    id: 'marketing',
-    num: '04',
-    title: 'MARKETING',
-    kr: '종합 마케팅',
-    desc: '온라인 · 오프라인, 국내 · 국외 풀퍼널 캠페인 설계와 집행',
-    color: '#FFB800',
-    links: [
-      { label: '통합 솔루션', overlay: 'integrated-solution' },
-      { label: '미디어 · 매체', overlay: 'global-network' },
-      { label: 'INSIGHTS', overlay: 'insights' },
-    ],
-  },
-  {
-    id: 'ailab',
-    num: '05',
-    title: 'AI INNOVATION LAB',
-    kr: 'AI 이노베이션 랩',
-    desc: '사이니지 제작 · 유통, 글로벌 사이트 제작 등 — 데이터로 예측하는 마케팅의 새로운 차원',
-    color: '#00FF94',
-    links: [{ label: 'AI LAB', overlay: 'ai-lab' }],
-  },
-];
+const ROWS: HubRow[] = ITEMS;
 
 // 나다운 미감 공통 스프링/이징 (CLAUDE.md 모션 퍼스트 룰)
 const NADAUN_SPRING = { stiffness: 90, damping: 26, restDelta: 0.0005 };
