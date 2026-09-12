@@ -17,6 +17,7 @@ desktop.ini
 *.sln
 
 # Dependencies
+node_modules
 node_modules/
 
 # Logs

@@ -51,53 +51,56 @@ export function ScrollStory({intro,impact}:{intro:React.ReactNode;impact:React.R
   </SceneProgress.Provider>;
 }
 
-// A shared clock drives each hand-off. Adjacent layers use the same travel and
-// interval; the motif changes with the content rather than restarting an effect.
+// Each scene shares the same scroll clock, with a different role for type, figures and media.
+// Scroll choreography is the approved content structure, including on hosts with reduced motion.
 const SequenceProgress=createContext<MotionValue<number>|null>(null);
-type TransitionKind='zoom'|'drop'|'cover'|'dissolve';
-const HANDOFFS:TransitionKind[]=['zoom','drop','drop','drop','cover','zoom','dissolve','drop','zoom'];
 
 export function SceneObject({children,order=0}:{children:React.ReactNode;order?:number}) {
   const scene=useContext(SequenceProgress);
   const settled=useMotionValue(0);
-  const reduce=useReducedMotion();
   const offset=order*.035;
-  const y=useTransform(scene??settled,[-.35+offset,offset,.65+offset,1+offset],[64,0,0,-64]);
-  return <motion.div style={reduce?undefined:{y}}>{children}</motion.div>;
+  const y=useTransform(scene??settled,[-.30+offset,offset,.62,1.05],[64,0,-20-order*4,-80]);
+  return <motion.div style={{y}}>{children}</motion.div>;
 }
 
 export function SceneType({as='h2',order=0,className,children}:{as?:'h1'|'h2'|'p';order?:number;className?:string;children:React.ReactNode}) {
   const context=useContext(SequenceProgress);
   const settled=useMotionValue(0);
   const p=context??settled;
-  const delay=order*.055;
+  const delay=order*.035;
   const opacity=useTransform(p,[-.18+delay,delay,.60,.78],[0,1,1,0]);
-  const y=useTransform(p,[-.18+delay,delay,.60,.78],[28,0,0,-24]);
+  const y=useTransform(p,[-.18+delay,delay,.60,.78],[32,0,-16,-44]);
   const Tag=as==='h1'?motion.h1:as==='p'?motion.p:motion.h2;
   return <Tag className={className} style={{opacity,y}}>{children}</Tag>;
 }
 
+export function SceneBar({ratio}:{ratio:number}) {
+  const context=useContext(SequenceProgress);
+  const settled=useMotionValue(.5);
+  const scaleX=useTransform(context??settled,[-.12,.48],[0,1]);
+  return <motion.span style={{width:`${ratio*100}%`,scaleX,transformOrigin:'left'}}/>;
+}
+
 function SequenceLayer({position,index,active,children}:{position:MotionValue<number>;index:number;active:boolean;children:React.ReactNode}) {
   const local=useTransform(position,value=>value-index);
-  const opacity=useTransform(local,[-.38,-.05,.80,1.12],[0,1,1,0]);
-  // The preceding copy is fully gone at .78; following copy starts at .82.
-  // Media overlaps throughout that interval and moves independently of the type.
+  const opacity=useTransform(local,[-.38,-.05,.72,1],[0,1,1,0]);
+  // Previous copy leaves before the next title arrives; images bridge the gap.
   const copy=useTransform(local,[-.18,0,.60,.78],[0,1,1,0]);
   const visibility=useTransform(local,value=>value>=-.38&&value<=1.12?'visible':'hidden');
-  const mediaY=useTransform(local,[-.38,0,.74,1.12],['48px','0px','0px','-48px']);
-  const mediaScale=useTransform(local,[-.38,0,.74,1.12],[1.07,1,1,1.05]);
-  const style={opacity,visibility,pointerEvents:active?'auto':'none','--scene-copy-opacity':copy,'--scene-media-y':mediaY,'--scene-media-scale':mediaScale} as MotionStyle;
+  const mediaY=useTransform(local,[-.38,0,.70,1.12],['80px','16px','-32px','-96px']);
+  const mediaScale=useTransform(local,[-.38,0,.70,1.12],index===0?[1.18,1.08,1,1.12]:[1.12,1.05,1,1.06]);
+  const figureScale=useTransform(local,[-.2,0,.65,1.05],[.92,1,1.055,1.18]);
+  const rule=useTransform(local,[-.12,.58],[0,1]);
+  const style={opacity,visibility,pointerEvents:active?'auto':'none','--scene-copy-opacity':copy,'--scene-media-y':mediaY,'--scene-media-scale':mediaScale,'--scene-figure-scale':figureScale,'--scene-rule':rule} as MotionStyle;
   return <SequenceProgress.Provider value={local}><motion.div className="insights-deck-scene" data-scene={index} aria-hidden={!active} {...(!active?{inert:''}:{})} style={style}><div className="insights-deck-inner">{children}</div></motion.div></SequenceProgress.Provider>;
 }
 function ImageBridge({position}:{position:MotionValue<number>}) {
-  // The image takes over the viewport before the work tiles settle independently.
-  const opacity=useTransform(position,[4.6,4.8,4.92,5],[0,1,1,0]);
-  const scale=useTransform(position,[4.6,5],[1.18,1]);
-  const clipPath=useTransform(position,[4.6,4.88],['inset(38% 24% 38% 24%)','inset(0% 0% 0% 0%)']);
-  return <motion.div className="insights-image-bridge" aria-hidden="true" style={{opacity,clipPath}}><motion.img src="/hero/pepsi-festa.webp" alt="" style={{scale}}/></motion.div>;
+  const opacity=useTransform(position,[.60,.77,.87,.99],[0,1,1,0]);
+  const scale=useTransform(position,[.60,1.03],[1.2,1]);
+  const clipPath=useTransform(position,[.60,.88],['inset(32% 24% 32% 24%)','inset(0% 0% 0% 0%)']);
+  return <motion.div className="insights-image-bridge" aria-hidden="true" style={{opacity,clipPath}}><motion.img src="https://media.nadaun.co/video/%EA%B0%80%EB%A1%9C/20251020%20Livernovo%20v1%2015s%20final_%20WEB%20HIGH%20AD_1080p.jpg" alt="" style={{scale}}/></motion.div>;
 }
 export function ScrollSequence({scenes}:{scenes:React.ReactNode[]}) {
-  const reduce=useReducedMotion();
   const container=useContext(InsightsScrollContext);
   const target=useRef<HTMLDivElement>(null);
   const {scrollYProgress}=useScroll({container,target,layoutEffect:false,offset:['start start','end end']});
@@ -105,9 +108,8 @@ export function ScrollSequence({scenes}:{scenes:React.ReactNode[]}) {
   const position=useSpring(clock,{stiffness:200,damping:30,restDelta:.001});
   const [active,setActive]=useState(0);
   useMotionValueEvent(position,'change',value=>setActive(Math.max(0,Math.min(scenes.length-1,Math.floor(value+.20)))));
-  if(reduce)return <div id="insights-sequence" className="insights-deck-static">{scenes.map((scene,i)=><section key={i} data-nav-scene={i}>{scene}</section>)}</div>;
-  return <div ref={target} id="insights-sequence" className="insights-connected-stage" style={{height:`calc(var(--collective-view-height,100svh) * ${scenes.length*.95})`}}>
-    {scenes.map((_,i)=><span key={i} className="insights-scroll-anchor" data-nav-scene={i} style={{top:`calc((100% - var(--collective-view-height,100svh)) * ${i/(scenes.length-1+.52)})`}}/>)}
+  return <div ref={target} id="insights-sequence" className="insights-connected-stage" style={{height:`calc(var(--collective-view-height,100svh) * ${scenes.length*1.35})`}}>
+    {scenes.map((_,i)=><span key={i} className="insights-scroll-anchor" data-nav-scene={i} style={{top:`calc((100% - var(--collective-view-height,100svh)) * ${(i===0?0:i+.16)/(scenes.length-1+.52)})`}}/>)}
     <div className="insights-deck-pin">{scenes.map((scene,index)=><SequenceLayer key={index} position={position} index={index} active={active===index}>{scene}</SequenceLayer>)}<ImageBridge position={position}/></div>
   </div>;
 }

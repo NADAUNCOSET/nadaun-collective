@@ -60,6 +60,7 @@ const ROWS: HubRow[] = [
     links: [
       { label: '통합 솔루션', overlay: 'integrated-solution' },
       { label: '미디어 · 매체', overlay: 'global-network' },
+      { label: 'INSIGHTS', overlay: 'insights' },
     ],
   },
   {

@@ -29,3 +29,15 @@ The film reel waits until its section approaches the viewport. Playback pauses o
 Source, Git and backups stay on NAS. Platform-specific build dependencies may be local. Build: `npm run build`; type check: `npm run lint`. `backups` is excluded from TypeScript source checks and deployment.
 
 Shared style instructions: NAS `_claude/.agents/skills/nadaun-web-ui/SKILL.md`.
+
+## Collective navigation and motion — 2026-09-12
+
+The main menu is ABOUT / PORTFOLIO / CONTACT. INSIGHTS opens from the MARKETING tile (both hub layouts) and its About business detail. It contains cumulative impact, LIVERNOVO campaign delivery, the channel report, the attributed STARLOGIN launch case and an inquiry link.
+
+About's “우리의 7가지 사업군” opens seven individual service descriptions. Its introduction, history and globe remain mounted so returning to About preserves the reading position. The descriptions distinguish production previews, historical STARLOGIN work and signage platform services.
+
+The Insights scroll sequence must remain active regardless of the host OS reduced-motion flag, per the owner's explicit direction. Do not introduce a static replacement or a motion-enable button. One 200/30 spring drives text travel, figure expansion, image coverage, report bars and the handoffs; outgoing copy clears before incoming copy. About's Seoul routes, globe rotation and expansion also remain scroll-driven. See the NAS web skill reference `collective-motion-2026-09-12.md` for the accepted instructions and verification record.
+
+Verify actual slow, fast and reverse scrolling, all five result scenes, all seven service selections, top-level navigation while a detail is open, and 320/390px layouts. Check both host motion preference values to prevent another silent replacement of the choreography.
+
+On macOS, platform-specific dependencies live under `~/.node_modules_local/nadaun-collective/node_modules`, linked from NAS. Vite's cache uses `os.tmpdir()`. If SMB prevents emptying an old `dist`, use a fresh local output directory with `npm run build -- --outDir <local-scratch>`; source, commits and backups stay on NAS. Windows must use its own platform dependencies rather than the Mac symlink target.

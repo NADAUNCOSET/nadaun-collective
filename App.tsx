@@ -125,7 +125,7 @@ const App: React.FC = () => {
         {/* Fetch each detail view only when requested. */}
         <div className="collective-overlays"><Suspense fallback={<div className="fixed inset-0 z-[100] grid place-items-center bg-[#1a1a1a]" role="status"><span className="text-sm text-white/60">Loading…</span><button type="button" onClick={closeOverlay} className="absolute top-4 right-4 w-11 h-11" aria-label="닫기">×</button></div>}>
         {activeOverlay === 'starlogin' && <StarloginOverlay onClose={closeOverlay} onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}}/>}
-        {activeOverlay === 'about' && (<AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}} />)}
+        {activeOverlay === 'about' && (<AboutOverlay isOpen={activeOverlay === 'about'} onClose={closeOverlay} onNavigate={handleNavClick} onContactClick={() => {setInquiryPreset(undefined);setActiveOverlay('contact');}} />)}
         {activeOverlay === 'ai-lab' && (<AiInnovationLabOverlay initialSection={labSection} isOpen={activeOverlay === 'ai-lab'} onClose={closeOverlay} onBack={backToHub} onContactClick={() => {setInquiryPreset(labSection==='signage'?'signage':labSection==='production'?'solution':undefined);setActiveOverlay('contact');}} />)}
         {activeOverlay === 'insights' && (<InsightsOverlay
           isOpen={activeOverlay === 'insights'}

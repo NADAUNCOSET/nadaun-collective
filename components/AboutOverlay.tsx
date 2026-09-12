@@ -1,6 +1,7 @@
-import React, { useRef, useEffect, useMemo, Suspense, createContext, useContext } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, useReducedMotion, MotionValue } from 'framer-motion';
+import React, { useRef, useEffect, useMemo, useState, Suspense, createContext, useContext } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useMotionValueEvent, MotionValue } from 'framer-motion';
 import { X } from 'lucide-react';
+import AboutBusinesses from './AboutBusinesses';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -109,7 +110,7 @@ const Chapter1: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
 };
 
 // ── Chapter 2 ─────────────────────────────────────────────────────────────────
-const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
+const Chapter2: React.FC<{ g: MotionValue<number>; onBusinesses: () => void }> = ({ g, onBusinesses }) => {
   const p = useTransform(g, [Math.max(0,C2S-.024), Math.min(1,C2E+.024)], [0, 1]);
 
   const line1Op = useTransform(p, [0.00, 0.16], [0, 1]);
@@ -146,11 +147,7 @@ const Chapter2: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
             매체에 적합한 사진·영상과 시각 경험으로 구현합니다.
           </motion.p>
           <motion.div style={{ opacity: pillOp }} className="flex flex-wrap gap-3 mt-10">
-            {['COMMERCE', 'CONTENT', 'DISTRIBUTION', 'PRODUCTION SYSTEMS'].map(tag => (
-              <span key={tag} className="text-xs font-bold uppercase tracking-normal px-5 py-2.5 border border-white/25 rounded-full text-white/70">
-                {tag}
-              </span>
-            ))}
+            <button type="button" onClick={onBusinesses} className="about-business-entry">우리의 7가지 사업군 <span aria-hidden="true">↗</span></button>
           </motion.div>
         </motion.div></AboutCopy>
       </StickyPanel>
@@ -461,7 +458,6 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
   const groupRef = useRef<THREE.Group>(null);
   const earthRef = useRef<THREE.Mesh>(null);
   const cityLabelRefs = useRef<(HTMLDivElement|null)[]>([]);
-  const reduce = useReducedMotion();
   const cloudRef = useRef<THREE.Mesh>(null);
   const cloudMatRef = useRef<THREE.MeshStandardMaterial | null>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
@@ -512,13 +508,13 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
     if (!g) return;
 
     const phase = globeSequence(p);
-    const de = reduce ? 1 : easeOutExpo(phase.descent);
+    const de = easeOutExpo(phase.descent);
     g.quaternion.slerpQuaternions(qStart, qSeoul, de);
-    spinQuaternion.setFromAxisAngle(northAxis, (reduce ? 0 : phase.turn) * Math.PI * 2);
+    spinQuaternion.setFromAxisAngle(northAxis, phase.turn * Math.PI * 2);
     g.quaternion.multiply(spinQuaternion);
 
     // Seoul close-up opens into the complete network before the full turn.
-    const pullback = reduce ? 1 : easeInOut(phase.pullback);
+    const pullback = easeInOut(phase.pullback);
     const networkDistance = Math.max(4.4, 1.3 / Math.tan(42 * Math.PI / 360) / Math.max(.25, size.width / size.height));
     const camZ = lerp(lerp(5.2, 2.25, de), networkDistance, pullback);
     const camY = lerp(lerp(1.25, 0.02, de), 0.24, pullback);
@@ -530,7 +526,7 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
     if (cloudMatRef.current) cloudMatRef.current.opacity = 0.34 * (1 - de);
 
     if (pulseRef.current) {
-      const beat = reduce ? 0 : 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 2.2);
+      const beat = 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 2.2);
       const sc = 1 + beat * 1.8;
       pulseRef.current.scale.set(sc, sc, sc);
       (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - beat) * 0.6 * clamp01((p - 0.06) / 0.08);
@@ -540,7 +536,7 @@ const RealGlobe: React.FC<{ progressRef: React.MutableRefObject<number> }> = ({ 
       const geo = arcRefs.current[i];
       const mat = arcMatRefs.current[i];
       if (!geo || !mat) return;
-      const { trace, arrival } = globeConnection(reduce ? .46 : p, i);
+      const { trace, arrival } = globeConnection(p, i);
       const total = arcs[i].length / 3;
       geo.setDrawRange(0, Math.floor(total * trace));
       mat.opacity = 0.9 * clamp01(trace * 4);
@@ -640,8 +636,7 @@ const Chapter4: React.FC<{ g: MotionValue<number> }> = ({ g }) => {
   const koreaLabelY = useTransform(p, [0.05, 0.10], ['18px', '0px']);
   const titleOp = useTransform(p, [0.80, 0.92, 0.97, 1], [0, 1, 1, 0]);
   const titleY = useTransform(p, [0.80, 0.92], ['32px', '0px']);
-  const reduce = useReducedMotion();
-  const globeScale = useTransform(p, [0.80, 0.92], [1, reduce ? 1 : 1.65]);
+  const globeScale = useTransform(p, [0.80, 0.92], [1, 1.65]);
   const globeOpacity = useTransform(p, [0.80, 0.92], [1, 0]);
   const exitOp = useTransform(p, [0.97, 1], [1, 0]);
 
@@ -727,9 +722,11 @@ interface AboutOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   onContactClick?: () => void;
+  onNavigate: (id: string) => void;
 }
 
-const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactClick }) => {
+const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactClick, onNavigate }) => {
+  const [businessesOpen, setBusinessesOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
   const scaleX = useSpring(progress, { stiffness: 200, damping: 30, restDelta: 0.001 });
@@ -751,10 +748,10 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
 
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') businessesOpen ? setBusinessesOpen(false) : onClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, businessesOpen]);
 
   return (
     <AnimatePresence>
@@ -774,7 +771,8 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
             className="editorial-header shrink-0 flex items-center justify-between border-b border-white/10 bg-[#070707]/95 backdrop-blur-md"
             style={{ height: HEADER_H }}
           >
-            <span className="text-xs font-bold tracking-normal text-[#FFB800] uppercase">About</span>
+            <button type="button" className="about-return text-xs font-bold tracking-normal text-[#FFB800] uppercase" onClick={() => setBusinessesOpen(false)}>{businessesOpen ? '← About' : 'About'}</button>
+            <button type="button" className="about-business-nav" aria-expanded={businessesOpen} aria-controls="about-businesses" onClick={() => setBusinessesOpen(!businessesOpen)}>우리의 7가지 사업군</button>
             <button onClick={onClose} aria-label="어바웃 닫기"
               className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
             >
@@ -784,17 +782,19 @@ const AboutOverlay: React.FC<AboutOverlayProps> = ({ isOpen, onClose, onContactC
 
           <div
             ref={scrollRef}
-            className="flex-1 overflow-y-scroll"
+            className="flex-1 min-h-0 overflow-y-scroll"
+            hidden={businessesOpen}
             style={{ scrollbarWidth: 'none' }}
           >
             <div className="about-scroll-track" style={{height:`${TOTAL}vh`}}><div className="about-stage">
               <AboutLayer g={scaleX} start={C1S} end={C1E}><Chapter1 g={scaleX}/></AboutLayer>
-              <AboutLayer g={scaleX} start={C2S} end={C2E}><Chapter2 g={scaleX}/></AboutLayer>
+              <AboutLayer g={scaleX} start={C2S} end={C2E}><Chapter2 g={scaleX} onBusinesses={() => setBusinessesOpen(true)}/></AboutLayer>
               <AboutLayer g={scaleX} start={C3S} end={C3E}><Chapter3 g={scaleX}/></AboutLayer>
               <AboutLayer g={scaleX} start={C4S} end={C4E}><Chapter4 g={scaleX}/></AboutLayer>
               <AboutLayer g={scaleX} start={C5S} end={C5E}><Chapter5 g={scaleX} onContactClick={onContactClick}/></AboutLayer>
             </div></div>
           </div>
+          {businessesOpen && <AboutBusinesses onNavigate={onNavigate}/>}
         </motion.div>
       )}
     </AnimatePresence>
