@@ -47,9 +47,9 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
   const scrollRef=useRef<HTMLElement>(null);
   const {scrollYProgress}=useScroll({container:scrollRef});
   const progress=useSpring(scrollYProgress,{stiffness:200,damping:30,restDelta:.001});
-  const titleY=useTransform(progress,[0,1],[0,-64]);
-  const mediaY=useTransform(progress,[0,1],[0,-36]);
-  const mediaScale=useTransform(progress,[0,1],[1.06,1]);
+  const titleY=useTransform(progress,[0,1],[0,-24]);
+  const mediaY=useTransform(progress,[0,1],['0%','-3%']);
+  const mediaScale=useTransform(progress,[0,1],[1.12,1.08]);
   const [active, setActive] = useState<'video' | 'photo'>('video');
 
 
@@ -93,7 +93,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
             </button>
           </header>
 
-          <div className="editorial-page-content mx-auto flex flex-col">
+          <div className="portfolio-scroll-track"><div className="editorial-page-content mx-auto flex flex-col">
             <motion.div className="editorial-intro" style={{y:titleY}}>
               <div className="md:col-span-8">
                 <motion.p
@@ -189,7 +189,7 @@ const PortfolioOverlay: React.FC<PortfolioOverlayProps> = ({ isOpen, onClose }) 
                 );
               })}
             </div>
-          </div>
+          </div></div>
         </motion.section>
       )}
     </AnimatePresence>

@@ -70,3 +70,5 @@
 
 .collective-overlays>.fixed{scrollbar-width:none;}
 .collective-overlays>.fixed::-webkit-scrollbar{display:none;}
+
+@media(min-width:768px){.portfolio-scroll-track{position:relative;height:calc(var(--collective-view-height)*1.6);}.collective-portfolio .editorial-page-content{position:sticky;top:64px;}}
