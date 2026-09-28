@@ -29,7 +29,6 @@ const Header: React.FC<HeaderProps> = ({ onNavClick, introFinished = true, activ
     <header ref={headerRef} className={`fixed top-0 left-0 right-0 z-[300] transition-colors ${isScrolled || activeSection ? 'border-b border-white/10 bg-[#1a1a1a]/95 backdrop-blur-md' : 'bg-[#1a1a1a] lg:bg-transparent'}`} style={{ opacity:introFinished ? 1 : 0, visibility:introFinished ? 'visible' : 'hidden', transition:'opacity .25s' }}>
       <div className="h-16 lg:h-[76px] px-4 lg:px-[var(--header-pad,1.5rem)] flex items-center justify-between gap-4">
         <a href="#" onClick={(event)=>{event.preventDefault();setIsMenuOpen(false);onHome?.();window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}} aria-label="NADAUN COLLECTIVE 홈" className="flex items-center gap-2 min-h-[44px] shrink-0">
-          <img src="/nadaun_logo.png" alt="" width="80" height="40" className="lg:hidden w-20 h-10 object-contain brightness-0 invert" />
           <span className="hidden lg:inline text-3xl font-extrabold text-white leading-none tracking-tight">NADAUN</span>
           <span className="text-[10px] lg:text-3xl font-medium lg:font-light leading-none tracking-normal lg:tracking-tight text-white/50 lg:text-[#FFB800]">COLLECTIVE</span>
         </a>

@@ -43,3 +43,7 @@ About is the baseline motion language for every Collective detail. Its 200/30 sc
 Verify actual slow, fast and reverse scrolling, all five result scenes, all seven benefit selections and six hub tiles, top-level navigation while a detail is open, and 320/390px layouts. Check both host motion preference values to prevent another silent replacement of the choreography.
 
 On macOS, platform-specific dependencies live under `~/.node_modules_local/nadaun-collective/node_modules`, linked from NAS. Vite's cache uses `os.tmpdir()`. If SMB prevents emptying an old `dist`, use a fresh local output directory with `npm run build -- --outDir <local-scratch>`; source, commits and backups stay on NAS. Windows must use its own platform dependencies rather than the Mac symlink target.
+
+## Mobile header — 2026-09-28
+
+The mobile header shows COLLECTIVE without the separate NADAUN logo image, as requested by the owner. Keep its existing home link, Contact and menu controls. Desktop retains the approved NADAUN COLLECTIVE text lockup.
