@@ -28,7 +28,7 @@ const UNIVERSE_DATA: BuildingData[] = [
     subtitle: 'INFRA SOLUTION',
     desc: '모든 창작의 시작,\n압도적 기술력의 인프라',
     links: [
-      { label: '자사몰',    url: 'https://www.rainbowbene.com/' },
+      { label: '자사몰',    url: 'https://shop.nadaun.co/' },
       { label: '스토어',    url: 'https://smartstore.naver.com/rainbowbene' },
       { label: '블로그',    url: 'https://blog.naver.com/nadaunstudio' },
       { label: '블로그스팟', url: 'https://nadaunspace.blogspot.com/' },
