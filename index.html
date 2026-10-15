@@ -32,32 +32,143 @@
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AdvertisingAgency",
+  "@id": "https://collective.nadaun.co/#organization",
+  "name": "NADAUN COLLECTIVE",
+  "alternateName": [
+    "나다운 컬렉티브",
+    "나다운 콜렉티브",
+    "나다운"
+  ],
+  "url": "https://collective.nadaun.co/",
+  "description": "종합광고대행, 기업 브랜딩, 사진·영상 제작, 기업행사 스케치와 인터뷰 콘텐츠를 통합 수행하는 광고대행사.",
+  "areaServed": {
+    "@type": "Country",
+    "name": "South Korea"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "영등포로33길 18, 1층",
+    "addressLocality": "영등포구",
+    "addressRegion": "서울",
+    "addressCountry": "KR"
+  },
+  "brand": {
+    "@type": "Brand",
+    "name": "NADAUN"
+  },
+  "knowsAbout": [
+    "종합광고대행",
+    "기업 브랜딩",
+    "사진 제작",
+    "영상 제작",
+    "기업행사",
+    "행사 스케치",
+    "인터뷰 영상",
+    "브랜드 콘텐츠",
+    "AI 마케팅",
+    "글로벌 마케팅"
+  ],
+  "makesOffer": [
     {
-      "@context": "https://schema.org",
-      "@type": "AdvertisingAgency",
-      "@id": "https://collective.nadaun.co/#organization",
-      "name": "NADAUN COLLECTIVE",
-      "alternateName": ["나다운 컬렉티브", "나다운 콜렉티브"],
-      "url": "https://collective.nadaun.co/",
-      "description": "종합광고대행, 기업 브랜딩, 사진·영상 제작, 기업행사 스케치와 인터뷰 콘텐츠를 통합 수행하는 광고대행사.",
-      "areaServed": { "@type": "Country", "name": "South Korea" },
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "영등포로33길 18, 1층",
-        "addressLocality": "영등포구",
-        "addressRegion": "서울",
-        "addressCountry": "KR"
-      },
-      "brand": { "@type": "Brand", "name": "NADAUN" },
-      "knowsAbout": ["종합광고대행", "기업 브랜딩", "사진 제작", "영상 제작", "기업행사", "행사 스케치", "인터뷰 영상", "브랜드 콘텐츠", "AI 마케팅", "글로벌 마케팅"],
-      "makesOffer": [
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "통합 브랜드 전략 · 기획"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "사진 · 영상 · 기업행사 스케치 · 인터뷰 콘텐츠 제작"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "AI 테크 솔루션 · VFX"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "글로벌 마케팅 · 미디어 바잉"}}
-      ]
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "통합 브랜드 전략 · 기획"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "사진 · 영상 · 기업행사 스케치 · 인터뷰 콘텐츠 제작"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "AI 테크 솔루션 · VFX"
+      }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": "글로벌 마케팅 · 미디어 바잉"
+      }
     }
-    </script>
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "나다운 콜렉티브 서비스",
+    "url": "https://collective.nadaun.co/services-guide.html",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "브랜드 전략과 광고",
+          "url": "https://collective.nadaun.co/#contact"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "사진 제작",
+          "url": "https://photo.nadaun.co/services-guide.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "영상 제작",
+          "url": "https://video.nadaun.co/services-guide.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "장비와 촬영 공간",
+          "url": "https://shop.nadaun.co/services-guide.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "브랜드 굿즈와 납품 상담",
+          "url": "https://shop.nadaun.co/gifts.html"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "제작 방식과 협업",
+          "url": "https://collective.nadaun.co/#contact"
+        }
+      }
+    ]
+  },
+  "subOrganization": [
+    {
+      "@id": "https://shop.nadaun.co/#store"
+    },
+    {
+      "@id": "https://photo.nadaun.co/#business"
+    },
+    {
+      "@id": "https://video.nadaun.co/#business"
+    }
+  ]
+}
+</script>
 
     <script type="application/ld+json">
     {

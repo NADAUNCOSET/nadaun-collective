@@ -169,6 +169,7 @@ const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
               <p>T. 02-6053-6231 · E. info@nadaun.co</p>
             </div>
             <div className="flex flex-col md:items-end gap-2">
+              <a href="/services-guide.html" className="text-white/70 hover:text-white">나다운 서비스 분야별 안내 ↗</a>
               <p className="text-gray-700">© 2026 NADAUN COLLECTIVE. All Rights Reserved.</p>
             </div>
           </motion.div>
