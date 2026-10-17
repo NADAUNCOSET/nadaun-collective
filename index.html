@@ -243,21 +243,8 @@
       }
       /* Prevent FOUC */
       #root { background: var(--nadaun-bg); min-height: 100dvh; }
-      .nadaun-network, .network-fallback { padding: clamp(48px, 7vw, 112px) clamp(20px, 6vw, 96px); background: #171717; color: #f5f4f0; font-family: Manrope, Pretendard, sans-serif; }
-      .network-eyebrow { margin: 0 0 20px; font-size: 12px; font-weight: 700; color: #ffb800; }
-      .network-intro h2 { margin: 0 0 18px; font-size: clamp(32px, 5vw, 64px); font-weight: 600; letter-spacing: -0.045em; line-height: 1.15; }
-      .network-intro > p:last-child { color: #aaa; font-size: 15px; line-height: 1.9; word-break: keep-all; }
-      .network-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(24px, 6vw, 96px); margin-top: 48px; }
-      .network-links a { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 26px 0; border-top: 1px solid #ffffff26; text-decoration: none; color: inherit; transition: color .2s; }
-      .network-links strong { display: block; font-size: clamp(18px, 2vw, 25px); font-weight: 600; letter-spacing: -.025em; }
-      .network-links small { display: block; margin-top: 8px; font-size: 13px; line-height: 1.6; color: #aaa; word-break: keep-all; }
-      .network-links a > span:last-child { font-size: 28px; color: #ffb800; }
-      .network-links a:hover, .network-home a:hover { color: #ffb800; }
-      .network-links a:focus-visible, .network-home a:focus-visible { outline: 2px solid #ffb800; outline-offset: 6px; }
-      .network-home { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; margin: 48px 0 0; padding-top: 24px; border-top: 1px solid #ffffff26; font-size: 12px; color: #aaa; }
-      .network-home a { color: #f5f4f0; text-decoration: none; font-weight: 600; }
+      .network-fallback { padding: clamp(48px, 7vw, 112px) clamp(20px, 6vw, 96px); background: #171717; color: #f5f4f0; font-family: Manrope, Pretendard, sans-serif; }
       .network-fallback { line-height: 1.8; }
-      @media (max-width: 640px) { .network-links { grid-template-columns: minmax(0, 1fr); margin-top: 32px; } .network-links a { padding: 22px 0; } }
     </style>
   </head>
   <body>
@@ -275,26 +262,10 @@
       <h2>주요 클라이언트</h2>
       <p>삼성, 현대, HD현대, 현대제철, 기아, 펩시, LG, 아모레퍼시픽, 디올, 캘빈클라인, 코웨이, 올리브영, 정샘물, 넘버즈인, 더샘, 토니모리, 가온칩스, 헥토, K2, 엘르, 에미레이트 등.</p>
       <p>문의: collective.nadaun.co · 서울특별시 영등포구 영등포로33길 18, 1층 · 최고의 캠페인은 대화에서 시작됩니다.</p>
-      <p>포트폴리오와 모션을 보려면 JavaScript를 켜주세요. 아래 링크에서 나다운의 서비스와 장비 정보를 확인하실 수 있습니다.</p>
+      <p>포트폴리오와 모션을 보려면 JavaScript를 켜주세요.</p>
       </section>
     </noscript>
     <div id="root"></div>
-    <footer class="nadaun-network" aria-labelledby="network-title">
-      <div class="network-intro">
-        <p class="network-eyebrow">NADAUN NETWORK</p>
-        <h2 id="network-title">나다운의 모든 연결.</h2>
-        <p>브랜드 기획과 사진·영상 제작에서 촬영 장비와 웨딩까지.<br />필요한 나다운을 만나보세요.</p>
-      </div>
-      <nav aria-label="나다운 서비스 바로가기" class="network-links">
-        <a href="https://shop.nadaun.co/"><span><strong>NADAUN SHOP</strong><small>촬영 장비 · 브랜드별 제품 · 구매 상담</small></span><span aria-hidden="true">↗</span></a>
-        <a href="https://nadaunspace.blogspot.com/"><span><strong>SPACE JOURNAL</strong><small>장비 소식 · 촬영 가이드 · 캡쳐원 알려줘</small></span><span aria-hidden="true">↗</span></a>
-        <a href="https://photo.nadaun.co/"><span><strong>PHOTO</strong><small>제품 · 인물 · 브랜드 사진 포트폴리오</small></span><span aria-hidden="true">↗</span></a>
-        <a href="https://video.nadaun.co/"><span><strong>VIDEO</strong><small>광고 · 브랜드 필름 · 행사 영상 포트폴리오</small></span><span aria-hidden="true">↗</span></a>
-        <a href="https://wedding.nadaun.co/"><span><strong>WEDDING</strong><small>웨딩 스냅 · 본식 촬영 · 웨딩 필름</small></span><span aria-hidden="true">↗</span></a>
-        <a href="https://allinone.nadaun.co/"><span><strong>ALL IN ONE</strong><small>기획 · 스토리보드 · 프리프로덕션 도구 · 로그인</small></span><span aria-hidden="true">↗</span></a>
-      </nav>
-      <p class="network-home"><a href="https://collective.nadaun.co/">NADAUN COLLECTIVE</a><span>기획부터 제작까지, 나다운으로.</span></p>
-    </footer>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
