@@ -13,7 +13,7 @@ export default {
     } else {
       response = await env.ASSETS.fetch(request);
       if (response.status === 404 && !url.pathname.split('/').at(-1).includes('.')) {
-        response = await env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
+        response = await env.ASSETS.fetch(new Request(new URL('/', url), request));
       }
     }
     const headers = new Headers(response.headers);

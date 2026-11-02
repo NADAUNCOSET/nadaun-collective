@@ -4,6 +4,9 @@
   "main": "worker.mjs",
   "compatibility_date": "2026-11-02",
   "workers_dev": true,
+  "routes": [
+    { "pattern": "collective.nadaun.co", "custom_domain": true, "zone_name": "nadaun.co" }
+  ],
   "assets": {
     "directory": ".build/public",
     "binding": "ASSETS",

@@ -19,9 +19,14 @@ test('extensionless application navigation falls back to compiled index, missing
   const env = { ASSETS: { fetch: async request => {
     const path = new URL(request.url).pathname;
     visited.push(path);
-    return new Response(path === '/index.html' ? 'current SPA' : 'missing', { status: path === '/index.html' ? 200 : 404 });
+    // Static Assets normalizes /index.html to /; fetching / internally avoids
+    // redirecting the visitor away from their original application route.
+    if (path === '/index.html') return new Response(null, { status: 307, headers: { Location: '/' } });
+    return new Response(path === '/' ? 'current SPA' : 'missing', { status: path === '/' ? 200 : 404 });
   } } };
-  assert.equal(await (await worker.fetch(new Request('https://example.test/about'), env)).text(), 'current SPA');
-  assert.deepEqual(visited, ['/about', '/index.html']);
+  const response = await worker.fetch(new Request('https://example.test/about'), env);
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), 'current SPA');
+  assert.deepEqual(visited, ['/about', '/']);
   assert.equal((await worker.fetch(new Request('https://example.test/missing.js'), env)).status, 404);
 });
