@@ -1,0 +1,15 @@
+{
+  "asOf": "2026-11-02T06:28:48.438Z",
+  "scope": "Cloudflare current-source preparation",
+  "build": "passed",
+  "publicFileCount": 105,
+  "publicBytes": 22639106,
+  "testsPassed": 4,
+  "dryRun": "passed",
+  "privateCredentialMatches": 0,
+  "liveDeploymentAndCanonicalHost": "parent operator owns deployment and live verification",
+  "pending": [
+    "Parent review/commit of pre-existing staged package-lock.json",
+    "Parent live preview/canonical verification"
+  ]
+}
