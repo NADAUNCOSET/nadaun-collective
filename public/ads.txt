@@ -5,3 +5,4 @@ subdomain=video.nadaun.co
 subdomain=photo.nadaun.co
 subdomain=wedding.nadaun.co
 subdomain=music.nadaun.co
+subdomain=agency.nadaun.co
