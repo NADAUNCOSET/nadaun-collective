@@ -16,6 +16,8 @@ export async function publicAdsResponse(response, request) {
   if (!/<script\b[^>]*\bsrc\s*=\s*["'][^"']*pagead\/js\/adsbygoogle\.js(?:[?"'])/i.test(original)) insertion += adsenseLoader + '\n';
   const html = insertion ? original.replace(/<\/head\s*>/i, insertion + '</head>') : original;
   const headers = new Headers(response.headers);
+  // Materialized UTF-8 text must not retain a compressed-body transport header.
+  headers.delete('Content-Encoding');
   if (html !== original) {
     headers.delete('Content-Length');
     headers.delete('ETag');

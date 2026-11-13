@@ -34,13 +34,13 @@ test('extensionless application navigation falls back to compiled index, missing
 test('approved public hosts receive one async loader and account meta without changing content', async () => {
   const original = '<html><head><title>Approved</title></head><body><main>Original motion and media</main></body></html>';
   for (const host of ['collective.nadaun.co', 'nadaun.co']) for (const path of ['/', '/index.html', '/services-guide', '/services-guide.html']) {
-    const response = await publicAdsResponse(new Response(original, { headers: { 'Content-Type': 'text/html', 'ETag': 'old' } }), new Request('https://' + host + path));
+    const response = await publicAdsResponse(new Response(original, { headers: { 'Content-Type': 'text/html', 'ETag': 'old', 'Content-Encoding': 'gzip' } }), new Request('https://' + host + path));
     const html = await response.text();
     assert.equal((html.match(/pagead\/js\/adsbygoogle\.js/g) || []).length, 1);
     assert.equal((html.match(/name="google-adsense-account"/g) || []).length, 1);
     assert.match(html, /<script async src="https:\/\/pagead2\.googlesyndication\.com/);
     assert.match(html, /<main>Original motion and media<\/main>/);
-    assert.equal(response.status, 200); assert.equal(response.headers.get('ETag'), null);
+    assert.equal(response.status, 200); assert.equal(response.headers.get('ETag'), null); assert.equal(response.headers.get('Content-Encoding'), null);
   }
 });
 test('unapproved hosts, sensitive paths, redirects and assets remain byte-identical', async () => {
