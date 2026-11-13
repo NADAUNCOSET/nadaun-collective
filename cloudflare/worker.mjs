@@ -2,6 +2,27 @@ const manifests = {
   '/livernovo-videos.json': 'https://media.nadaun.co/website/video-manifest.json',
   '/video-portfolio.json': 'https://media.nadaun.co/video/manifest.json',
 };
+// Only these approved public hosts and content URLs receive third-party ads.
+const adsenseHosts = new Set(['collective.nadaun.co', 'nadaun.co']);
+const adsensePaths = new Set(['/', '/index.html', '/services-guide', '/services-guide.html']);
+const adsenseMeta = '<meta name="google-adsense-account" content="ca-pub-9416492869063856">';
+const adsenseLoader = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9416492869063856" crossorigin="anonymous"></script>';
+export async function publicAdsResponse(response, request) {
+  const url = new URL(request.url);
+  if (request.method !== 'GET' || !adsenseHosts.has(url.hostname) || !adsensePaths.has(url.pathname) || response.status !== 200 || !/^text\/html(?:;|$)/i.test(response.headers.get('Content-Type') || '')) return response;
+  const original = await response.text();
+  let insertion = '';
+  if (!/<meta\b[^>]*\bname\s*=\s*["']google-adsense-account["']/i.test(original)) insertion += adsenseMeta + '\n';
+  if (!/<script\b[^>]*\bsrc\s*=\s*["'][^"']*pagead\/js\/adsbygoogle\.js(?:[?"'])/i.test(original)) insertion += adsenseLoader + '\n';
+  const html = insertion ? original.replace(/<\/head\s*>/i, insertion + '</head>') : original;
+  const headers = new Headers(response.headers);
+  if (html !== original) {
+    headers.delete('Content-Length');
+    headers.delete('ETag');
+    headers.delete('Content-MD5');
+  }
+  return new Response(html, { status: response.status, statusText: response.statusText, headers });
+}
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -20,6 +41,6 @@ export default {
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Frame-Options', 'DENY');
     if (url.pathname.startsWith('/assets/') || url.pathname.endsWith('.webp')) headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    return new Response(response.body, { status: response.status, headers });
+    return publicAdsResponse(new Response(response.body, { status: response.status, headers }), request);
   },
 };

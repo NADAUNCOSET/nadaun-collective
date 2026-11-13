@@ -10,7 +10,7 @@
   "assets": {
     "directory": ".build/public",
     "binding": "ASSETS",
-    "run_worker_first": ["/livernovo-videos.json", "/video-portfolio.json"],
+    "run_worker_first": ["/livernovo-videos.json", "/video-portfolio.json", "/", "/index.html", "/services-guide", "/services-guide.html"],
     "not_found_handling": "none"
   },
   "observability": { "enabled": true, "traces": { "enabled": true } }
