@@ -24,7 +24,7 @@ View your app in AI Studio: https://ai.studio/apps/b1a71b86-266e-42b0-9a0f-0b305
 
 Compact navigation follows video.nadaun.co: small line icons, Contact, 44px controls, restrained charcoal/gold UI. Detailed overlays load on demand. The heavy 3D bundle loads only with the About view; shared React helpers remain in the initial runtime chunk. Tailwind CSS is compiled during build rather than generated in the visitor browser.
 
-The film reel waits until its section approaches the viewport. Playback pauses offscreen, in a hidden tab, while an overlay is open, or when paused by the visitor. Watch films opens the shared NADAUN portfolio/player. Desktop and 320/390px layouts should be reviewed after changes.
+The main page flows from the service hub and Hero to Clients. Films remain accessible through the existing PORTFOLIO menu. The owner requested removal of the standalone Watch films reel on 2026-11-14. Desktop and 320/390px layouts should be reviewed after changes.
 
 Source, Git and backups stay on NAS. Platform-specific build dependencies may be local. Build: `npm run build`; type check: `npm run lint`. `backups` is excluded from TypeScript source checks and deployment.
 

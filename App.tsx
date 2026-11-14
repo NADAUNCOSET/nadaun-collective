@@ -13,7 +13,6 @@ const InsightsOverlay = lazy(() => import('./components/InsightsOverlay'));
 import Intro from './components/Intro';
 import ServiceHub from './components/ServiceHub';
 import ServiceHubV2 from './components/ServiceHubV2';
-import VideoReel from './components/VideoReel';
 const IntegratedSolutionOverlay = lazy(() => import('./components/IntegratedSolutionOverlay'));
 const ImmersiveCreativeOverlay = lazy(() => import('./components/ImmersiveCreativeOverlay'));
 const GlobalNetworkOverlay = lazy(() => import('./components/GlobalNetworkOverlay'));
@@ -166,7 +165,6 @@ const App: React.FC = () => {
             )}
           </div>
           <Hero />
-          <VideoReel paused={!!activeOverlay} />
           <Clients />
         </main>
 
