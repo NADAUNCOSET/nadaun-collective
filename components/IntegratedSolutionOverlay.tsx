@@ -4,7 +4,8 @@ import { X, ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { InsightsScrollContext, ScrollStory, SceneLine, StoryMedia, ScrollReveal } from './InsightsMotion';
 import './insights-motion.css';
 import './marketing-motion.css';
-interface IntegratedSolutionOverlayProps {isOpen:boolean;onClose:()=>void;onBack?:()=>void;onContactClick:()=>void;onSignageClick:()=>void;}
+import { blogGroups, socialChannels, jamesChannel } from './marketingChannels';
+interface IntegratedSolutionOverlayProps {isOpen:boolean;onClose:()=>void;onBack?:()=>void;onContactClick:()=>void;onAnnualContact:()=>void;onSignageClick:()=>void;}
 const SERVICES = [
   {
     id: 'plan',
@@ -38,15 +39,50 @@ const SERVICES = [
 ];
 
 
-export default function IntegratedSolutionOverlay({isOpen,onClose,onBack,onContactClick,onSignageClick}:IntegratedSolutionOverlayProps) {
+export default function IntegratedSolutionOverlay({isOpen,onClose,onBack,onContactClick,onAnnualContact,onSignageClick}:IntegratedSolutionOverlayProps) {
   const scrollRef=useRef<HTMLElement>(null);
   const {scrollYProgress}=useScroll({container:scrollRef});
   useEffect(()=>{if(!isOpen)return;const key=(e:KeyboardEvent)=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[isOpen,onClose]);
+  useEffect(() => {
+    if (!isOpen) return;
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    scrollRef.current?.focus({preventScroll: true});
+    return () => { if (trigger?.isConnected) trigger.focus({preventScroll: true}); };
+  }, [isOpen]);
   if(!isOpen)return null;
-  return <InsightsScrollContext.Provider value={scrollRef}><motion.section ref={scrollRef} role="dialog" aria-label="통합 마케팅 솔루션" className="marketing-page collective-editorial fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" initial={{y:'100%'}} animate={{y:0}} transition={{duration:.495,ease:[.22,1,.36,1]}}>
+  return <InsightsScrollContext.Provider value={scrollRef}><motion.section ref={scrollRef} tabIndex={-1} role="dialog" aria-label="통합 마케팅 솔루션" className="marketing-page collective-editorial fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" initial={{y:'100%'}} animate={{y:0}} transition={{duration:.495,ease:[.22,1,.36,1]}}>
     <header className="marketing-header"><motion.div className="marketing-progress" style={{scaleX:scrollYProgress}}/><span>MARKETING · 통합 솔루션</span>{onBack&&<button onClick={onBack} aria-label="메인으로 돌아가기"><ArrowLeft size={18}/></button>}<button onClick={onClose} aria-label="통합 솔루션 닫기"><X size={20}/></button></header>
     <div className="marketing-content">
-      <ScrollStory intro={<div className="marketing-opening"><div><p className="marketing-kicker">Integrated solution</p><h1><SceneLine visible>INTEGRATED</SceneLine><SceneLine order={1}>SOLUTION.</SceneLine></h1><p className="editorial-body">크리에이티브 기획 · 콘텐츠 제작 · 미디어 실행.<br/>브랜드의 메시지를 하나의 캠페인으로 연결합니다.</p></div><StoryMedia src="/hero/pepsi-festa.webp" alt="펩시 페스타 무대와 브랜드 콘텐츠" caption="NADAUN · Pepsi Festa"/></div>} impact={<div className="marketing-statement"><p className="marketing-kicker">Strategy · Contents · Media</p><h2>어떤 이야기인가.<br/>어떻게 보여주는가.<br/>누구에게 닿는가.</h2><p className="editorial-body">브랜드 전략과 제작 방향, 매체별 실행 계획을 함께 검토합니다. 캠페인의 목적에 맞는 콘텐츠를 만들고 실제 집행 결과를 확인합니다.</p></div>}/>
+      <section className="annual-hero" aria-labelledby="annual-title">
+        <div>
+          <p className="marketing-kicker">블로그 · SNS · 유튜브 제작</p>
+          <h1 id="annual-title">연간 브랜드<br/>콘텐츠 파트너십</h1>
+          <p className="editorial-body">신제품을 소개하고, 만드는 사람을 만나고, 실제 사용법을 보여줍니다. 나다운이 직접 운영하는 블로그 32개와 유튜브 ‘장비맨 제임스’에서 브랜드에 맞는 채널을 고르고, SNS까지 이어지는 콘텐츠를 기획하고 제작합니다.</p>
+          <button className="annual-cta" onClick={onAnnualContact}>연간 계약 문의하기 <ArrowUpRight size={18}/></button>
+        </div>
+        <a className="annual-episode" href="https://www.youtube.com/watch?v=Cot77dRuJ6c" target="_blank" rel="noopener noreferrer">
+          <img src="/hero/gear-james-ep3.webp" width="1280" height="720" alt="장비맨 제임스 3화, 뷰티 촬영 현장"/>
+          <span>장비맨 제임스 · 뷰티 촬영 현장 보기 <ArrowUpRight size={16}/></span>
+        </a>
+      </section>
+      <section className="annual-channels" aria-labelledby="annual-channels-title">
+        <h2 id="annual-channels-title">브랜드를 소개할 채널</h2>
+        <div className="annual-channel-grid">
+          <div><h3>블로그 32개</h3><p>제품의 특징과 사용법, 브랜드 이야기를 독자가 관심 있는 주제에 맞춰 기사로 만듭니다.</p></div>
+          <div><h3>유튜브</h3><p>‘장비맨 제임스’에서 제품을 써 보고, 브랜드를 만드는 사람과 현장을 영상으로 소개합니다.</p><a href={jamesChannel} target="_blank" rel="noopener noreferrer">장비맨 제임스 채널 <ArrowUpRight size={16}/></a></div>
+          <div><h3>SNS</h3><p>촬영한 사진과 영상을 짧은 클립과 게시물로 편집해 채널별로 소개합니다.</p><div className="annual-social">{socialChannels.map(channel=><a key={channel.href} href={channel.href} target="_blank" rel="noopener noreferrer">{channel.name} <ArrowUpRight size={14}/></a>)}</div></div>
+        </div>
+        <details className="annual-directory">
+          <summary>운영 블로그 32개 전체 보기</summary>
+          {blogGroups.map(group=><div key={group.platform} className="annual-platform">
+            <h3>{group.platform} <small>{group.channels.length}개</small></h3>
+            <ul>{group.channels.map(channel=><li key={channel.href}><a href={channel.href} target="_blank" rel="noopener noreferrer">{channel.name} <ArrowUpRight size={14}/></a></li>)}</ul>
+          </div>)}
+        </details>
+        <p className="annual-inquiry">연간 홍보를 계획 중이라면 브랜드와 소개하고 싶은 제품을 알려주세요. 일정과 예산에 맞춰 제작 형식, 발행 채널, 운영 횟수를 함께 정합니다.</p>
+        <button className="marketing-link" onClick={onAnnualContact}>연간 계약 문의하기 <ArrowUpRight size={18}/></button>
+      </section>
+      <ScrollStory intro={<div className="marketing-opening"><div><p className="marketing-kicker">Integrated solution</p><h2><SceneLine visible>INTEGRATED</SceneLine><SceneLine order={1}>SOLUTION.</SceneLine></h2><p className="editorial-body">크리에이티브 기획 · 콘텐츠 제작 · 미디어 실행.<br/>브랜드의 메시지를 하나의 캠페인으로 연결합니다.</p></div><StoryMedia src="/hero/pepsi-festa.webp" alt="펩시 페스타 무대와 브랜드 콘텐츠" caption="NADAUN · Pepsi Festa"/></div>} impact={<div className="marketing-statement"><p className="marketing-kicker">Strategy · Contents · Media</p><h2>어떤 이야기인가.<br/>어떻게 보여주는가.<br/>누구에게 닿는가.</h2><p className="editorial-body">브랜드 전략과 제작 방향, 매체별 실행 계획을 함께 검토합니다. 캠페인의 목적에 맞는 콘텐츠를 만들고 실제 집행 결과를 확인합니다.</p></div>}/>
       {SERVICES.map((service,index)=><section className="marketing-service" key={service.id}>
         <ScrollReveal className="marketing-service-heading"><p className="marketing-kicker">0{index+1} · {service.subtitle}</p><h2>{service.title.split(' ').map((word,i)=><React.Fragment key={i}>{i>0&&<> <br/></>}{word}</React.Fragment>)}</h2></ScrollReveal>
         <div><ScrollReveal><p className="editorial-body">{service.desc}</p></ScrollReveal><div className="marketing-features">{service.features.map((feature,i)=><ScrollReveal key={feature}><span>0{i+1}</span><h3>{feature}</h3></ScrollReveal>)}</div>{service.id==='signage'&&<ScrollReveal><button className="marketing-link" onClick={onSignageClick}>사이니지 플랫폼 살펴보기 <ArrowUpRight size={18}/></button></ScrollReveal>}</div>

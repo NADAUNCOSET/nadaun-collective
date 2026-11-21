@@ -31,3 +31,40 @@
 .marketing-media-grid h3{font-size:24px;}
 .marketing-media-grid p{font-size:13px;color:#ffffff90;margin-top:12px;}
 @media(max-width:767px){.marketing-opening{grid-template-columns:1fr;gap:24px;}.marketing-opening h1{margin-bottom:20px;}.marketing-opening .story-media{height:25svh;}.marketing-kicker{font-size:11px;margin-bottom:18px;}.marketing-service{grid-template-columns:1fr;gap:32px;padding-block:64px;}.marketing-service-heading h2 br{display:none;}.marketing-service-heading h2 br:after{content:' ';}.marketing-features{margin-top:32px;}.marketing-features>div{min-height:84px;}.marketing-broadcast,.marketing-media-grid{grid-template-columns:1fr;gap:36px;margin-top:36px;}.marketing-media-section{padding-block:64px;}.marketing-media-grid h3{font-size:22px;}.marketing-statement h2{margin-bottom:24px;}}
+
+.annual-hero, .annual-channels { --annual-rule: #ffffff32; --annual-accent: #fbb200; }
+.annual-hero { display:grid; grid-template-columns:1fr 1.08fr; gap:clamp(32px,6vw,96px); align-items:center; min-height:min(720px,78svh); padding-block:clamp(44px,7vw,106px); }
+.annual-hero .marketing-kicker { margin-bottom:16px; }
+.annual-hero h1 { margin:0 0 24px; word-break:keep-all; }
+.annual-hero .editorial-body { max-width:38em; }
+.annual-cta, .annual-episode span, .annual-channel-grid a, .annual-directory a { display:inline-flex; align-items:center; gap:8px; }
+.annual-cta { min-height:48px; margin-top:24px; padding:10px 20px; color:var(--nadaun-bg,#222); background:var(--annual-accent); font-weight:700; }
+.annual-cta:hover { background:#f7ce67; }
+.annual-episode { display:block; }
+.annual-episode img { display:block; width:100%; height:auto; }
+.annual-episode span { min-height:44px; font-size:13px; }
+.annual-channels { border-top:1px solid var(--annual-rule); padding-block:clamp(44px,7vw,104px); }
+.annual-channel-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-block:36px 28px; gap:clamp(20px,4vw,72px); }
+.annual-channel-grid h3, .annual-platform h3 { margin:0 0 12px; font-size:22px; }
+.annual-channel-grid p, .annual-inquiry { color:rgba(245,244,240,.78); line-height:1.75; }
+.annual-social { display:flex; flex-wrap:wrap; gap:0 15px; }
+.annual-channel-grid a, .annual-directory a { min-height:44px; font-size:14px; }
+.annual-channels a:hover, .annual-episode:hover span, .annual-directory summary:hover { color:var(--annual-accent); }
+.annual-directory { border-block:1px solid var(--annual-rule); }
+.annual-directory summary { padding:16px 0; cursor:pointer; font-weight:650; }
+.annual-platform { padding:16px 0; }
+.annual-platform small { font-size:14px; font-weight:400; }
+.annual-platform ul { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0 18px; }
+.annual-directory a { justify-content:space-between; width:100%; border-bottom:1px solid var(--annual-rule); }
+.annual-directory svg { flex-shrink:0; }
+.annual-inquiry { max-width:46em; margin-top:28px; }
+.annual-channels .marketing-link { margin-top:8px; }
+.annual-hero :focus-visible, .annual-channels :focus-visible { outline:2px solid var(--annual-accent); outline-offset:3px; }
+@media(max-width:767px) {
+  .annual-hero, .annual-channel-grid { grid-template-columns:1fr; }
+  .annual-hero { min-height:auto; gap:26px; padding-block:36px; }
+  .annual-hero h1 { margin-bottom:16px; }
+  .annual-channel-grid { gap:20px; margin-block:24px; }
+  .annual-platform ul { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:375px) { .annual-platform ul { grid-template-columns:1fr; } }

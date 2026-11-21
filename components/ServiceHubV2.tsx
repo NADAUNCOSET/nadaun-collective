@@ -66,10 +66,11 @@ export const ITEMS: HubItem[] = [
     id: 'marketing',
     num: '03',
     title: 'MARKETING',
-    kr: '온라인 · 오프라인 광고대행 · 마케팅',
-    desc: '브랜드 전략과 캠페인 기획, 디지털 · 방송 · 옥외 광고, 광고 협찬 · PPL · 언론홍보와 디지털 사이니지를 운영합니다.',
+    kr: '연간 브랜드 콘텐츠 제작·홍보',
+    desc: '블로그 32개와 유튜브 ‘장비맨 제임스’, SNS를 연계해 브랜드의 제품과 서비스를 소개합니다.',
     color: '#FFB800',
     rolling: [
+      { src: '/hero/pepsi-festa.webp', name: '브랜드 콘텐츠 제작 현장' },
       { src: 'https://media.nadaun.co/collective/btl/01-subway.webp', name: '지하철 스크린도어' },
       { src: 'https://media.nadaun.co/collective/btl/03-taxi.webp', name: '택시 미디어' },
       { src: 'https://media.nadaun.co/collective/btl/04-bus.webp', name: '버스 외부광고' },
@@ -402,7 +403,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                 transition: 'font-size 0.5s cubic-bezier(0.16,1,0.3,1)',
               }}
             >
-              {item.title}
+              <button type="button" aria-expanded={active} className="text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">{item.title}</button>
             </h3>
 
             <AnimatePresence>
@@ -424,7 +425,7 @@ const Tiles: React.FC<{ activeId: string; setActiveId: (id: string) => void; onO
                   >
                     {item.desc}
                   </motion.p>
-                  <div className="mt-3.5 flex flex-wrap items-center gap-x-7 gap-y-2.5">
+                  <div className={`mt-3.5 flex flex-wrap items-center gap-x-7 gap-y-2.5 ${item.id === 'marketing' ? '[&>button]:min-h-[44px]' : ''}`}>
                     {item.links.length > 0 ? (
                       item.links.map((link, li) => (
                         <LinkWord key={link.label} link={link} index={li} color={item.color} onOverlay={onOverlay} />
@@ -459,7 +460,7 @@ interface ServiceHubV2Props {
 }
 
 const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, revealStarted = true }) => {
-  const [activeId, setActiveId] = useState<string>('moment');
+  const [activeId, setActiveId] = useState<string>('marketing');
 
   const selectTile = (id: string) => {
     setActiveId(id);

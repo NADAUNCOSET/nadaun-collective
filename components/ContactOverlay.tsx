@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircle, Loader2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ContactOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  initialType?: 'signage' | 'solution';
+  initialType?: 'signage' | 'solution' | 'annual';
 }
 
 const SECTION_H = 'min-h-[85vh]';
@@ -56,7 +56,15 @@ const BigQ: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose, initialType }) => {
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent'>('idle');
-  const [inquiryTypes, setInquiryTypes] = useState({ production: false, promotion: false, signage: initialType === 'signage', solution: initialType === 'solution' });
+  const [inquiryTypes, setInquiryTypes] = useState({ annual: initialType === 'annual', production: false, promotion: false, signage: initialType === 'signage', solution: initialType === 'solution' });
+
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButton.current?.focus({preventScroll: true});
+    return () => { if (trigger?.isConnected) trigger.focus({preventScroll: true}); };
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,6 +76,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose, initia
       );
       object.access_key = '47df068a-03bd-415b-907e-c3acf6e3fc02';
       const types = [
+        inquiryTypes.annual && '연간 브랜드 콘텐츠 제작·홍보',
         inquiryTypes.production && '광고 제작',
         inquiryTypes.promotion && '광고 홍보',
         inquiryTypes.signage && '사이니지 제작',
@@ -94,13 +103,16 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose, initia
     }
   };
 
-  const toggle = (t: 'production' | 'promotion' | 'signage' | 'solution') =>
+  const toggle = (t: keyof typeof inquiryTypes) =>
     setInquiryTypes(p => ({ ...p, [t]: !p[t] }));
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          role="dialog"
+          aria-label="프로젝트 문의"
+          onKeyDown={e => { if (e.key === 'Escape') onClose(); }}
           className="fixed inset-0 z-[105] bg-black text-white overflow-y-auto"
           style={{ scrollbarWidth: 'none' }}
           initial={{ y: '100%' }}
@@ -111,10 +123,11 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose, initia
           {/* Header */}
           <div className="sticky top-0 left-0 right-0 h-[57px] flex items-center justify-between px-8 md:px-16 border-b border-white/8 bg-black/95 backdrop-blur-md z-10">
             <span className="text-[11px] font-bold tracking-normal text-white/50 uppercase">
-              NADAUN COLLECTIVE — 문의하기
+              NADAUN COLLECTIVE — {initialType === 'annual' ? '연간 브랜드 콘텐츠 문의' : '문의하기'}
             </span>
             <button
               onClick={onClose}
+              ref={closeButton}
               aria-label="문의 닫기"
               className="w-9 h-9 flex items-center justify-center rounded-full border border-white/15 hover:border-white/40 hover:bg-white/8 transition-all"
             >
@@ -189,6 +202,7 @@ const ContactOverlay: React.FC<ContactOverlayProps> = ({ isOpen, onClose, initia
                     <BigQ>어떤 도움이<br />필요하신가요?</BigQ>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {[
+                        { key: 'annual' as const, label: '연간 브랜드 콘텐츠 제작·홍보', items: ['블로그 콘텐츠', '유튜브 기획·촬영', 'SNS 연계 홍보'] },
                         { key: 'production' as const, label: '광고 제작', items: ['영상 촬영', '사진 촬영', 'TVC · CF', '브랜드 필름', '기업 VCR', '3D · 모션그래픽', '지면 · 앨범', '웹 · 디자인'] },
                         { key: 'promotion' as const, label: '광고 홍보 · 송출', items: ['공영 · 지상파', '종합편성', '케이블 PP', 'IPTV 3사', '위성 · 케이블 SO', '지하철 스크린도어', '옥외 전광판', '택시 · 버스', '해외 · 글로벌', '퍼포먼스 · 바이럴'] },
                         { key: 'signage' as const, label: '사이니지 제작', items: ['스마트 TV', '현장 설치', '네트워크 관리', '콘텐츠 편성 · 배포', '제작 플로우 자동화'] },

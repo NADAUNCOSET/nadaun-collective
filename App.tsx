@@ -32,7 +32,7 @@ const App: React.FC = () => {
   const [introFinished, setIntroFinished] = useState(false);
   const [hubRevealStarted, setHubRevealStarted] = useState(false);
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
-  const [inquiryPreset, setInquiryPreset] = useState<'signage'|'solution'|undefined>();
+  const [inquiryPreset, setInquiryPreset] = useState<'signage'|'solution'|'annual'|undefined>();
   const [labSection, setLabSection] = useState<'overview'|'production'|'signage'>('overview');
   // 기본 2안(이미지 타일). 1안 리스트 비교는 ?hub=1 로만 접근 (검수용)
   const [hubVersion] = useState<1 | 2>(() =>
@@ -135,6 +135,7 @@ const App: React.FC = () => {
         {activeOverlay === 'portfolio' && (<PortfolioOverlay isOpen={activeOverlay === 'portfolio'} onClose={closeOverlay} />)}
         {activeOverlay === 'integrated-solution' && (<IntegratedSolutionOverlay
           isOpen={activeOverlay === 'integrated-solution'}
+          onAnnualContact={() => {setInquiryPreset('annual');setActiveOverlay('contact');}}
           onSignageClick={() => openLab('signage')}
           onClose={closeOverlay}
           onBack={backToHub}
