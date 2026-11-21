@@ -66,11 +66,10 @@ export const ITEMS: HubItem[] = [
     id: 'marketing',
     num: '03',
     title: 'MARKETING',
-    kr: '연간 브랜드 콘텐츠 제작·홍보',
-    desc: '블로그 32개와 유튜브 ‘장비맨 제임스’, SNS를 연계해 브랜드의 제품과 서비스를 소개합니다.',
+    kr: '온라인 · 오프라인 광고대행 · 마케팅',
+    desc: '브랜드 전략과 캠페인 기획, 디지털 · 방송 · 옥외 광고, 광고 협찬 · PPL · 언론홍보와 디지털 사이니지를 운영합니다.',
     color: '#FFB800',
     rolling: [
-      { src: '/hero/pepsi-festa.webp', name: '브랜드 콘텐츠 제작 현장' },
       { src: 'https://media.nadaun.co/collective/btl/01-subway.webp', name: '지하철 스크린도어' },
       { src: 'https://media.nadaun.co/collective/btl/03-taxi.webp', name: '택시 미디어' },
       { src: 'https://media.nadaun.co/collective/btl/04-bus.webp', name: '버스 외부광고' },
@@ -460,7 +459,7 @@ interface ServiceHubV2Props {
 }
 
 const ServiceHubV2: React.FC<ServiceHubV2Props> = ({ onOverlay, revealStarted = true }) => {
-  const [activeId, setActiveId] = useState<string>('marketing');
+  const [activeId, setActiveId] = useState<string>('moment');
 
   const selectTile = (id: string) => {
     setActiveId(id);

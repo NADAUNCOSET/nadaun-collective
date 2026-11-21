@@ -22,6 +22,13 @@ const SERVICES = [
     features: ['TVC · CF · 브랜드필름', '기업 VCR', '3D · 모션그래픽', '사진 · 영상 촬영'],
   },
   {
+    id: 'audience',
+    title: 'TARGET AUDIENCE',
+    subtitle: '블로그 · SNS · 유튜브 타깃 오디언스',
+    desc: '브랜드가 만나고 싶은 고객을 기준으로 채널을 고릅니다. 관심사별 블로그 기사와 유튜브 영상, SNS 게시물을 기획하고 제작해 제품과 서비스를 소개합니다.',
+    features: [],
+  },
+  {
     id: 'broadcast',
     title: 'MEDIA & BROADCAST',
     subtitle: '전국 · 글로벌 송출',
@@ -39,6 +46,44 @@ const SERVICES = [
 ];
 
 
+function AudienceChannels({ onContact }: { onContact: () => void }) {
+  return (
+    <div className="audience-channels">
+      <div className="audience-channel">
+        <h3>블로그</h3>
+        <p>직접 운영하는 블로그 32곳 중 브랜드와 독자층이 맞는 곳에 제품 소개, 사용법, 인터뷰를 싣습니다.</p>
+        <details className="annual-directory">
+          <summary>운영 블로그 32개 전체 보기</summary>
+          {blogGroups.map(group=><div key={group.platform} className="annual-platform">
+            <h3>{group.platform} <small>{group.channels.length}개</small></h3>
+            <ul>{group.channels.map(channel=><li key={channel.href}><a href={channel.href} target="_blank" rel="noopener noreferrer">{channel.name} <ArrowUpRight size={14}/></a></li>)}</ul>
+          </div>)}
+        </details>
+      </div>
+      <div className="audience-channel">
+        <h3>유튜브 · 장비맨 제임스</h3>
+        <p>제품을 직접 써 보고, 브랜드를 만드는 사람과 현장을 영상으로 소개합니다.</p>
+        <div className="audience-links">
+          <a href={jamesChannel} target="_blank" rel="noopener noreferrer">장비맨 제임스 채널 <ArrowUpRight size={15}/></a>
+          <a href="https://www.youtube.com/watch?v=Cot77dRuJ6c" target="_blank" rel="noopener noreferrer">뷰티 촬영 현장 보기 <ArrowUpRight size={15}/></a>
+        </div>
+      </div>
+      <div className="audience-channel">
+        <h3>SNS 연계</h3>
+        <p>블로그와 유튜브에서 다룬 내용을 사진과 짧은 영상으로 편집해 SNS로 이어갑니다.</p>
+        <div className="audience-links">{socialChannels.map(channel =>
+          <a key={channel.href} href={channel.href} target="_blank" rel="noopener noreferrer">{channel.name} <ArrowUpRight size={15}/></a>
+        )}</div>
+      </div>
+      <div className="audience-channel">
+        <h3>연간 브랜드 콘텐츠 파트너십</h3>
+        <p>꾸준한 홍보가 필요한 브랜드라면 제품과 일정을 알려주세요. 예산에 맞춰 제작 형식과 채널, 발행 횟수를 함께 정합니다.</p>
+        <button className="marketing-link" onClick={onContact}>연간 계약 문의하기 <ArrowUpRight size={18}/></button>
+      </div>
+    </div>
+  );
+}
+
 export default function IntegratedSolutionOverlay({isOpen,onClose,onBack,onContactClick,onAnnualContact,onSignageClick}:IntegratedSolutionOverlayProps) {
   const scrollRef=useRef<HTMLElement>(null);
   const {scrollYProgress}=useScroll({container:scrollRef});
@@ -53,39 +98,10 @@ export default function IntegratedSolutionOverlay({isOpen,onClose,onBack,onConta
   return <InsightsScrollContext.Provider value={scrollRef}><motion.section ref={scrollRef} tabIndex={-1} role="dialog" aria-label="통합 마케팅 솔루션" className="marketing-page collective-editorial fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" initial={{y:'100%'}} animate={{y:0}} transition={{duration:.495,ease:[.22,1,.36,1]}}>
     <header className="marketing-header"><motion.div className="marketing-progress" style={{scaleX:scrollYProgress}}/><span>MARKETING · 통합 솔루션</span>{onBack&&<button onClick={onBack} aria-label="메인으로 돌아가기"><ArrowLeft size={18}/></button>}<button onClick={onClose} aria-label="통합 솔루션 닫기"><X size={20}/></button></header>
     <div className="marketing-content">
-      <section className="annual-hero" aria-labelledby="annual-title">
-        <div>
-          <p className="marketing-kicker">블로그 · SNS · 유튜브 제작</p>
-          <h1 id="annual-title">연간 브랜드<br/>콘텐츠 파트너십</h1>
-          <p className="editorial-body">신제품을 소개하고, 만드는 사람을 만나고, 실제 사용법을 보여줍니다. 나다운이 직접 운영하는 블로그 32개와 유튜브 ‘장비맨 제임스’에서 브랜드에 맞는 채널을 고르고, SNS까지 이어지는 콘텐츠를 기획하고 제작합니다.</p>
-          <button className="annual-cta" onClick={onAnnualContact}>연간 계약 문의하기 <ArrowUpRight size={18}/></button>
-        </div>
-        <a className="annual-episode" href="https://www.youtube.com/watch?v=Cot77dRuJ6c" target="_blank" rel="noopener noreferrer">
-          <img src="/hero/gear-james-ep3.webp" width="1280" height="720" alt="장비맨 제임스 3화, 뷰티 촬영 현장"/>
-          <span>장비맨 제임스 · 뷰티 촬영 현장 보기 <ArrowUpRight size={16}/></span>
-        </a>
-      </section>
-      <section className="annual-channels" aria-labelledby="annual-channels-title">
-        <h2 id="annual-channels-title">브랜드를 소개할 채널</h2>
-        <div className="annual-channel-grid">
-          <div><h3>블로그 32개</h3><p>제품의 특징과 사용법, 브랜드 이야기를 독자가 관심 있는 주제에 맞춰 기사로 만듭니다.</p></div>
-          <div><h3>유튜브</h3><p>‘장비맨 제임스’에서 제품을 써 보고, 브랜드를 만드는 사람과 현장을 영상으로 소개합니다.</p><a href={jamesChannel} target="_blank" rel="noopener noreferrer">장비맨 제임스 채널 <ArrowUpRight size={16}/></a></div>
-          <div><h3>SNS</h3><p>촬영한 사진과 영상을 짧은 클립과 게시물로 편집해 채널별로 소개합니다.</p><div className="annual-social">{socialChannels.map(channel=><a key={channel.href} href={channel.href} target="_blank" rel="noopener noreferrer">{channel.name} <ArrowUpRight size={14}/></a>)}</div></div>
-        </div>
-        <details className="annual-directory">
-          <summary>운영 블로그 32개 전체 보기</summary>
-          {blogGroups.map(group=><div key={group.platform} className="annual-platform">
-            <h3>{group.platform} <small>{group.channels.length}개</small></h3>
-            <ul>{group.channels.map(channel=><li key={channel.href}><a href={channel.href} target="_blank" rel="noopener noreferrer">{channel.name} <ArrowUpRight size={14}/></a></li>)}</ul>
-          </div>)}
-        </details>
-        <p className="annual-inquiry">연간 홍보를 계획 중이라면 브랜드와 소개하고 싶은 제품을 알려주세요. 일정과 예산에 맞춰 제작 형식, 발행 채널, 운영 횟수를 함께 정합니다.</p>
-        <button className="marketing-link" onClick={onAnnualContact}>연간 계약 문의하기 <ArrowUpRight size={18}/></button>
-      </section>
-      <ScrollStory intro={<div className="marketing-opening"><div><p className="marketing-kicker">Integrated solution</p><h2><SceneLine visible>INTEGRATED</SceneLine><SceneLine order={1}>SOLUTION.</SceneLine></h2><p className="editorial-body">크리에이티브 기획 · 콘텐츠 제작 · 미디어 실행.<br/>브랜드의 메시지를 하나의 캠페인으로 연결합니다.</p></div><StoryMedia src="/hero/pepsi-festa.webp" alt="펩시 페스타 무대와 브랜드 콘텐츠" caption="NADAUN · Pepsi Festa"/></div>} impact={<div className="marketing-statement"><p className="marketing-kicker">Strategy · Contents · Media</p><h2>어떤 이야기인가.<br/>어떻게 보여주는가.<br/>누구에게 닿는가.</h2><p className="editorial-body">브랜드 전략과 제작 방향, 매체별 실행 계획을 함께 검토합니다. 캠페인의 목적에 맞는 콘텐츠를 만들고 실제 집행 결과를 확인합니다.</p></div>}/>
-      {SERVICES.map((service,index)=><section className="marketing-service" key={service.id}>
+      <ScrollStory intro={<div className="marketing-opening"><div><p className="marketing-kicker">Integrated solution</p><h1><SceneLine visible>INTEGRATED</SceneLine><SceneLine order={1}>SOLUTION.</SceneLine></h1><p className="editorial-body">크리에이티브 기획 · 콘텐츠 제작 · 미디어 실행.<br/>브랜드의 메시지를 하나의 캠페인으로 연결합니다.</p></div><StoryMedia src="/hero/pepsi-festa.webp" alt="펩시 페스타 무대와 브랜드 콘텐츠" caption="NADAUN · Pepsi Festa"/></div>} impact={<div className="marketing-statement"><p className="marketing-kicker">Strategy · Contents · Media</p><h2>어떤 이야기인가.<br/>어떻게 보여주는가.<br/>누구에게 닿는가.</h2><p className="editorial-body">브랜드 전략과 제작 방향, 매체별 실행 계획을 함께 검토합니다. 캠페인의 목적에 맞는 콘텐츠를 만들고 실제 집행 결과를 확인합니다.</p></div>}/>
+      {SERVICES.map((service,index)=><section className="marketing-service" key={service.id} data-service={service.id}>
         <ScrollReveal className="marketing-service-heading"><p className="marketing-kicker">0{index+1} · {service.subtitle}</p><h2>{service.title.split(' ').map((word,i)=><React.Fragment key={i}>{i>0&&<> <br/></>}{word}</React.Fragment>)}</h2></ScrollReveal>
-        <div><ScrollReveal><p className="editorial-body">{service.desc}</p></ScrollReveal><div className="marketing-features">{service.features.map((feature,i)=><ScrollReveal key={feature}><span>0{i+1}</span><h3>{feature}</h3></ScrollReveal>)}</div>{service.id==='signage'&&<ScrollReveal><button className="marketing-link" onClick={onSignageClick}>사이니지 플랫폼 살펴보기 <ArrowUpRight size={18}/></button></ScrollReveal>}</div>
+        <div><ScrollReveal><p className="editorial-body">{service.desc}</p></ScrollReveal>{service.id === 'audience' ? <AudienceChannels onContact={onAnnualContact}/> : <div className="marketing-features">{service.features.map((feature,i)=><ScrollReveal key={feature}><span>0{i+1}</span><h3>{feature}</h3></ScrollReveal>)}</div>}{service.id==='signage'&&<ScrollReveal><button className="marketing-link" onClick={onSignageClick}>사이니지 플랫폼 살펴보기 <ArrowUpRight size={18}/></button></ScrollReveal>}</div>
       </section>)}
       <section className="marketing-final"><ScrollReveal><p className="marketing-kicker">Contact</p><h2>캠페인의 방향을<br/>함께 설계합니다.</h2><button className="marketing-link" onClick={onContactClick}>광고 문의하기 <ArrowUpRight size={18}/></button></ScrollReveal></section>
     </div>
